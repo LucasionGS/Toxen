@@ -7,5 +7,10 @@
   },
   "devDependencies": {
     "electron": "^6.0.3"
+  },
+  "dependencies": {
+    "ffmpeg": "0.0.4",
+    "fluent-ffmpeg": "^2.1.2",
+    "ytdl-core": "^0.29.5"
   }
 }

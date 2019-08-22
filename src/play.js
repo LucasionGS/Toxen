@@ -1,3 +1,4 @@
+const ffmpeg = require('fluent-ffmpeg');
 var nowPlaying = "";
 var songs = {};
 var songCount = 0;
@@ -132,45 +133,4 @@ function onMenuHover()
 function offMenuHover()
 {
   document.getElementById("sidebar").setAttribute("hover", "false");
-}
-
-function addMusic()
-{
-  var url = document.getElementById("addUrl").value;
-  var name = document.getElementById("addName").value.replace("&", "and");
-  var button = document.getElementById("addButton");
-  button.innerHTML = "Downloading and adding...";
-  fetch("./music/dl.php?url="+url+"&name="+name)
-  .then(response => {
-    return response.json();
-  })
-  .then(data => {
-    console.log(data);
-    console.log("./music/dl.php?url="+url+"&name="+name);
-
-    //Add music
-    var newItem = document.createElement("div");
-    newItem.setAttribute("class", "music-item");
-    newItem.setAttribute("id","music-"+songCount);
-    newItem.setAttribute("onclick", "playSong("+songCount +");");
-    var newItemP = document.createElement("p");
-    newItemP.innerHTML = data.artist + " - " + data.title;
-    newItem.appendChild(newItemP);
-    console.log(newItem);
-    document.getElementById("music-list").appendChild(newItem);
-    songs.push(data.file);
-    console.log(songs);
-
-    /*
-    echo "<div class=\"music-item\" id=\"music-".$id."\" onclick=\"playSong(".$id.");\"><p>";
-    echo $data["artist"]." - ".$data["title"];
-    echo "</p></div>";
-    */
-
-    button.innerHTML = "Add Music...";
-  })
-  .catch(err => {
-    console.log(err);
-    button.innerHTML = "Error... check console."
-  });
 }

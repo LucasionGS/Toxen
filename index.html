@@ -26,6 +26,12 @@
         Volume Changer
         -->
       </div>
+      <div class="addMusic">
+        <!--label for="url"><p>Get download URL from <a href="//ytmp3.cc" target="_blank">ytmp3.cc</a></p></label-->
+        <input id="addUrl" class="addMusicItem" type="text" name="url" value="" placeholder="YouTube URL" required autocomplete="off"><br>
+        <input id="addName" class="addMusicItem" type="text" name="name" value="" placeholder="Artist (If known) - Title of the song" required autocomplete="off"><br>
+        <button type="button" id="addButton" class="addMusicItem" onclick="addMusic();">Add Music...</button>
+      </div>
     </div>
     <div id="content">
       <canvas id="canvas"></canvas>
