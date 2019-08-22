@@ -18,48 +18,13 @@
     <div id="sidebar" class="sidebar" onmouseover="onMenuHover();" onmouseout="offMenuHover();" hover="true">
       <h1 id="title">Music Player</h1>
       <div class="music-list" id="music-list">
-        <!--?php
-        $list = array();
-        $path = "./music/";
-        $files = scandir($path);
-        $toJson = array();
-        $in = 2;
-        for ($i = 2; $i < count($files); $i++) {
-          if (strtolower(substr($files[$i],-4)) == ".mp3") {
-            array_push($toJson, $path.$files[$i]);
-            $parts = explode(" - ", $files[$i]);
-            if (count($parts) > 1) {
-              $list[$i-$in] = array(
-                "artist" => $parts[0],
-                "title" => substr($parts[1], 0, strlen($parts[1])-4)
-              );
-            }
-            else {
-              $list[$i-$in] = array(
-                "artist" => "Unknown",
-                "title" => substr($parts[0], 0, strlen($parts[0])-4)
-              );
-            }
-          }
-          else {
-            $in++;
-          }
-        }
+        <!--
+        Custom dim background
+        Custom Default background
+        Custom in-game picture changer
 
-        echo
-        "<script class=\"delete_this\">
-          songs = ".json_encode($toJson).";
-          var _x = document.getElementsByClassName(\"delete_this\")[0];
-          //_x.parentNode.remove(childNodes[0]);
-        </script>";
-
-        //sort($list);
-        foreach ($list as $id => $data) {
-          echo "<div title=\"".$data["artist"]." - ".$data["title"]."\"class=\"music-item\" id=\"music-".$id."\" onclick=\"playSong(".$id.");\"><p>";
-          echo $data["artist"]." - ".$data["title"];
-          echo "</p></div>";
-        }
-        ?-->
+        Volume Changer
+        -->
       </div>
     </div>
     <div id="content">

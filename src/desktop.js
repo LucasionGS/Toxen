@@ -1,4 +1,10 @@
+const fs = require("fs");
+//const ytdl = require("ytdl-core");
+//const pathDir = fs.readFileSync("./musicFolder", "utf8")+"/";*/
+
+
 var musicFiles;
+
 fetch("../../musicList.json")
 .then(response => {
 return response.json();
