@@ -82,7 +82,7 @@ function musicEnd()
   if (!randomize) {
     console.log(songCount);
     console.log(data.id);
-    if (songCount > data.id) {
+    if (songCount > data.id+1) {
       playSong(data.id+1);
     }
     else {
