@@ -198,7 +198,40 @@ function fileDropped(e)
     }, 1000);
   }
   else if (file.path.toLowerCase().endsWith(".mp3")) {
+    console.log(file);
+    fs.copyFileSync(file.path, pathDir+file.name);
+    //Adding the file, i swear make a fucking function >_>
+    {
+      var _title = file.name.substring(0,file.name.length-4);
+      var artist;
+      var title;
+      var filePath;
+      var parts = _title.split(" - ", 2);
+      if (parts.length > 1) {
+        artist = parts[0];
+        title = parts[1];
+        filePath = pathDir+_title+".mp3";
+      }
+      else {
+        artist = "Unknown";
+        title = parts[0];
+        filePath = pathDir+_title+".mp3";
+      }
 
+      var newItem = document.createElement("div");
+      newItem.setAttribute("class", "music-item");
+      newItem.setAttribute("id","music-"+ songCount);
+      newItem.setAttribute("onclick", "playSong("+ songCount +");");
+      var newItemP = document.createElement("p");
+      newItemP.innerHTML = artist + " - " + title;
+      newItem.appendChild(newItemP);
+      console.log(newItem);
+      document.getElementById("music-list").appendChild(newItem);
+      songs[songCount] = filePath;
+      songCount++;
+    }
+    alert(file.name+" is being copied to your music folder. Wait a couple seconds before you click play on it.\n"+
+    "Still working on getting it to just update when it's done copying...");
   }
   else {
     alert("You can only drop in a .jpg file!");
