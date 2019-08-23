@@ -1,58 +1,5 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, Menu } = require('electron')
 const fs = require('fs');
-/*var musicDir;
-var musicFiles = [];
-
-if (fs.existsSync("./musicFolder")) {
-  musicDir = fs.readFileSync("./musicFolder", "utf8");
-  console.log(musicDir);
-}
-else {
-  fs.writeFile("./musicFolder", "./music/", (err) => {
-    //console.log("Created new file: musicFolder");
-  });
-  musicDir = "./music/";
-}
-console.log(musicDir);
-musicDir = musicDir.replace("\\","/");
-
-var _musicFiles;
-try {
-  _musicFiles = fs.readdirSync(musicDir);
-}
-catch (e) {
-  console.log("The directory in the \""+musicDir+"\" file doesn't exist.\nPlease change the content of musicFolder to an existing folder! Using current folder to prevent crash.");
-  _musicFiles = fs.readdirSync("./");
-}
-var musicJson = "[ ";
-for (var i = 0; i < _musicFiles.length; i++) {
-  if (_musicFiles[i].endsWith(".mp3")) {
-    musicFiles[musicFiles.length] = _musicFiles[i].substring(0, _musicFiles[i].length-4);
-
-    //Creating JSON as string
-    var _title = _musicFiles[i].substring(0, _musicFiles[i].length-4);
-    var artist;
-    var title;
-    var file;
-    var parts = _title.split(" - ", 2);
-    if (parts.length > 1) {
-      artist = parts[0];
-      title = parts[1];
-      file = musicDir+"/"+_title+".mp3";
-    }
-    else {
-      artist = "Unknown";
-      title = parts[0];
-      file = musicDir+"/"+_title+".mp3";
-    }
-    musicJson += '\n  {\n    "artist":"' + artist + '",\n    "title":"' + title + '",\n    "file":"' + file + '"\n  },';
-  }
-}
-musicJson = musicJson.substring(0, musicJson.length-1);
-musicJson += "\n]";
-console.log(musicFiles);
-fs.writeFileSync("./musicList.json", musicJson);*/
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
@@ -66,6 +13,39 @@ function createWindow () {
       nodeIntegration: true
     }
   })
+
+  var menu = Menu.buildFromTemplate([
+    {
+      label:"Music Player",
+      click(){
+        win.loadFile('index.html')
+        console.log("Open Music Player");
+      },
+      accelerator: "F1"
+    },
+    {
+      label:"Settings",
+      click(){
+        win.loadFile('settings.html')
+        console.log("Open Settings");
+      },
+      accelerator: "F2"
+    },
+    {
+      label:"Dev",
+      click(){
+        win.webContents.openDevTools();
+      },
+      accelerator: "F12"
+    },
+    {
+      label:"Exit",
+      click(){
+        app.quit();
+      }
+    }
+  ]);
+  Menu.setApplicationMenu(menu);
 
   // and load the index.html of the app.
   win.loadFile('index.html')

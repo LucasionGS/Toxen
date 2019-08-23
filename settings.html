@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./src/main.css">
+    <link rel="stylesheet" href="./src/settings.css">
+    <script src="./src/settings.js" charset="utf-8"></script>
+    <title>Toxon - Settings</title>
+  </head>
+  <body>
+    <div class="settings">
+      <h1 id="title">Settings</h1>
+      <div class="settingsList">
+        <input class="setBox" type="checkbox" name="visualizer" checked>
+        <label>Visualizer</label>
+        <br>
+        <input class="setBox" type="checkbox" name="backgroundDim">
+        <label>Background Dim</label>
+
+
+        <div class="Button" id="applyButton" onclick="applySettings();">
+          <p>Apply</p>
+        </div>
+        <a href="index.html">
+          <div class="Button" id="backButton">
+            <p>Cancel</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </body>
+  <footer></footer>
+</html>

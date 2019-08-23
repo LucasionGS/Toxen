@@ -1,5 +1,16 @@
 const fs = require("fs");
 const ytdl = require("ytdl-core");
+var settings;
+try {
+  settings = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
+} catch (e) {
+  settings = {
+    "visualizer":true,
+    
+  }
+} finally {
+
+}
 var allMusicData = [];
 var pathDir;
 console.log(pathDir);
