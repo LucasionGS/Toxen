@@ -1,19 +1,23 @@
 const { app, BrowserWindow, Menu } = require('electron')
 const fs = require('fs');
+const winWidth = 1280;
+const winHeight = 768;
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let win
+let win;
+let usageWin;
 
 function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: winWidth,
+    height: winHeight,
     icon:"./icon.png",
     webPreferences: {
       nodeIntegration: true
     }
-  })
+
+  });
 
   var menu = Menu.buildFromTemplate([
     {
@@ -30,6 +34,27 @@ function createWindow () {
         win.webContents.openDevTools();
       },
       accelerator: "F12"
+    },
+    {
+      label:"Usage",
+      click(){
+        //Create Usage window
+        try {
+          usageWin.close();
+        } catch (e) {
+          console.log("Not open yet c:");
+        }
+        usageWin = new BrowserWindow({
+          parent: win,
+          width: winWidth,
+          height: winHeight,
+          icon:"./icon.png",
+          webPreferences: {
+            nodeIntegration: true
+          }
+        });
+        usageWin.loadFile("usage.html");
+      }
     },
     {
       label:"Exit",

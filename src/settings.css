@@ -1,7 +1,7 @@
 div.settings{
   position: relative;
   width: 90vw;
-  height: 90vh;
+  min-height: 90vh;
   margin: auto;
   margin-top: 5vh;
   border-radius: 10px;

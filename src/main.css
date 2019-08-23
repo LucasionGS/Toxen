@@ -7,9 +7,10 @@ body{
 }
 
 /* Default Text Attributes */
-h1, h2, h3, h4, p{
+h1, h2, h3, h4, p, ul, ol, li{
   color: white;
 }
+
 h1#title{
   font-size: 48px;
   padding: 10px;
