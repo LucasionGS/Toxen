@@ -5,6 +5,7 @@ var songCount = 0;
 var data;
 var isReady = false;
 var randomize = false;
+var audio;
 
 function playToggle() {
   const btn = document.getElementById("play");
@@ -52,6 +53,7 @@ function playSong(id)
   }
   setBG(data);
   play(document.getElementById("play"));
+  document.getElementById("now-playing").setAttribute("playingid", id);
   Visualizer();
   //alert(data["song"]);
 }
@@ -114,12 +116,18 @@ function changeProgress(e)
   audio.currentTime = audio.duration * procent;
 }
 
-function setBG(song)
+function setBG(song, reset)
 {
-  var body = document.getElementsByTagName('body')[0];
-  var curBG = song.file.substring(0,song.file.length-4)+".jpg";
-  body.style.background = "url(\""+curBG+"\") no-repeat center center fixed";
-  body.style.backgroundSize = "cover";
+  if (reset == true) {
+    var body = document.getElementsByTagName('body')[0];
+    body.style.background = ""; //Resets
+  }
+  else {
+    var body = document.getElementsByTagName('body')[0];
+    var curBG = song.file.substring(0,song.file.length-4)+".jpg";
+    body.style.background = "url(\""+curBG+"\") no-repeat center center fixed";
+    body.style.backgroundSize = "cover";
+  }
   console.log(body.style.backgroundImage);
 }
 

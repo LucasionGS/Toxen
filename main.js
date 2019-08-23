@@ -1,6 +1,6 @@
 const { app, BrowserWindow } = require('electron')
 const fs = require('fs');
-var musicDir;
+/*var musicDir;
 var musicFiles = [];
 
 if (fs.existsSync("./musicFolder")) {
@@ -51,7 +51,7 @@ for (var i = 0; i < _musicFiles.length; i++) {
 musicJson = musicJson.substring(0, musicJson.length-1);
 musicJson += "\n]";
 console.log(musicFiles);
-fs.writeFileSync("./musicList.json", musicJson);
+fs.writeFileSync("./musicList.json", musicJson);*/
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

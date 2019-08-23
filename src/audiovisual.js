@@ -1,13 +1,10 @@
-var audio;
-
-window.onload = function() {
-
-  //var file = document.getElementById("thefile");
-  audio = document.getElementById("musicObject");
-}
+/*window.onload = function() {
+  document.getElementById("musicObject");
+}*/
 
 function Visualizer(){
-  audio.load();
+  audio = document.getElementById("musicObject")
+  //audio.load();
   audio.play();
   var context = new AudioContext();
   var src = context.createMediaElementSource(audio);
@@ -23,7 +20,7 @@ function Visualizer(){
   analyser.fftSize = 256;
 
   var bufferLength = analyser.frequencyBinCount;
-  console.log(bufferLength);
+  //console.log(bufferLength);
 
   var dataArray = new Uint8Array(bufferLength);
 

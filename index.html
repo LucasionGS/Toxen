@@ -10,7 +10,7 @@
     <script src="./src/desktop.js" charset="utf-8"></script>
     <title>Music Player</title>
   </head>
-  <body onkeydown="keypress(event);" onload="onload();">
+  <body onkeydown="keypress(event);" onload="onload();" ondrop="alert('file?');">
     <!--
     http://i3.ytimg.com/vi/ VIDEO ID /maxresdefault.jpg
     http://i3.ytimg.com/vi/lL33M9e-g8Q/maxresdefault.jpg
@@ -38,7 +38,7 @@
     </div>
   </body>
   <div class="player">
-    <div id="now-playing" class="now-playing">
+    <div id="now-playing" class="now-playing" playingid="-1">
       <p id="song-title">text</p>
       <progress id="curTime" value="0" max="100" onmousedown="changeProgress(event);"></progress>
     </div>
