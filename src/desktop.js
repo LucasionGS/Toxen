@@ -26,7 +26,7 @@ window.onload = function(){
     _musicFiles = fs.readdirSync(pathDir);
   }
   catch (e) {
-    alert("The directory in the \""+pathDir+"\" file doesn't exist.\nPlease change the content of musicFolder to an existing folder! Using current folder to prevent crash.");
+    alert("The directory string in the \"musicFolder\" file doesn't exist.\nPlease change the content of musicFolder to an existing folder! Using current folder to prevent crash.\nThe file is in the same folder as the application folder.");
     _musicFiles = fs.readdirSync("./");
   }
 
