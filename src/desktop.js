@@ -1,16 +1,18 @@
 const fs = require("fs");
 const ytdl = require("ytdl-core");
+var otherWindow;
 var settings;
-try {
-  settings = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
-} catch (e) {
-  settings = {
-    "visualizer":true,
-    
+setInterval(() => {
+  try {
+    settings = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
+  } catch (e) {
+    settings = {
+      //Add default settings if no file.
+      "visualizer":true,
+      "backgroundDim":50,
+    }
   }
-} finally {
-
-}
+}, 250);
 var allMusicData = [];
 var pathDir;
 console.log(pathDir);
@@ -18,7 +20,7 @@ console.log(pathDir);
 //Loading music and other startup events
 window.onload = function(){
   var musicFiles = [];
-
+  otherWindow = document.getElementById("otherWindow");
   if (fs.existsSync("./musicFolder")) {
     pathDir = fs.readFileSync("./musicFolder", "utf8")+"/";
     console.log(pathDir);
@@ -184,7 +186,7 @@ function fileDropped(e)
   //alert("You dropped in a file!");
   var file = files[0];
   console.log(file);
-  if (file.path.endsWith(".jpg")) {
+  if (file.path.toLowerCase().endsWith(".jpg")) {
     var curId = document.getElementById("now-playing").getAttribute("playingid");
     var fileName = songs[curId].split("/")[songs[curId].split("/").length-1];
     fileName = fileName.substring(0,fileName.length-4);
@@ -195,7 +197,21 @@ function fileDropped(e)
       setBG(songs[curId]);
     }, 1000);
   }
+  else if (file.path.toLowerCase().endsWith(".mp3")) {
+
+  }
   else {
     alert("You can only drop in a .jpg file!");
   }
+}
+
+var lastWindow;
+function openSettings()
+{
+  try {
+    lastWindow.close();
+  } catch (e) {
+
+  }
+  lastWindow = window.open("settings.html");
 }

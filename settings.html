@@ -12,17 +12,25 @@
     <div class="settings">
       <h1 id="title">Settings</h1>
       <div class="settingsList">
-        <input class="setBox" type="checkbox" name="visualizer" checked>
+        <input class="setting setBox" type="checkbox" settype="checkbox"
+        name="visualizer" checked>
         <label>Visualizer</label>
-        <br>
-        <input class="setBox" type="checkbox" name="backgroundDim">
-        <label>Background Dim</label>
 
+        <div class="separator"></div>
 
+        <label id="bgdim">Background Dim: %</label><br>
+        <input class="setting slider" type="range" settype="value" id="bgdimslider"
+        name="backgroundDim" min="0" max="100" value="50"
+        oninput="event_bgdim();">
+        </div>
+
+        <!-- Buttons -->
+        <!-- Apply button -->
         <div class="Button" id="applyButton" onclick="applySettings();">
           <p>Apply</p>
         </div>
-        <a href="index.html">
+        <!-- Close button -->
+        <a href="#back" onclick="window.close();">
           <div class="Button" id="backButton">
             <p>Cancel</p>
           </div>

@@ -1,4 +1,5 @@
 div.settings{
+  position: relative;
   width: 90vw;
   height: 90vh;
   margin: auto;
@@ -17,7 +18,6 @@ div.settings #title{
 }
 
 div.settings div.settingsList{
-  display: block;
   position: relative;
   box-sizing: border-box;
   padding: 20px;
@@ -76,4 +76,12 @@ div.Button p{
   text-align: center;
   margin-left: 50%;
   transform: translate(-50%, 50%);
+}
+
+div.separator{
+  width: 100%;
+  height: 1px;
+  background: #393939;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }

@@ -73,6 +73,9 @@ function keypress(e)
     }
     randomize = !randomize;
   }
+  else if (e.altKey && e.key == "s") {
+    openSettings();
+  }
 }
 
 function onload() {

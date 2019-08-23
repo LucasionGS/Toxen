@@ -39,23 +39,23 @@ function Visualizer(){
 
     analyser.getByteFrequencyData(dataArray);
 
-    ctx.fillStyle = "rgba(9, 9, 9, 0.5)";
+    ctx.fillStyle = "rgba(0, 0, 0, "+(settings.backgroundDim/100)+")";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    if (settings.visualizer) {
+      for (var i = 0; i < bufferLength; i++) {
+        barHeight = (dataArray[i]*1.5)-50;
 
-    for (var i = 0; i < bufferLength; i++) {
-      barHeight = (dataArray[i]*1.5)-50;
+        var r = barHeight + (25 * (i/bufferLength));
+        var g = 0 * (i/bufferLength);
+        var b = 250 - (barHeight/5);
 
-      var r = barHeight + (25 * (i/bufferLength));
-      var g = 0 * (i/bufferLength);
-      var b = 250 - (barHeight/5);
+        ctx.fillStyle = "rgba(" + r + "," + g + "," + b + ", 0.5)";
+        ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
 
-      ctx.fillStyle = "rgba(" + r + "," + g + "," + b + ", 0.5)";
-      ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
-
-      x += barWidth + 1;
+        x += barWidth + 1;
+      }
     }
   }
-
   audio.play();
   renderFrame();
 }
