@@ -7,6 +7,10 @@ var isReady = false;
 var randomize = false;
 var audio;
 
+function onload() {
+  audio = document.getElementById("musicObject");
+}
+
 function playToggle() {
   const btn = document.getElementById("play");
   var mode = btn.getAttribute("mode");
@@ -54,6 +58,7 @@ function playSong(id)
   setBG(data);
   play(document.getElementById("play"));
   document.getElementById("now-playing").setAttribute("playingid", id);
+  //notification("Now Playing", data["song"], 2000);
   Visualizer();
   //alert(data["song"]);
 }
@@ -66,20 +71,19 @@ function keypress(e)
   }
   else if (e.altKey && e.key == "r") {
     if (randomize) {
-      alert("Randomizer turned off");
+      notification("Randomizer turned off", "", 1000);
     }
     else {
-      alert("Randomizer turned on");
+      notification("Randomizer turned on", "", 1000);
     }
     randomize = !randomize;
   }
   else if (e.altKey && e.key == "s") {
     openSettings();
   }
-}
-
-function onload() {
-  audio = document.getElementById("musicObject");
+  else if (e.key == "n") {
+    notification("Title of the notification", "This is a test message for debugging, please ignore it for now c: Now, move on with your day");
+  }
 }
 
 function musicEnd()

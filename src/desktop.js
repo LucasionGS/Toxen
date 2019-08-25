@@ -10,12 +10,12 @@ setInterval(() => {
       //Add default settings if no file.
       "visualizer":true,
       "backgroundDim":50,
+      "visualizerIntensity":15,
     }
   }
 }, 250);
 var allMusicData = [];
 var pathDir;
-console.log(pathDir);
 
 //Loading music and other startup events
 window.onload = function(){
@@ -23,15 +23,12 @@ window.onload = function(){
   otherWindow = document.getElementById("otherWindow");
   if (fs.existsSync("./musicFolder")) {
     pathDir = fs.readFileSync("./musicFolder", "utf8")+"/";
-    console.log(pathDir);
   }
   else {
     fs.writeFile("./musicFolder", "./music/", (err) => {
-      //console.log("Created new file: musicFolder");
     });
     pathDir = "./music/";
   }
-  console.log(pathDir);
   pathDir = pathDir.replace("\\","/");
 
   var _musicFiles;
@@ -39,11 +36,12 @@ window.onload = function(){
     _musicFiles = fs.readdirSync(pathDir);
   }
   catch (e) {
-    alert("The directory string in the \"musicFolder\" file doesn't exist.\nPlease change the content of musicFolder to an existing folder! Using current folder to prevent crash.\nThe file is in the same folder as the application folder.");
+    notification("Invalid Folder", "The directory string in the \"musicFolder\" file doesn't exist.\nPlease change the content of musicFolder to an existing folder! Using current folder to prevent crash.\nThe file is in the same folder as the application folder.");
     _musicFiles = fs.readdirSync("./");
   }
 
   var musicJson = "[ ";
+  var newMp3Count = 0;
   for (var i = 0; i < _musicFiles.length; i++) {
     if (_musicFiles[i].endsWith(".mp3")) {
       musicFiles[musicFiles.length] = _musicFiles[i].substring(0, _musicFiles[i].length-4);
@@ -64,18 +62,20 @@ window.onload = function(){
         title = parts[0];
         file = pathDir+"/"+_title+".mp3";
       }
-      musicJson += '\n  {\n    "artist":"' + artist + '",\n    "title":"' + title + '",\n    "file":"' + file + '"\n  },';
+      //musicJson += '\n  {\n    "artist":"' + artist + '",\n    "title":"' + title + '",\n    "file":"' + file + '"\n  },';
+      musicFiles[newMp3Count] = {
+        "artist":artist,
+        "title":title,
+        "file":file
+      };
+      newMp3Count++;
     }
   }
-  musicJson = musicJson.substring(0, musicJson.length-1);
-  musicJson += "\n]";
-  //console.log(musicFiles);
-  //console.log(musicJson);
 
   //Inserting music
 
-  musicFiles = JSON.parse(musicJson);
-  console.log(musicFiles);
+  //musicFiles = JSON.parse(musicJson);
+  //console.log(musicFiles);
   if (musicFiles.length > 0) {
     for (var i = 0; i < musicFiles.length; i++) {
       var newItem = document.createElement("div");
@@ -104,7 +104,6 @@ window.onload = function(){
 
   //Create drop area
   let dropArea = document.getElementsByTagName("body")[0];
-  console.log(dropArea);
   dropArea.addEventListener('drop', fileDropped, false);
   //dropArea.addEventListener('dragenter', handlerFunction, false);
   //dropArea.addEventListener('dragleave', handlerFunction, false);
@@ -164,7 +163,7 @@ function addMusic()
   var newItemP = document.createElement("p");
   newItemP.innerHTML = artist + " - " + title;
   newItem.appendChild(newItemP);
-  console.log(newItem);
+  //console.log(newItem);
   document.getElementById("music-list").appendChild(newItem);
   songs[songCount] = file;
   songCount++;
@@ -185,12 +184,12 @@ function fileDropped(e)
   let files = dt.files;
   //alert("You dropped in a file!");
   var file = files[0];
-  console.log(file);
+  //console.log(file);
   if (file.path.toLowerCase().endsWith(".jpg")) {
     var curId = document.getElementById("now-playing").getAttribute("playingid");
     var fileName = songs[curId].split("/")[songs[curId].split("/").length-1];
     fileName = fileName.substring(0,fileName.length-4);
-    console.log(fileName);
+    //console.log(fileName);
     //fs.createReadStream(file.path).pipe(fs.createWriteStream(pathDir+fileName+".jpg"));
     fs.copyFileSync(file.path, pathDir+fileName+".jpg");
     setTimeout(function () {
@@ -198,7 +197,7 @@ function fileDropped(e)
     }, 1000);
   }
   else if (file.path.toLowerCase().endsWith(".mp3")) {
-    console.log(file);
+    //console.log(file);
     fs.copyFileSync(file.path, pathDir+file.name);
     //Adding the file, i swear make a fucking function >_>
     {
@@ -225,16 +224,16 @@ function fileDropped(e)
       var newItemP = document.createElement("p");
       newItemP.innerHTML = artist + " - " + title;
       newItem.appendChild(newItemP);
-      console.log(newItem);
+      //console.log(newItem);
       document.getElementById("music-list").appendChild(newItem);
       songs[songCount] = filePath;
       songCount++;
     }
-    alert(file.name+" is being copied to your music folder. Wait a couple seconds before you click play on it.\n"+
+    notification("Copying music from file",file.name+" is being copied to your music folder. Wait a couple seconds before you click play on it.\n"+
     "Still working on getting it to just update when it's done copying...");
   }
   else {
-    alert("You can only drop in a .jpg file!");
+    notification("Invalid file", "You can only drop in .mp3 and .jpg files!");
   }
 }
 

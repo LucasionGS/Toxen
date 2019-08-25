@@ -6,7 +6,8 @@
     <link rel="stylesheet" href="./src/main.css">
     <link rel="stylesheet" href="./src/settings.css">
     <script src="./src/settings.js" charset="utf-8"></script>
-    <title>Toxon - Settings</title>
+    <script src="./src/global.js" charset="utf-8"></script>
+    <title>Toxen - Settings</title>
   </head>
   <body>
     <div class="settings">
@@ -21,9 +22,14 @@
         <label id="bgdim">Background Dim: %</label><br>
         <input class="setting slider" type="range" settype="value" id="bgdimslider"
         name="backgroundDim" min="0" max="100" value="50"
-        oninput="event_bgdim();">
-      </div>
+        oninput="event_sliderUpdate();">
+        <br>
+        <label id="visualintense">Visualizer Intensity</label><br>
+        <input class="setting slider" type="range" settype="value" id="visualizerintensity"
+        name="visualizerIntensity" min="1" max="50" value="15"
+        oninput="event_sliderUpdate();">
 
+      </div>
       <!-- Buttons -->
       <!-- Apply button -->
       <div class="Button" id="applyButton" onclick="applySettings();">

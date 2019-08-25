@@ -41,9 +41,10 @@ function Visualizer(){
 
     ctx.fillStyle = "rgba(0, 0, 0, "+(settings.backgroundDim/100)+")";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    var intensity = settings.visualizerIntensity/10;
     if (settings.visualizer) {
       for (var i = 0; i < bufferLength; i++) {
-        barHeight = (dataArray[i]*1.5)-50;
+        barHeight = (dataArray[i]*intensity-(10*intensity));
 
         var r = barHeight + (25 * (i/bufferLength));
         var g = 0 * (i/bufferLength);

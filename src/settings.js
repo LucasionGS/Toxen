@@ -3,7 +3,7 @@ const preset = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
 const options = document.getElementsByClassName("setting");
 window.onload = function()
 {
-  event_bgdim(-1);
+  event_sliderUpdate(-1);
   for (var i = 0; i < options.length; i++) {
     var typeOfSetting = options[i].getAttribute("settype");
     for (var key in preset) {
@@ -52,10 +52,13 @@ function applySettings()
   }, 2000);
 }
 
-function event_bgdim(value)
+function event_sliderUpdate(value)
 {
+  //New Setting
   document.getElementById("bgdim").innerHTML = "Background Dim: "+document.getElementById("bgdimslider").value+"%";
-  if (value == -1) {
+  document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+document.getElementById("visualizerintensity").value;
+  if (value == -1) { //Default setting
     document.getElementById("bgdim").innerHTML = "Background Dim: "+preset["backgroundDim"]+"%";
+    document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+preset["visualizerIntensity"];
   }
 }
