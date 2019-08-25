@@ -2,12 +2,13 @@
   document.getElementById("musicObject");
 }*/
 
+var src;
 function Visualizer(){
   audio = document.getElementById("musicObject")
   //audio.load();
   audio.play();
   var context = new AudioContext();
-  var src = context.createMediaElementSource(audio);
+  try { src = context.createMediaElementSource(audio); } catch (e) { }
   var analyser = context.createAnalyser();
   var canvas = document.getElementById("canvas");
   canvas.width = window.innerWidth;

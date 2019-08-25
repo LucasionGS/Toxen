@@ -1,6 +1,30 @@
+const http = require('https');
+
 setTimeout(function () {
-  notification("Checking for updates...","", 1000);
+  checkUpdate();
 }, 0);
+
+function checkUpdate()
+{
+  const curVers = JSON.parse(fs.readFileSync("./resources/app/package.json", "utf8")).version;
+  fetch("https://api.github.com/repos/LucasionGS/Toxen/releases/latest")
+  .then(response => {
+    return response.json();
+  })
+  .then(data => {
+    const newVers = data.tag_name;
+    const dlUrl = data.assets[0].browser_download_url;
+    console.log(curVers);
+    console.log(newVers);
+    console.log(dlUrl);
+    if (curVers != newVers) {
+      notification("New Update Available", "<a href=\""+dlUrl+"\">Click here to download</a>");
+    }
+  })
+  .catch(err => {
+    notification("Check Update failed", err);
+  });
+}
 
 function Make(tag){
   return document.createElement(tag);
@@ -42,6 +66,11 @@ function closeNotificationByObject(object)
 
 function notification(title, message, dieAfter)
 {
+  //Variable check
+  if (!message) {
+    message = "";
+  }
+
   //Object creation
   var mainDiv = Make("div");
   var h1 = Make("h1");
@@ -79,4 +108,5 @@ function notification(title, message, dieAfter)
       closeNotificationByObject(mainDiv);
     }, dieAfter);
   }
+  return mainDiv;
 }

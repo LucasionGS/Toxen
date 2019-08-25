@@ -16,7 +16,6 @@ function createWindow () {
     webPreferences: {
       nodeIntegration: true
     }
-
   });
 
   var menu = Menu.buildFromTemplate([
@@ -24,7 +23,7 @@ function createWindow () {
       label:"Music Player",
       click(){
         win.loadFile('index.html')
-        console.log("Open Music Player");
+        //console.log("Open Music Player");
       },
       accelerator: "F1"
     },
@@ -42,7 +41,7 @@ function createWindow () {
         try {
           usageWin.close();
         } catch (e) {
-          console.log("Not open yet c:");
+          //console.log("Not open yet c:");
         }
         usageWin = new BrowserWindow({
           parent: win,
