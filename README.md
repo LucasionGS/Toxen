@@ -1,4 +1,4 @@
-# Toxen
+# ![Toxen Logo](https://raw.githubusercontent.com/LucasionGS/Toxen/master/icon.ico) Toxen
 So basically, music.
 ## What is Toxen?
 Toxen is a music player to play local music from your computer. It supports individual backgrounds for each song (Currently only supports jpg as backgrounds, if you want to use .png then rename it to .jpg. This will be automatic later).
