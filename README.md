@@ -6,7 +6,6 @@ It has an audio visualizer which works for every mp3 you insert.
 You can drag and drop files into the interface for easy adding of music and backgrounds.
 
 More info below.
-vvvvvvvvvvvvvvv
 
 ## Supported Files
 These files are what is currently supported
@@ -22,9 +21,9 @@ These files are what is currently supported
    it will set it as background for the song. (It will first update when you go off the song and back on it)
 
 ## Functions & Shortcuts
-Pressing on Alt+R will set it to shuffle through songs instead of linearly.
-Pressing Alt+S will open the settings menu. There's currently 2 settings only: Background Dim, and Toggle Visualizer.
-It still doesn't have a volume changer BUT i will get it done, just not done it yet. The default volume is 30% so it isn't ear killing from the get-go.
+Pressing on **Alt+R** will set it to shuffle through songs instead of linearly.
+Pressing **Alt+S** will open the settings menu. There's currently 3 settings only: **Toggle Visualizer**, **Background Dim** and **Visualizer Intensity**.
+It still doesn't have a **Volume Changer** BUT i will get it done, just not done it yet. The default volume is 30% so it isn't ear killing from the get-go.
 
 ## Build-in YouTube Downloader
 Thanks to [node-ytdl-core](https://github.com/fent/node-ytdl-core/issues), I made a built-in youtube downloader. You can insert a YouTube URL and a title for the song (Formatted as [Artist - Title])
