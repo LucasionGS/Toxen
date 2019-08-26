@@ -1,7 +1,12 @@
 # Toxen
 So basically, music.
 ## What is Toxen?
-Toxen is a music player to play local music from your computer. It supports individual backgrounds for each song (Currently only supports jpg as backgrounds, if you want to use .png then rename it to .jpg. This will be automatic later)
+Toxen is a music player to play local music from your computer. It supports individual backgrounds for each song (Currently only supports jpg as backgrounds, if you want to use .png then rename it to .jpg. This will be automatic later).
+It has an audio visualizer which works for every mp3 you insert.
+You can drag and drop files into the interface for easy adding of music and backgrounds.
+
+More info below.
+vvvvvvvvvvvvvvv
 
 ## Supported Files
 These files are what is currently supported
@@ -19,12 +24,12 @@ These files are what is currently supported
 ## Functions & Shortcuts
 Pressing on Alt+R will set it to shuffle through songs instead of linearly.
 Pressing Alt+S will open the settings menu. There's currently 2 settings only: Background Dim, and Toggle Visualizer.
-It still doesn't have a volume changer BUT i will get it done, just not done it yet >_> The default volume is 30% so it isn't ear killing from the get-go
+It still doesn't have a volume changer BUT i will get it done, just not done it yet. The default volume is 30% so it isn't ear killing from the get-go.
 
 ## Build-in YouTube Downloader
-Using [node-ytdl-core](https://github.com/fent/node-ytdl-core/issues), you can insert a link and a title for the song (Formatted as [Artist - Title])
+Thanks to [node-ytdl-core](https://github.com/fent/node-ytdl-core/issues), I made a built-in youtube downloader. You can insert a YouTube URL and a title for the song (Formatted as [Artist - Title])
 It will download from the link into an mp3 file and put it in your music folder.
-Make sure the link is valid, and don't forget to give it a name, I have no clue what happens if you don't... so don't test it
+Make sure the link is valid, and don't forget to give it a name, I have no clue what happens if you don't... so don't test it.
 
 ## Todo List
 - Volume changer
