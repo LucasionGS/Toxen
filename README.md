@@ -21,7 +21,7 @@ These files are what is currently supported
    it will set it as background for the song. (It will first update when you go off the song and back on it)
 
 ## Functions & Shortcuts
-Pressing on **Alt+R** will set it to shuffle through songs instead of linearly.
+Pressing on **Alt+R** will toggle shuffling through songs instead of linearly.
 Pressing **Alt+S** will open the settings menu. There's currently 3 settings only: **Toggle Visualizer**, **Background Dim** and **Visualizer Intensity**.
 It still doesn't have a **Volume Changer** BUT i will get it done, just not done it yet. The default volume is 30% so it isn't ear killing from the get-go.
 
