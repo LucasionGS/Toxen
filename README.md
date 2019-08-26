@@ -13,7 +13,7 @@ These files are what is currently supported
 | Purpose | Supported Files [Planned support] |
 | --- | --- |
 | Music Files | mp3 only |
-| Backgrounds | jpg only [png] |
+| Backgrounds | jpg & png |
 
 ## Drag and Drop
    You can drag and drop music into the program to be added automatically to the current music folder.
