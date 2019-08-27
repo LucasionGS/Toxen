@@ -28,11 +28,15 @@ It still doesn't have a **Volume Changer** BUT i will get it done, just not done
 ## Build-in YouTube Downloader
 Thanks to [node-ytdl-core](https://github.com/fent/node-ytdl-core/issues), I made a built-in youtube downloader. You can insert a YouTube URL and a title for the song (Formatted as [Artist - Title])
 It will download from the link into an mp3 file and put it in your music folder.
-Make sure the link is valid, and don't forget to give it a name, I have no clue what happens if you don't... so don't test it.
+If you leave the [Artist - Title] field blank, it will use the YouTube video's original name.
 
 ## Todo List
 - Volume changer
 - Drag and drop Youtube link(?)
+- Beautify and improve the YouTube downloader section
+  - Perhaps a separate panel?
+  - Allow multiple link downloads
+  - Separate Artist and Title into 2 input fields
 - Add buttons
   - Previous
   - Skip
