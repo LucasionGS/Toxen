@@ -32,10 +32,14 @@ Make sure the link is valid, and don't forget to give it a name, I have no clue 
 
 ## Todo List
 - Volume changer
-- Allow more than just jpg files
 - Drag and drop Youtube link(?)
 - Add buttons
   - Previous
   - Skip
   - Repeat
   - Shuffle
+- Store music paths in a database for quick access
+- Full Song Refresh list (For when adding or removing music manually)
+
+## Completed from Todo List
+- Allow more than just jpg files (Added support for png, autoconverts to jpg in folder if dropped in app)
