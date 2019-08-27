@@ -76,3 +76,9 @@ There's currently 3 settings only: **Toggle Visualizer**, **Background Dim** and
 
 ## Completed from Todo List
 - Allow more than just jpg files (Added support for png, autoconverts to jpg in folder if dropped in app)
+
+## Known bugs
+- Visualizer
+  - Visualizer being offset by some random amount, both small amounts and drastic amounts
+- YouTube downloader
+  - If the app deems the URL valid, but the video doesn't exist, can't be found or any error during, it will get stuck at downloading and won't proceed, restart required to download new files, if so
