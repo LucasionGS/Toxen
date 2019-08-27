@@ -22,7 +22,7 @@ These files are what is currently supported
 
 ## Functions & Shortcuts
 
-| Action | Shortcut | Description |
+| Shortcut | Action | Description |
 | --- | --- | --- |
 | Alt + S | Open Settings | Opens the settings panel where you can customize Toxen |
 | Alt + R | Toggle Shuffle | Toggle randomly shuffling through songs instead of linearly |
