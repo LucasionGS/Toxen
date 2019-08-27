@@ -63,5 +63,8 @@ If you leave the [Artist - Title] field blank, it will use the YouTube video's o
 - Store music paths in a database for quick access
 - Full Song Refresh list (For when adding or removing music manually)
 
+## Working on
+- Setting music folder from within settings, forcing the user to set it in settings before trying to use the software
+
 ## Completed from Todo List
 - Allow more than just jpg files (Added support for png, autoconverts to jpg in folder if dropped in app)
