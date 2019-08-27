@@ -1,7 +1,7 @@
 # ![Toxen Logo](https://raw.githubusercontent.com/LucasionGS/Toxen/master/icon.ico) Toxen
 So basically, music.
 ## What is Toxen?
-Toxen is a music player to play local music from your computer. It supports individual backgrounds for each song (Currently only supports jpg as backgrounds, if you want to use .png then rename it to .jpg. This will be automatic later).
+Toxen is a music player to play local music from your computer. It supports individual backgrounds for each song.
 It has an audio visualizer which works for every mp3 you insert.
 You can drag and drop files into the interface for easy adding of music and backgrounds.
 
@@ -44,6 +44,7 @@ There's currently 3 settings only: **Toggle Visualizer**, **Background Dim** and
 - Store settings and some other files in a separate directory from the downloaded files
   - This will prevent settings from being overwritten on update
 - Volume changer
+- Default background for music without a custom one
 - Drag and drop Youtube link(?)
 - Beautify and improve the YouTube downloader section
   - Perhaps a separate panel?
