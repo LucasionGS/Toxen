@@ -16,9 +16,9 @@ These files are what is currently supported
 | Backgrounds | jpg & png |
 
 ## Drag and Drop
-   You can drag and drop music into the program to be added automatically to the current music folder.
-   If you drag and drop a jpg file onto a currently playing song,
-   it will set it as background for the song. (It will first update when you go off the song and back on it)
+You can drag and drop music into the program to be added automatically to the current music folder.
+If you drag and drop a jpg file onto a currently playing song,
+it will set it as background for the song. (It will first update when you go off the song and back on it)
 
 ## Functions & Shortcuts
 
@@ -31,11 +31,19 @@ It still doesn't have a **Volume Changer** BUT i will get it done, just not done
 
 ## Build-in YouTube Downloader
 Thanks to [node-ytdl-core](https://github.com/fent/node-ytdl-core), I made a built-in youtube downloader. You can insert a YouTube URL and a title for the song (Formatted as [Artist - Title])
+When you've filled out the URL and optionally the alternate title, press **Enter** or press **Add music** to download it.
 It will download from the link into an mp3 file and put it in your music folder.
 If you leave the [Artist - Title] field blank, it will use the YouTube video's original name.
 
 ## Settings
-There's currently 3 settings only: **Toggle Visualizer**, **Background Dim** and **Visualizer Intensity**.
+### Toggle Visualizer
+This is a checkbox which either enables or disables the audio visualizer.
+
+### Background Dim
+This setting dims the background by a procentage from 0-100 (0 being none, 100 being completely blacked out)
+
+### Visualizer Intensity
+A scale of how intense the visualizer should be. The higher it is, the taller the bars will go up more easily.
 
 ## Todo List
 - Self-updator (Created separately in C# most likely, packaged with the software)
@@ -45,7 +53,6 @@ There's currently 3 settings only: **Toggle Visualizer**, **Background Dim** and
   - Will require a list of file metadata, including the URL to the music file and background if any
 - Store settings and some other files in a separate directory from the downloaded files
   - This will prevent settings from being overwritten on update
-- Volume changer
 - Default background for music without a custom one
 - Drag and drop Youtube link(?)
 - Beautify and improve the YouTube downloader section
@@ -58,7 +65,6 @@ There's currently 3 settings only: **Toggle Visualizer**, **Background Dim** and
   - Previous
   - Skip
   - Repeat
-  - Shuffle (Currently works with **Alt+R** but no dedicated button yet)
 - Highlight current song in menu
 - New tag for music finished being added
 - Search through music
@@ -74,10 +80,14 @@ There's currently 3 settings only: **Toggle Visualizer**, **Background Dim** and
 - Full Song Refresh list (For when adding or removing music manually)
 
 ## Working on
-- Setting music folder from within settings, forcing the user to set it in settings before trying to use the software
 
 ## Completed from Todo List
 - Allow more than just jpg files (Added support for png, autoconverts to jpg in folder if dropped in app)
+- Volume changer
+- Setting music folder from within settings
+- Refresh files when changing directory in settings
+- Add Buttons
+  - Shuffle
 
 ## Known bugs
 - Visualizer
