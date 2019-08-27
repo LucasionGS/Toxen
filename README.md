@@ -31,17 +31,35 @@ It will download from the link into an mp3 file and put it in your music folder.
 If you leave the [Artist - Title] field blank, it will use the YouTube video's original name.
 
 ## Todo List
+- Self-updator (Created separately in C# most likely, packaged with the software)
+  - Optimally, only download files that are eithe missing or different to save time
+  - If the updator needs to be updated as well, Toxen should download it upon startup.
+- Store settings and some other files in a separate directory from the downloaded files
+  - This will prevent settings from being overwritten on update
 - Volume changer
 - Drag and drop Youtube link(?)
 - Beautify and improve the YouTube downloader section
   - Perhaps a separate panel?
   - Allow multiple link downloads
   - Separate Artist and Title into 2 input fields
+- Allow more music formats
+- Session listen history (For "previous" button to remember what to go back to)
 - Add buttons
   - Previous
   - Skip
   - Repeat
-  - Shuffle
+  - Shuffle (Currently works with **Alt+R** but no dedicated button yet)
+- Highlight current song in menu
+- New tag for music finished being added
+- Search through music
+- Allow to add more metadata info
+  - Contributors
+  - Source
+  - Year
+- Right-click Context menu
+  - Rename
+  - Delete
+  - Edit Metadata
 - Store music paths in a database for quick access
 - Full Song Refresh list (For when adding or removing music manually)
 
