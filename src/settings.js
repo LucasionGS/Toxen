@@ -1,5 +1,15 @@
 const fs = require('fs');
-const preset = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
+const process = require('child_process');
+var preset;
+try {
+  preset = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
+}
+catch (e) {
+  notification("No settings found", "It doesn't seem like you have set up your settings yet.\n"+
+  "For this app to work, it's important you select a music folder (A folder that already exists)\n"+
+  "");
+}
+
 const options = document.getElementsByClassName("setting");
 window.onload = function()
 {
@@ -61,4 +71,15 @@ function event_sliderUpdate(value)
     document.getElementById("bgdim").innerHTML = "Background Dim: "+preset["backgroundDim"]+"%";
     document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+preset["visualizerIntensity"];
   }
+}
+
+function openMusicFolder(){
+  var _url = document.getElementById("musicDir").value.replace("\\","\\\\");
+  if (_url == "") {
+    _url = document.getElementById("musicDir").getAttribute("placeholder").replace("\\","\\\\")
+  }
+  while (_url.startsWith("/") || _url.startsWith("\\")) {
+    _url = _url.substring(1);
+  }
+  process.exec('start "" "'+_url+'"');
 }

@@ -11,22 +11,33 @@ h1, h2, h3, h4, p, ul, ol, li{
   color: white;
 }
 
-h1#title{
+h1.title{
   font-size: 48px;
   padding: 10px;
   margin: 0;
   user-select: none;
+  white-space: nowrap;
   transition: all 0.2s ease-in-out;
+}
+
+h1.subtitle{
+  font-size: 24px;
+  padding: 5px;
+  margin: 0;
+  user-select: none;
+  white-space: nowrap;
 }
 
 div.sidebar{
   box-sizing: border-box;
   background: #202020;
   height: 92vh;
-  max-width: 35%;
+  min-width: 400px;
+  max-width: 30%;
   border-style: solid;
   border-width: 1px;
   overflow: hidden;
+  overflow-y: auto;
 }
 
 div.sidebar div.addMusic{
@@ -35,7 +46,7 @@ div.sidebar div.addMusic{
 
 div.sidebar .music-list{
   box-sizing: border-box;
-  width: 100%;
+  /*width: 100%;*/
   margin-top: 10px;
   background: #424242;
   border-style: solid;
@@ -49,38 +60,36 @@ div.sidebar .music-list{
   margin-left: 5px;
 }
 
-@media screen and (min-width:769px){
-  div.sidebar .music-list p{
-    white-space: nowrap;
-  }
-
-  div.sidebar[hover="false"]{
-    width: 10%;
-    opacity: 0;
-    transition: all 1.0s ease-out;
-  }
-
-  div.sidebar[hover="true"]{
-    width: 100%;
-    opacity: 1;
-    transition: all 0.2s ease-in-out;
-  }
-
-  div.sidebar[hover="false"] h1#title
-  {
-    white-space: nowrap;
-  }
-
-  div.sidebar[hover="false"] .music-list{
-    width: 100%;
-    transition: all 0.2s ease-in-out;
-    overflow: hidden;
-  }
+div.sidebar .music-list p{
+  white-space: nowrap;
 }
 
-  div.sidebar .music-list p{
-    margin-left: 5px;
-  }
+div.sidebar[hover="false"]{
+  width: 10%;
+  min-width: 10%;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 1.0s ease-out;
+}
+
+div.sidebar[hover="true"]{
+  opacity: 1;
+  transition: all 0.2s ease-in-out;
+}
+
+div.sidebar[hover="false"] h1.title
+{
+  white-space: nowrap;
+}
+
+div.sidebar[hover="false"] .music-list{
+  transition: all 0.2s ease-in-out;
+  overflow: hidden;
+}
+
+div.sidebar .music-list p{
+  margin-left: 5px;
+}
 
 div.player{
   position: fixed;
@@ -221,6 +230,31 @@ div.Button#doneButton:hover{
   background: #ff0000;
 }
 
+div.Button.btnDefault{
+  position: relative;
+  background: #707070;
+}
+
+div.Button.btnDefault:hover{
+  background: #8c8c8c;
+}
+
+div.Button.btnDefault[activated="false"]{
+  background: #a20000;
+}
+div.Button.btnDefault[activated="false"]:hover{
+  background: #d10000;
+}
+
+div.Button.btnDefault[activated="true"]{
+  background: #17a200;
+}
+
+div.Button.btnDefault[activated="true"]:hover{
+  background: #1dcb00;
+}
+
+
 div.Button p{
   user-select: none;
   margin: 0;
@@ -244,7 +278,7 @@ label{
 }
 
 /* @MEDIA */
-@media screen and (max-width:768px){
+/*@media screen and (max-width:768px){
   h1#title{
     text-align: center;
   }
@@ -290,4 +324,4 @@ label{
     left: -100;
     top: -100;
   }
-}
+}*/

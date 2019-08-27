@@ -1,9 +1,11 @@
 const http = require('https');
 
+//Default check for update on startup
 setTimeout(function () {
-  checkUpdate();
+  //checkUpdate();
 }, 0);
 
+//Check for updates
 function checkUpdate()
 {
   const curVers = JSON.parse(fs.readFileSync("./resources/app/package.json", "utf8")).version;
@@ -30,6 +32,7 @@ function Make(tag){
   return document.createElement(tag);
 }
 
+//Global close top notification function
 function closeNotification()
 {
   id = document.getElementsByClassName("_notification").length-1;
@@ -42,6 +45,7 @@ function closeNotification()
   }, 300);
 }
 
+//Global close notification by ID function
 function closeNotificationById(id)
 {
   if (!id) {
@@ -56,6 +60,7 @@ function closeNotificationById(id)
   }, 300);
 }
 
+//Global close notification by specific Object function
 function closeNotificationByObject(object)
 {
   object.setAttribute("action", "close");
@@ -64,6 +69,7 @@ function closeNotificationByObject(object)
   }, 300);
 }
 
+//Global Notification function
 function notification(title, message, dieAfter)
 {
   //Variable check
@@ -109,4 +115,9 @@ function notification(title, message, dieAfter)
     }, dieAfter);
   }
   return mainDiv;
+}
+
+//Global Context Menu
+function contextMenu() {
+  //make in a sec c:
 }

@@ -10,6 +10,9 @@ let usageWin;
 function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
+    title:"Toxen",
+    minWidth:800,
+    minHeight:768,
     width: winWidth,
     height: winHeight,
     icon:"./icon.png",

@@ -17,18 +17,27 @@
     http://i3.ytimg.com/vi/lL33M9e-g8Q/maxresdefault.jpg
     -->
     <div id="sidebar" class="sidebar" onmouseover="onMenuHover();" onmouseout="offMenuHover();" hover="true">
-      <h1 id="title">Toxen Music</h1>
+      <h1 id="title" class="title">Toxen Music</h1>
       <div class="music-list" id="music-list">
-        <!--
-        Custom dim background
-        Custom Default background
-        Volume Changer
-        -->
+        <!-- Music gets inserted here -->
       </div>
+      <div class="separator"></div>
+      <div id="btnShuffleToggle" activated="false" class="Button btnDefault" onclick="randomize = !randomize; this.setAttribute('activated', randomize);">
+        <p>Shuffle</p>
+      </div>
+      <div class="separator"></div>
+      <h1 id="subtitle" class="subtitle">Options</h1>
+      <label>- Volume +</label><br>
+      <input id="volume" type="range" name="volume" min="0" max="100" value="30" oninput="changeVolume()">
+      <div class="Button btnDefault" onclick="openSettings()">
+        <p>Settings</p>
+      </div>
+      <div class="separator"></div>
+      <h1 id="subtitle" class="subtitle">YouTube Downloader</h1>
       <div class="addMusic">
-        <!--label for="url"><p>Get download URL from <a href="//ytmp3.cc" target="_blank">ytmp3.cc</a></p></label-->
         <input id="addUrl" class="addMusicItem" type="text" name="url" value="" placeholder="YouTube URL" required autocomplete="off"><br>
-        <input id="addName" class="addMusicItem" type="text" name="name" value="" placeholder="Artist (If known) - Title of the song" required autocomplete="off"><br>
+        <input id="addName" class="addMusicItem" type="text" name="name" value="" placeholder="Artist (If known) - Title of the song" autocomplete="off"><br>
+        <input type="checkbox" id="dlImg" name="dlImg" checked><label>Download Thumbnail</label><br>
         <button type="button" id="addButton" class="addMusicItem" onclick="addMusic();">Add Music...</button>
       </div>
     </div>

@@ -59,13 +59,27 @@ function playSong(id)
   play(document.getElementById("play"));
   document.getElementById("now-playing").setAttribute("playingid", id);
   //notification("Now Playing", data["song"], 2000);
+  changeVolume();
+  /*document.getElementById("canvas").parentNode.removeChild(document.getElementById("canvas"));
+  var newCanvas = document.createElement("canvas");
+  newCanvas.setAttribute("id", "canvas");
+  document.getElementById("content").appendChild(newCanvas);*/
   Visualizer();
   //alert(data["song"]);
 }
 
+//Keypresses
 function keypress(e)
 {
-  if(e.keyCode == 32)
+  var curFocus = document.activeElement;
+  var curFocusTag = curFocus.tagName.toLowerCase();
+  var isFocusInput = curFocusTag == "input";
+  if (e.keyCode == 13 && curFocus.getAttribute("class") == "addMusicItem") {
+    if (!document.getElementById("addButton").disabled) {
+      addMusic();
+    }
+  }
+  else if(e.keyCode == 32 && !isFocusInput)
   {
     playToggle();
   }
@@ -80,9 +94,6 @@ function keypress(e)
   }
   else if (e.altKey && e.key == "s") {
     openSettings();
-  }
-  else if (e.key == "n") {
-    notification("Title of the notification", "This is a test message for debugging, please ignore it for now c: Now, move on with your day");
   }
 }
 
@@ -111,6 +122,7 @@ function update()
   document.getElementById("curTime").value = audio.currentTime;
 }
 
+//Execute update()
 setInterval(() => {
   if (audio != undefined && audio.currentTime != undefined && audio.duration != undefined) {
     update();
@@ -123,7 +135,11 @@ function changeProgress(e)
   audio.currentTime = audio.duration * procent;
 }
 
-function setBG(song, reset)
+function changeVolume() {
+  document.getElementById("musicObject").volume = document.getElementById("volume").value/100;
+}
+
+function setBG(song, queryString, reset)
 {
   if (reset == true) {
     var body = document.getElementsByTagName('body')[0];
@@ -132,13 +148,11 @@ function setBG(song, reset)
   else {
     var body = document.getElementsByTagName('body')[0];
     var curBG = song.file.substring(0,song.file.length-4)+".jpg";
-    body.style.background = "url(\""+curBG+"\") no-repeat center center fixed";
+    body.style.background = "url(\""+curBG+"?"+queryString+"\") no-repeat center center fixed";
     body.style.backgroundSize = "cover";
   }
   console.log(body.style.backgroundImage);
 }
-
-var whileMenuHover;
 
 function onMenuHover()
 {

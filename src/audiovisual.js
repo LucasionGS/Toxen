@@ -1,19 +1,22 @@
-/*window.onload = function() {
-  document.getElementById("musicObject");
-}*/
+function VisualizerChangeSrc()
+{
 
-var src;
+}
+
 function Visualizer(){
-  audio = document.getElementById("musicObject")
+  audio = document.getElementById("musicObject");
   //audio.load();
   audio.play();
   var context = new AudioContext();
-  try { src = context.createMediaElementSource(audio); } catch (e) { }
+  var src = context.createMediaElementSource(audio);
   var analyser = context.createAnalyser();
+  console.log(context);
+  console.log(HTMLMediaElement);
   var canvas = document.getElementById("canvas");
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   var ctx = canvas.getContext("2d");
+
 
   src.connect(analyser);
   analyser.connect(context.destination);
@@ -31,7 +34,6 @@ function Visualizer(){
   var barWidth = (WIDTH / bufferLength) * 2.5;
   var barHeight;
   var x = 0;
-
 
   function renderFrame() {
     requestAnimationFrame(renderFrame);
