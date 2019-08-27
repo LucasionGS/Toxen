@@ -30,7 +30,7 @@ These files are what is currently supported
 It still doesn't have a **Volume Changer** BUT i will get it done, just not done it yet. The default volume is 30% so it isn't ear killing from the get-go.
 
 ## Build-in YouTube Downloader
-Thanks to [node-ytdl-core](https://github.com/fent/node-ytdl-core/issues), I made a built-in youtube downloader. You can insert a YouTube URL and a title for the song (Formatted as [Artist - Title])
+Thanks to [node-ytdl-core](https://github.com/fent/node-ytdl-core), I made a built-in youtube downloader. You can insert a YouTube URL and a title for the song (Formatted as [Artist - Title])
 It will download from the link into an mp3 file and put it in your music folder.
 If you leave the [Artist - Title] field blank, it will use the YouTube video's original name.
 
@@ -84,3 +84,8 @@ There's currently 3 settings only: **Toggle Visualizer**, **Background Dim** and
   - Visualizer being offset by some random amount, both small amounts and drastic amounts
 - YouTube downloader
   - If the app deems the URL valid, but the video doesn't exist, can't be found or any error during, it will get stuck at downloading and won't proceed, restart required to download new files, if so
+
+## Library Credits
+**Audio Visualizer** based on [**JS Audio Visualizer**](https://codepen.io/nfj525/pen/rVBaab) created by [Nick Jones](https://codepen.io/nfj525).
+
+**YouTube Downloader** is using [**node-ytdl-core**](https://github.com/fent/node-ytdl-core) created by [fent](https://github.com/fent/), to get video information and download data streams
