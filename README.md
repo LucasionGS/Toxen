@@ -10,7 +10,7 @@ More info below.
 ## Supported Files
 These files are what is currently supported
 
-| Purpose | Supported Files [Planned support] |
+| Element | Supported Files [Planned support] |
 | --- | --- |
 | Music Files | mp3 only |
 | Backgrounds | jpg & png |
@@ -21,14 +21,21 @@ These files are what is currently supported
    it will set it as background for the song. (It will first update when you go off the song and back on it)
 
 ## Functions & Shortcuts
-Pressing on **Alt+R** will toggle shuffling through songs instead of linearly.
-Pressing **Alt+S** will open the settings menu. There's currently 3 settings only: **Toggle Visualizer**, **Background Dim** and **Visualizer Intensity**.
+
+| Action | Shortcut | Description |
+| --- | --- | --- |
+| Alt + S | Open Settings | Opens the settings panel where you can customize Toxen |
+| Alt + R | Toggle Shuffle | Toggle randomly shuffling through songs instead of linearly |
+
 It still doesn't have a **Volume Changer** BUT i will get it done, just not done it yet. The default volume is 30% so it isn't ear killing from the get-go.
 
 ## Build-in YouTube Downloader
 Thanks to [node-ytdl-core](https://github.com/fent/node-ytdl-core/issues), I made a built-in youtube downloader. You can insert a YouTube URL and a title for the song (Formatted as [Artist - Title])
 It will download from the link into an mp3 file and put it in your music folder.
 If you leave the [Artist - Title] field blank, it will use the YouTube video's original name.
+
+## Settings
+There's currently 3 settings only: **Toggle Visualizer**, **Background Dim** and **Visualizer Intensity**.
 
 ## Todo List
 - Self-updator (Created separately in C# most likely, packaged with the software)
