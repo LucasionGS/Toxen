@@ -41,6 +41,8 @@ There's currently 3 settings only: **Toggle Visualizer**, **Background Dim** and
 - Self-updator (Created separately in C# most likely, packaged with the software)
   - Optimally, only download files that are eithe missing or different to save time
   - If the updator needs to be updated as well, Toxen should download it upon startup.
+- Allow remote music files
+  - Will require a list of file metadata, including the URL to the music file and background if any
 - Store settings and some other files in a separate directory from the downloaded files
   - This will prevent settings from being overwritten on update
 - Volume changer
