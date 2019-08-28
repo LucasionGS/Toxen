@@ -12,7 +12,9 @@ var mousePos = {
   "Y":0
 };
 
-window.onmousemove = function(e){
+//Get mouse position
+window.onmousemove = function(e)
+{
   mousePos.X = e.clientX;
   mousePos.Y = e.clientY;
 }
@@ -77,7 +79,9 @@ function playSong(id)
   //console.log(playHistory);
   var allMusicItems = document.getElementsByClassName("music-item");
   for (var i = 0; i < allMusicItems.length; i++) {
-    allMusicItems[i].removeAttribute("playing");
+    if (allMusicItems[i].getAttribute("playing") != "new") {
+      allMusicItems[i].removeAttribute("playing");
+    }
   }
   var curMusicItem = document.getElementById("music-"+playHistory[playHistory.length-1]);
   if (playHistory.length >= 1) {
@@ -85,6 +89,8 @@ function playSong(id)
   }
   var musicListObject = document.getElementById("music-list");
   musicListObject.scrollTop = curMusicItem.offsetTop-Math.min(musicListObject.clientHeight, mousePos.Y);
+  clearInterval(subtitleInterval);
+  RenderSubtitles(data);
   Visualizer();
 }
 
@@ -188,7 +194,11 @@ function changeVolume()
 function setBG(song, queryString, reset)
 {
   if (queryString == undefined) {
-    queryString = fs.statSync(song.file.substring(0,song.file.length-4)+".jpg").ctimeMs;
+    try {
+      queryString = fs.statSync(song.file.substring(0,song.file.length-4)+".jpg").ctimeMs;
+    } catch (e) {
+      queryString = "";
+    }
   }
   if (reset == true) {
     var body = document.getElementsByTagName('body')[0];

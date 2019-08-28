@@ -40,7 +40,7 @@ window.onload = function(){
   }, false);
 
   dropArea.addEventListener('dragleave', function() {
-    closeNotificationByObject(dropHereNotif);
+    //closeNotificationByObject(dropHereNotif);
   }, false);
 
   dropArea.addEventListener('dragover', function(event){
@@ -246,6 +246,7 @@ async function addMusic()
     newItem.setAttribute("class", "music-item");
     newItem.setAttribute("id","music-"+ songCount);
     newItem.setAttribute("onclick", "playSong("+ songCount +");");
+    newItem.setAttribute("playing", "new");
     var newItemP = document.createElement("p");
     newItemP.innerHTML = artist + " - " + title;
     newItem.appendChild(newItemP);
@@ -284,7 +285,7 @@ function fileDropped(e)
   function isExt(ext) {
     return file.path.toLowerCase().endsWith(ext);
   }
-  //console.log(file);
+  //Background files
   if (isExt(".jpg") || isExt(".png")) {
     var curId = document.getElementById("now-playing").getAttribute("playingid");
     var fileName = songs[curId].split("/")[songs[curId].split("/").length-1];
@@ -292,6 +293,18 @@ function fileDropped(e)
     fs.copyFileSync(file.path, pathDir+fileName+".jpg");
     setBG({"file":songs[curId]});
   }
+  //Subtitle files
+  else if (isExt(".srt")) {
+    var curId = document.getElementById("now-playing").getAttribute("playingid");
+    var fileName = songs[curId].split("/")[songs[curId].split("/").length-1];
+    fileName = fileName.substring(0,fileName.length-4);
+    fs.copyFileSync(file.path, pathDir+fileName+".srt");
+    notification("Added Subtitles", "Successfully added subtitles added for \""+fileName+"\"", 1000);
+    console.log(allMusicData);
+    console.log(allMusicData[curId]);
+    RenderSubtitles(allMusicData[curId]);
+  }
+  //Music Files
   else if (isExt(".mp3")) {
     //console.log(file);
     fs.copyFileSync(file.path, pathDir+file.name);
@@ -317,12 +330,18 @@ function fileDropped(e)
       newItem.setAttribute("class", "music-item");
       newItem.setAttribute("id","music-"+ songCount);
       newItem.setAttribute("onclick", "playSong("+ songCount +");");
+      newItem.setAttribute("playing", "new");
       var newItemP = document.createElement("p");
       newItemP.innerHTML = artist + " - " + title;
       newItem.appendChild(newItemP);
       //console.log(newItem);
       document.getElementById("music-list").appendChild(newItem);
       songs[songCount] = filePath;
+      allMusicData.push({
+        "artist":artist,
+        "title":title,
+        "file":filePath
+      });
       songCount++;
     }
     notification("Your song has been added", "", 1000);
@@ -330,8 +349,10 @@ function fileDropped(e)
       document.getElementById("deleteOnNewLoad").parentNode.removeChild(document.getElementById("deleteOnNewLoad"));
     } catch (e) {}
   }
+  //If none of the above
   else {
-    notification("Invalid file", "You can only drop in .mp3 and .jpg files!");
+    notification("Invalid file",
+    "Music files: .mp3,\nBackgrounds: .png, .jpg\nSubtitles: .srt");
   }
 }
 

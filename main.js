@@ -1,4 +1,5 @@
-const { app, BrowserWindow, Menu } = require('electron')
+const { app, BrowserWindow, Menu } = require('electron');
+const process = require('child_process');
 const fs = require('fs');
 const winWidth = 1280;
 const winHeight = 768;
@@ -40,22 +41,8 @@ function createWindow () {
     {
       label:"Usage",
       click(){
-        //Create Usage window
-        try {
-          usageWin.close();
-        } catch (e) {
-          //console.log("Not open yet c:");
-        }
-        usageWin = new BrowserWindow({
-          parent: win,
-          width: winWidth,
-          height: winHeight,
-          icon:"./icon.png",
-          webPreferences: {
-            nodeIntegration: true
-          }
-        });
-        usageWin.loadFile("usage.html");
+        //Open github page
+        process.exec('start "" "https://github.com/LucasionGS/Toxen/blob/master/README.md"');
       }
     },
     {
