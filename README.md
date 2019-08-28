@@ -11,6 +11,7 @@ You can open the music panel any time, just hover your mouse over to the left si
 You can scroll in the music list separately from the whole panel. It includes quick options like volume changing, toggling shuffle, built-in downloader for YouTube audio and more.
 
 More info below.
+![Toxen Music](http://lucasion.tk/f/17.08.54-28.08.19.png)
 
 ## Supported Files
 These files are what is currently supported
@@ -28,7 +29,7 @@ it will set it as background for the song.
 
 You can also drop a supported subtitle file to add it to a song.
 
-## Functions & Shortcuts
+## Options & Shortcuts
 
 | Shortcut | Action | Description |
 | --- | --- | --- |
@@ -37,11 +38,15 @@ You can also drop a supported subtitle file to add it to a song.
 | Ctrl + Left Arrow | Previous song | Goes to the last song you played, this goes all the way back to the first song you played in this session |
 | Ctrl + Right Arrow | Next song | Goes to the next song on the list. If shuffle is enabled, it plays a random song instead |
 
+![Options](http://lucasion.tk/f/17.11.12-28.08.19.png)
+
 ## Build-in YouTube Downloader
 Thanks to [node-ytdl-core](https://github.com/fent/node-ytdl-core), I made a built-in youtube downloader. You can insert a YouTube URL and a title for the song (Formatted as [Artist - Title])
 When you've filled out the URL and optionally the alternate title, press **Enter** or press **Add music** to download it.
 It will download from the link into an mp3 file and put it in your music folder.
 If you leave the [Artist - Title] field blank, it will use the YouTube video's original name.
+
+![YouTube Downloader](http://lucasion.tk/f/17.12.22-28.08.19.png)
 
 ## Settings
 ### Curent music folder
@@ -56,6 +61,8 @@ This setting dims the background by a procentage from 0-100 (0 being none, 100 b
 
 ### Visualizer Intensity
 A scale of how intense the visualizer should be. The higher it is, the taller the bars will go up more easily.
+
+![Settings](http://lucasion.tk/f/17.13.16-28.08.19.png)
 
 ## Todo List
 - Self-updator (Created separately in C# most likely, packaged with the software)
