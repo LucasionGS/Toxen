@@ -10,8 +10,8 @@ function Visualizer(){
   var context = new AudioContext();
   var src = context.createMediaElementSource(audio);
   var analyser = context.createAnalyser();
-  console.log(context);
-  console.log(HTMLMediaElement);
+  //console.log(context);
+  //console.log(HTMLMediaElement);
   var canvas = document.getElementById("canvas");
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;

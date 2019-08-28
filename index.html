@@ -22,12 +22,25 @@
         <!-- Music gets inserted here -->
       </div>
       <div class="separator"></div>
-      <div id="btnShuffleToggle" activated="false" class="Button btnDefault" onclick="randomize = !randomize; this.setAttribute('activated', randomize);">
-        <p>Shuffle</p>
+      <!-- Shuffle & Repeat -->
+      <div class="divBox" style="overflow: hidden;">
+        <div id="btnShuffleToggle" activated="false" class="Button btnDefault float-left" onclick="toggleFunction('shuffle')">
+          <p>Shuffle</p>
+        </div>
       </div>
+      <!-- Previous & Next -->
+      <div class="divBox" style="overflow: hidden;">
+        <div id="btnPrevious" class="Button btnDefault float-left" onclick="toggleFunction('previous')">
+          <p>&laquo;Previous</p>
+        </div>
+        <div id="btnNext" class="Button btnDefault float-left" onclick="toggleFunction('next')">
+          <p>Next&raquo;</p>
+        </div>
+      </div>
+
       <div class="separator"></div>
       <h1 id="subtitle" class="subtitle">Options</h1>
-      <label>- Volume +</label><br>
+      <label id="volumeLabel">- Volume +</label><br>
       <input id="volume" type="range" name="volume" min="0" max="100" value="30" oninput="changeVolume()">
       <div class="Button btnDefault" onclick="openSettings()">
         <p>Settings</p>

@@ -290,7 +290,7 @@ function fileDropped(e)
     var fileName = songs[curId].split("/")[songs[curId].split("/").length-1];
     fileName = fileName.substring(0,fileName.length-4);
     fs.copyFileSync(file.path, pathDir+fileName+".jpg");
-    setBG({"file":songs[curId]}, file.lastModified);
+    setBG({"file":songs[curId]});
   }
   else if (isExt(".mp3")) {
     //console.log(file);

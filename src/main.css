@@ -130,6 +130,15 @@ div.music-item:hover{
   cursor: pointer;
 }
 
+div.music-item[playing]{
+  background: #015e00;
+}
+
+div.music-item[playing]:hover{
+  background: #318830;
+  cursor: pointer;
+}
+
 div.now-playing{
   position: absolute;
   margin: 5px;
@@ -252,6 +261,10 @@ div.Button.btnDefault[activated="true"]{
 
 div.Button.btnDefault[activated="true"]:hover{
   background: #1dcb00;
+}
+
+div.float-left{
+  float:left;
 }
 
 

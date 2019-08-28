@@ -16,9 +16,9 @@ function checkUpdate()
   .then(data => {
     const newVers = data.tag_name;
     const dlUrl = data.assets[0].browser_download_url;
-    console.log(curVers);
-    console.log(newVers);
-    console.log(dlUrl);
+    //console.log(curVers);
+    //console.log(newVers);
+    //console.log(dlUrl);
     if (curVers != newVers) {
       notification("New Update Available", "<a href=\""+dlUrl+"\">Click here to download</a>");
     }

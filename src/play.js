@@ -6,12 +6,24 @@ var data;
 var isReady = false;
 var randomize = false;
 var audio;
+var playHistory = [];
+var mousePos = {
+  "X":0,
+  "Y":0
+};
 
-function onload() {
+window.onmousemove = function(e){
+  mousePos.X = e.clientX;
+  mousePos.Y = e.clientY;
+}
+
+function onload()
+{
   audio = document.getElementById("musicObject");
 }
 
-function playToggle() {
+function playToggle()
+{
   const btn = document.getElementById("play");
   var mode = btn.getAttribute("mode");
   if (mode == "stop") {
@@ -49,23 +61,31 @@ function playSong(id)
   musicObject.src = data.file;
   musicObject.volume = 0.3;
   //console.log(data);
-  if (data["song"].length <= 40) {
+  if (data["song"].length <= 60) {
     document.getElementById("song-title").innerHTML = data["song"];
   }
   else {
-    document.getElementById("song-title").innerHTML = data["song"].substring(0, 37)+"...";
+    document.getElementById("song-title").innerHTML = data["song"].substring(0, 60)+"...";
   }
   setBG(data);
   play(document.getElementById("play"));
   document.getElementById("now-playing").setAttribute("playingid", id);
-  //notification("Now Playing", data["song"], 2000);
   changeVolume();
-  /*document.getElementById("canvas").parentNode.removeChild(document.getElementById("canvas"));
-  var newCanvas = document.createElement("canvas");
-  newCanvas.setAttribute("id", "canvas");
-  document.getElementById("content").appendChild(newCanvas);*/
+  if (playHistory[playHistory.length-1] != id) {
+    playHistory[playHistory.length] = id;
+  }
+  //console.log(playHistory);
+  var allMusicItems = document.getElementsByClassName("music-item");
+  for (var i = 0; i < allMusicItems.length; i++) {
+    allMusicItems[i].removeAttribute("playing");
+  }
+  var curMusicItem = document.getElementById("music-"+playHistory[playHistory.length-1]);
+  if (playHistory.length >= 1) {
+    curMusicItem.setAttribute("playing", true);
+  }
+  var musicListObject = document.getElementById("music-list");
+  musicListObject.scrollTop = curMusicItem.offsetTop-Math.min(musicListObject.clientHeight, mousePos.Y);
   Visualizer();
-  //alert(data["song"]);
 }
 
 //Keypresses
@@ -83,27 +103,51 @@ function keypress(e)
   {
     playToggle();
   }
-  else if (e.altKey && e.key == "r") {
-    if (randomize) {
-      notification("Randomizer turned off", "", 1000);
-    }
-    else {
-      notification("Randomizer turned on", "", 1000);
-    }
-    randomize = !randomize;
+  else if (e.ctrlKey && e.key == "r") {
+    toggleFunction("shuffle");
   }
-  else if (e.altKey && e.key == "s") {
+  else if (e.ctrlKey && e.key == "s") {
     openSettings();
+  }
+  else if (e.ctrlKey && e.key == "ArrowLeft") {
+    toggleFunction("previous");
+  }
+  else if (e.ctrlKey && e.key == "ArrowRight") {
+    toggleFunction("next");
+  }
+}
+
+function toggleFunction(func, force)
+{
+  var object;
+  if (func == "shuffle") {
+    object = document.getElementById("btnShuffleToggle");
+    randomize = !randomize;
+    object.setAttribute('activated', randomize);
+  }
+  if (func == "previous" && playHistory.length > 1) {
+    playHistory.length = playHistory.length-1;
+    playSong(playHistory[playHistory.length-1]);
+  }
+  if (func == "next") {
+    musicEnd();
   }
 }
 
 function musicEnd()
 {
+  var _id;
+  if (data == undefined || data.id == undefined) {
+    _id = 0;
+  }
+  else {
+    _id = data.id;
+  }
   if (!randomize) {
-    console.log(songCount);
-    console.log(data.id);
-    if (songCount > data.id+1) {
-      playSong(data.id+1);
+    //console.log(songCount);
+    //console.log(_id);
+    if (songCount > _id+1) {
+      playSong(_id+1);
     }
     else {
       playSong(0);
@@ -135,12 +179,17 @@ function changeProgress(e)
   audio.currentTime = audio.duration * procent;
 }
 
-function changeVolume() {
+function changeVolume()
+{
   document.getElementById("musicObject").volume = document.getElementById("volume").value/100;
+  document.getElementById("volumeLabel").innerHTML = "- Volume + " + document.getElementById("volume").value;
 }
 
 function setBG(song, queryString, reset)
 {
+  if (queryString == undefined) {
+    queryString = fs.statSync(song.file.substring(0,song.file.length-4)+".jpg").ctimeMs;
+  }
   if (reset == true) {
     var body = document.getElementsByTagName('body')[0];
     body.style.background = ""; //Resets
@@ -151,7 +200,7 @@ function setBG(song, queryString, reset)
     body.style.background = "url(\""+curBG+"?"+queryString+"\") no-repeat center center fixed";
     body.style.backgroundSize = "cover";
   }
-  console.log(body.style.backgroundImage);
+  //console.log(body.style.backgroundImage);
 }
 
 function onMenuHover()
