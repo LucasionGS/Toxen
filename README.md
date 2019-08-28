@@ -55,6 +55,7 @@ This setting dims the background by a procentage from 0-100 (0 being none, 100 b
 A scale of how intense the visualizer should be. The higher it is, the taller the bars will go up more easily.
 
 ## Todo List
+- Lyrics Display (A file that you can put onto a song, and it will be parsed into lyrics, much like .srt files)
 - Self-updator (Created separately in C# most likely, packaged with the software)
   - Optimally, only download files that are eithe missing or different to save time
   - If the updator needs to be updated as well, Toxen should download it upon startup.
