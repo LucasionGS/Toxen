@@ -17,13 +17,16 @@ These files are what is currently supported
 
 | Element | Supported Files [Planned support] |
 | --- | --- |
-| Music Files | mp3 only |
-| Backgrounds | jpg & png |
+| Music Files | mp3 |
+| Backgrounds | jpg, png |
+| Subtitles | srt |
 
 ## Drag and Drop
-You can drag and drop music into the program to be added automatically to the current music folder.
-If you drag and drop a jpg file onto a currently playing song,
-it will set it as background for the song. (It will first update when you go off the song and back on it)
+You can drag and drop music into the program to be added automatically to the current music folder and to your list.
+If you drag and drop a supported image file onto a currently playing song,
+it will set it as background for the song.
+
+You can also drop a supported subtitle file to add it to a song.
 
 ## Functions & Shortcuts
 
@@ -55,7 +58,6 @@ This setting dims the background by a procentage from 0-100 (0 being none, 100 b
 A scale of how intense the visualizer should be. The higher it is, the taller the bars will go up more easily.
 
 ## Todo List
-- Lyrics Display (A file that you can put onto a song, and it will be parsed into lyrics, much like .srt files)
 - Self-updator (Created separately in C# most likely, packaged with the software)
   - Optimally, only download files that are eithe missing or different to save time
   - If the updator needs to be updated as well, Toxen should download it upon startup.
@@ -71,7 +73,6 @@ A scale of how intense the visualizer should be. The higher it is, the taller th
   - Allow multiple link downloads
   - Separate Artist and Title into 2 input fields
 - Allow more music formats
-- New tag for music finished being added
 - Search through music
 - Allow to add more metadata info
   - Contributors
@@ -87,6 +88,8 @@ A scale of how intense the visualizer should be. The higher it is, the taller th
 ## Working on
 
 ## Completed from Todo List
+- New tag for music finished being added (Shows a green highlight on new files)
+- Lyrics Display (A file that you can put onto a song, and it will be parsed into lyrics, much like .srt files)
 - Session listen history (For "previous" button to remember what to go back to)
 - Highlight current song in menu
 - Allow more than just jpg files (Added support for png, autoconverts to jpg in folder if dropped in app)
