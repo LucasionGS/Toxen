@@ -99,8 +99,8 @@ A scale of how intense the visualizer should be. The higher it is, the taller th
   - Repeat
 
 ## Known bugs
-- Visualizer
-  - Visualizer being offset by some random amount, both small amounts and drastic amounts
+- ~~Visualizer~~
+  - ~~Visualizer being offset by some random amount, both small amounts and drastic amounts~~
 - YouTube downloader
   - If the app deems the URL valid, but the video doesn't exist, can't be found or any error during, it will get stuck at downloading and won't proceed, restart required to download new files, if so
 
