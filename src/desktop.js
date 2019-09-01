@@ -250,7 +250,7 @@ async function addMusic()
     var newItemP = document.createElement("p");
     newItemP.innerHTML = artist + " - " + title;
     newItem.appendChild(newItemP);
-    //console.log(newItem);
+    newItem.addEventListener('contextmenu', musicMenuFunc(event), false);
     document.getElementById("music-list").appendChild(newItem);
     songs[songCount] = file;
     songCount++;

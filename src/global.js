@@ -118,6 +118,36 @@ function notification(title, message, dieAfter)
 }
 
 //Global Context Menu
-function contextMenu() {
-  //make in a sec c:
+var musicMenu = Make("div");
+musicMenu.setAttribute("id", "contextMenu");
+musicMenu.setAttribute("class", "contextMenu");
+//Create Music Menu List
+var musicMenuList = {
+  "Rename": "rename",
+  "Delete": "delete",
+};
+var i = 0;
+for (var key in musicMenuList) {
+  var item = Make("div");
+  item.setAttribute("id", "contextMenuItem-");
+  item.setAttribute("class", "contextMenuItem");
+  item.setAttribute("onclick", menuFunction(musicMenuList[key]));
+  var itemP = Make("p");
+  itemP.innerHTML = key;
+  i++;
+}
+
+function musicMenuFunc(e) {
+  try { menu.parentNode.removeChild(menu); } catch (e){}
+  e.preventDefault();
+  //alert('success!');
+  document.getElementsByTagName("body")[0].appendChild(musicMenu);
+  return false;
+}
+
+function menuFunction()
+{
+  //Close menu
+  try { menu.parentNode.removeChild(menu); } catch (e){}
+  //Do action here
 }
