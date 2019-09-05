@@ -93,6 +93,7 @@ A scale of how intense the visualizer should be. The higher it is, the taller th
 - Full Song Refresh list (For when adding or removing music manually)
 
 ## Working on
+- Song settings
 
 ## Completed from Todo List
 - New tag for music finished being added (Shows a green highlight on new files)
