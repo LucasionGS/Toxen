@@ -19,7 +19,13 @@ function createWindow () {
     icon:"./icon.png",
     webPreferences: {
       nodeIntegration: true
-    }
+    },
+    show:false
+  });
+
+  win.once('ready-to-show', () => {
+    //This will prevent the white startup screen before the page loads in fully
+    win.show();
   });
 
   var menu = Menu.buildFromTemplate([
