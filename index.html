@@ -19,6 +19,7 @@
     -->
     <div id="sidebar" class="sidebar" onmouseover="onMenuHover();" onmouseout="offMenuHover();" hover="true">
       <h1 id="title" class="title">Toxen Music</h1>
+      <input type="text" name="search" value="" oninput="searchChange(this.value);" placeholder="Search...">
       <div class="music-list" id="music-list">
         <!-- Music gets inserted here -->
       </div>
@@ -27,6 +28,9 @@
       <div class="divBox" style="overflow: hidden;">
         <div id="btnShuffleToggle" activated="false" class="Button btnDefault float-left" onclick="toggleFunction('shuffle')">
           <p>Shuffle</p>
+        </div>
+        <div id="btnRepeatToggle" activated="false" class="Button btnDefault float-left" onclick="toggleFunction('repeat')">
+          <p>Repeat</p>
         </div>
       </div>
       <!-- Previous & Next -->
@@ -59,7 +63,7 @@
       <canvas id="canvas"></canvas>
     </div>
   </body>
-  <div class="player">
+  <div class="player" id="player">
     <div id="now-playing" class="now-playing" playingid="-1">
       <p id="song-title">text</p>
       <progress id="curTime" value="0" max="100" onmousedown="changeProgress(event);"></progress>

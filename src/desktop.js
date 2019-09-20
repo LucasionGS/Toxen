@@ -366,3 +366,15 @@ function openSettings()
   }
   lastWindow = window.open("settings.html");
 }
+
+function searchChange(search) {
+  var _songs = document.getElementsByClassName("music-item");
+  for (var i = 0; i < _songs.length; i++) {
+    if (!_songs[i].childNodes[0].innerHTML.toLowerCase().includes(search.toLowerCase())) {
+      _songs[i].style.display = "none";
+    }
+    else {
+      _songs[i].style.display = "block";
+    }
+  }
+}

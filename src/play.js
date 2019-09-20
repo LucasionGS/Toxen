@@ -5,6 +5,7 @@ var songCount = 0;
 var data;
 var isReady = false;
 var randomize = false;
+var repeat = false;
 var audio;
 var playHistory = [];
 var mousePos = {
@@ -110,9 +111,12 @@ function keypress(e)
     playToggle();
   }
   else if (e.ctrlKey && e.key == "r") {
-    toggleFunction("shuffle");
+    toggleFunction("repeat");
   }
   else if (e.ctrlKey && e.key == "s") {
+    toggleFunction("shuffle");
+  }
+  else if (e.ctrlKey && e.key == "o") {
     openSettings();
   }
   else if (e.ctrlKey && e.key == "ArrowLeft") {
@@ -120,6 +124,22 @@ function keypress(e)
   }
   else if (e.ctrlKey && e.key == "ArrowRight") {
     toggleFunction("next");
+  }
+  else if (e.key == "F11") {
+    var electron = require('electron');
+    var window = electron.remote.getCurrentWindow();
+    window.setFullScreen(!window.isFullScreen());
+    window.setMenuBarVisibility(!window.isFullScreen());
+    if (window.isFullScreen()) {
+      document.getElementById("player").style.display = "none";
+      document.getElementById("canvas").style.height = "100vh";
+      document.getElementById("sidebar").style.height = "100vh";
+    }
+    else {
+      document.getElementById("player").style.display = "block";
+      document.getElementById("canvas").style.height = "92vh";
+      document.getElementById("sidebar").style.height = "92vh";
+    }
   }
 }
 
@@ -130,6 +150,11 @@ function toggleFunction(func, force)
     object = document.getElementById("btnShuffleToggle");
     randomize = !randomize;
     object.setAttribute('activated', randomize);
+  }
+  if (func == "repeat") {
+    object = document.getElementById("btnRepeatToggle");
+    repeat = !repeat;
+    object.setAttribute('activated', repeat);
   }
   if (func == "previous" && playHistory.length > 1) {
     playHistory.length = playHistory.length-1;
@@ -149,9 +174,10 @@ function musicEnd()
   else {
     _id = data.id;
   }
+  if (repeat) {
+    playSong(_id);
+  }
   if (!randomize) {
-    //console.log(songCount);
-    //console.log(_id);
     if (songCount > _id+1) {
       playSong(_id+1);
     }
