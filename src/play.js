@@ -119,11 +119,14 @@ function keypress(e)
   else if (e.ctrlKey && e.key == "o") {
     openSettings();
   }
-  else if (e.ctrlKey && e.key == "ArrowLeft") {
+  else if ((e.ctrlKey && e.key == "ArrowLeft") || e.key == "MediaTrackPrevious") {
     toggleFunction("previous");
   }
-  else if (e.ctrlKey && e.key == "ArrowRight") {
+  else if ((e.ctrlKey && e.key == "ArrowRight") || e.key == "MediaTrackNext") {
     toggleFunction("next");
+  }
+  else if (e.key == "F5") {
+    location.reload();
   }
   else if (e.key == "F11") {
     var electron = require('electron');
