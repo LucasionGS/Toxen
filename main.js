@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, Tray } = require('electron');
 const process = require('child_process');
 const fs = require('fs');
 const winWidth = 1280;
@@ -73,6 +73,37 @@ function createWindow () {
     // when you should delete the corresponding element.
     win = null;
   });
+
+  win.on('minimize', function(event){
+      event.preventDefault();
+      win.hide();
+    });
+
+    var appIcon = null;
+    appIcon = new Tray("./icon.png");
+    var contextMenu = Menu.buildFromTemplate([
+      {
+        label: "Restore",
+        type: "radio",
+        click(){
+          win.show();
+        }
+      },
+      {
+        label: "Quit",
+        type: "radio",
+        click(){
+          app.quit();
+        }
+      }
+    ]);
+    appIcon.setToolTip("Toxen♫");
+    appIcon.setContextMenu(contextMenu);
+
+    appIcon.on("click", () => {
+      win.show();
+    });
+
 }
 
 // This method will be called when Electron has finished
