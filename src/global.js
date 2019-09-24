@@ -129,19 +129,24 @@ var musicMenuList = {
 var i = 0;
 for (var key in musicMenuList) {
   var item = Make("div");
-  item.setAttribute("id", "contextMenuItem-");
+  item.setAttribute("id", "contextMenuItem-"+i);
   item.setAttribute("class", "contextMenuItem");
-  item.setAttribute("onclick", menuFunction(musicMenuList[key]));
+  item.setAttribute("onclick", "menuFunction(\""+musicMenuList[key]+"\");");
   var itemP = Make("p");
   itemP.innerHTML = key;
+  item.appendChild(itemP);
+  musicMenu.appendChild(item);
   i++;
 }
 
 function musicMenuFunc(e) {
-  try { menu.parentNode.removeChild(menu); } catch (e){}
   e.preventDefault();
-  //alert('success!');
+  try { menu.parentNode.removeChild(menu); } catch (e){}
   document.getElementsByTagName("body")[0].appendChild(musicMenu);
+  console.log(musicMenu);
+  musicMenu.style.left = mousePos.X+"px";
+  musicMenu.style.top = mousePos.Y+"px";
+  musicMenu.setAttribute("onmouseout", "this.parentNode.removeChild(this);");
   return false;
 }
 

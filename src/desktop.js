@@ -126,6 +126,7 @@ function LoadMusic(){
       newItem.setAttribute("class", "music-item");
       newItem.setAttribute("id","music-"+ i);
       newItem.setAttribute("onclick", "playSong("+ i +");");
+      newItem.setAttribute("oncontextmenu", "musicMenuFunc(event);");
       var newItemP = document.createElement("p");
       newItemP.innerHTML = musicFiles[i].artist + " - " + musicFiles[i].title;
       newItem.appendChild(newItemP);
@@ -246,6 +247,7 @@ async function addMusic()
     newItem.setAttribute("class", "music-item");
     newItem.setAttribute("id","music-"+ songCount);
     newItem.setAttribute("onclick", "playSong("+ songCount +");");
+    newItem.setAttribute("oncontextmenu", "musicMenuFunc(event);");
     newItem.setAttribute("playing", "new");
     var newItemP = document.createElement("p");
     newItemP.innerHTML = artist + " - " + title;
