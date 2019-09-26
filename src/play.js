@@ -135,19 +135,21 @@ function keypress(e)
     window.setMenuBarVisibility(!window.isFullScreen());
     if (window.isFullScreen()) {
       document.getElementById("music-list").after(document.getElementById("player"));
-
-      //document.getElementById("player").style.display = "none";
       document.getElementById("canvas").style.height = "100vh";
-      //document.getElementById("sidebar").style.height = "100vh";
     }
     else {
       document.getElementById("player");
-      //document.getElementById("player").style.display = "block";
       document.getElementById("content").after(document.getElementById("player"))
       document.getElementById("canvas").style.height = "92vh";
-      //document.getElementById("sidebar").style.height = "92vh";
     }
   }
+}
+
+if (button) {
+  button = false;
+}
+else {
+  button = true;
 }
 
 function toggleFunction(func, force)
