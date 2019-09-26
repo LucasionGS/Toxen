@@ -8,12 +8,12 @@ setInterval(() => {
   try {
     settings = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
     if (settings.musicDir == "") {
-      settings.musicDir = "/ToxenMusic/";
+      settings.musicDir = defaultMusicDir;
     }
   } catch (e) {
     settings = {
       //Add default settings if no file.
-      "musicDir":"/ToxenMusic/",
+      "musicDir":defaultMusicDir,
       "visualizer":true,
       "backgroundDim":50,
       "visualizerIntensity":15,
@@ -80,8 +80,8 @@ function LoadMusic(){
     pathDir = settings.musicDir.replace("\\", "/")+"/";
   }
   else {
-    fs.mkdirSync("/ToxenMusic/", {recursive: true});
-    pathDir = "/ToxenMusic/";
+    fs.mkdirSync(defaultMusicDir, {recursive: true});
+    pathDir = defaultMusicDir;
     preMusicDirectory = pathDir;
   }
   _musicFiles = fs.readdirSync(pathDir);

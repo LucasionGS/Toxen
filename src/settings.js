@@ -1,6 +1,9 @@
 const fs = require('fs');
-const process = require('child_process');
+const proc = require('child_process');
 var preset;
+setTimeout(function () {
+  document.getElementById("musicDir").setAttribute('placeholder', defaultMusicDir);
+}, 1);
 try {
   preset = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
 }
@@ -9,6 +12,7 @@ catch (e) {
   "For this app to work, it's important you select a music folder (A folder that already exists)\n"+
   "");
 }
+
 
 const options = document.getElementsByClassName("setting");
 window.onload = function()
@@ -33,7 +37,7 @@ window.onload = function()
       }
     }
   }
-  console.log(preset);
+  //console.log(preset);
 }
 
 function applySettings()
@@ -76,10 +80,11 @@ function event_sliderUpdate(value)
 function openMusicFolder(){
   var _url = document.getElementById("musicDir").value.replace("\\","\\\\");
   if (_url == "") {
-    _url = document.getElementById("musicDir").getAttribute("placeholder").replace("\\","\\\\")
+    //_url = document.getElementById("musicDir").getAttribute("placeholder").replace("\\","\\\\")
+    _url = defaultMusicDir;
   }
   while (_url.startsWith("/") || _url.startsWith("\\")) {
     _url = _url.substring(1);
   }
-  process.exec('start "" "'+_url+'"');
+  proc.exec('start "" "'+_url+'"');
 }

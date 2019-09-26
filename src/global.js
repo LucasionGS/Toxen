@@ -1,4 +1,9 @@
 const http = require('https');
+var defaultMusicDir = process.env.HOME+"/Music/";
+while (defaultMusicDir.includes("\\")) {
+  defaultMusicDir = defaultMusicDir.replace("\\","/");
+  console.log("removed \\ from "+ defaultMusicDir);
+}
 
 //Default check for update on startup
 setTimeout(function () {
