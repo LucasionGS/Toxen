@@ -13,10 +13,10 @@ setInterval(() => {
   } catch (e) {
     settings = {
       //Add default settings if no file.
-      "musicDir":defaultMusicDir,
-      "visualizer":true,
-      "backgroundDim":50,
-      "visualizerIntensity":15,
+      "musicDir": defaultMusicDir,
+      "visualizer": true,
+      "backgroundDim": 50,
+      "visualizerIntensity": 15,
     }
   }
   if (preMusicDirectory != settings.musicDir) {
