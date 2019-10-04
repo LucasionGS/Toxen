@@ -74,10 +74,10 @@ function createWindow () {
     win = null;
   });
 
-  win.on('minimize', function(event){
+  /*win.on('minimize', function(event){
       event.preventDefault();
       win.hide();
-    });
+    });*/
 
     var appIcon = null;
     appIcon = new Tray("./icon.png");
