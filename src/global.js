@@ -1,9 +1,12 @@
 const http = require('https');
-var defaultMusicDir = process.env.HOME+"/Music/";
-while (defaultMusicDir.includes("\\")) {
+var proc = require('child_process');
+console.log(process.env);
+var defaultMusicDir = process.env.HOMEDRIVE+process.env.HOMEPATH+"/Music/";
+defaultMusicDir = defaultMusicDir.replace(/(\\+)/g, "/");
+/*while (defaultMusicDir.includes("\\")) {
   defaultMusicDir = defaultMusicDir.replace("\\","/");
   console.log("removed \\ from "+ defaultMusicDir);
-}
+}*/
 
 //Default check for update on startup
 setTimeout(function () {
@@ -25,7 +28,7 @@ function checkUpdate()
     //console.log(newVers);
     //console.log(dlUrl);
     if (curVers != newVers) {
-      notification("New Update Available", "<a href=\""+dlUrl+"\">Click here to download</a>");
+      notification("New Update Available", "<a href=\""+dlUrl+"\">Click here to download</a>\nOr <a onclick=\"proc.spawn('cmd.exe start \"\" ToxenInstall.exe', [], {detacted:true, stdio: 'ignore'});\" href=\"#\">Open the installer</a> to update automatically.");
     }
   })
   .catch(err => {

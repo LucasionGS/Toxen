@@ -1,5 +1,5 @@
 const fs = require('fs');
-const proc = require('child_process');
+var proc = require('child_process');
 var preset;
 setTimeout(function () {
   document.getElementById("musicDir").setAttribute('placeholder', defaultMusicDir);

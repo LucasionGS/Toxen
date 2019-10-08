@@ -119,6 +119,9 @@ function keypress(e)
   else if (e.ctrlKey && e.key == "o") {
     openSettings();
   }
+  else if (e.ctrlKey && e.key == "u") {
+    checkUpdate();
+  }
   else if ((e.ctrlKey && e.key == "ArrowLeft") || e.key == "MediaTrackPrevious") {
     toggleFunction("previous");
   }
