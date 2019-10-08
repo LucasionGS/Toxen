@@ -16,7 +16,7 @@ function createWindow () {
     minHeight:768,
     width: winWidth,
     height: winHeight,
-    icon:"./icon.png",
+    icon:"./icon.ico",
     webPreferences: {
       nodeIntegration: true
     },
@@ -80,7 +80,7 @@ function createWindow () {
     });*/
 
     var appIcon = null;
-    appIcon = new Tray("./icon.png");
+    appIcon = new Tray("./icon.ico");
     var contextMenu = Menu.buildFromTemplate([
       {
         label: "Restore",

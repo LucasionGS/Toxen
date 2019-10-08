@@ -31,7 +31,7 @@ function ParseSrt(song)
       "endTime":-1,
       "text":""
     };
-    if (lines[i] == "") {
+    if (lines[i].trim() == "") {
       continue;
     }
     if (!isNaN(lines[i])) {
@@ -50,7 +50,7 @@ function ParseSrt(song)
       newSub.endTime = ((+ints[0]*60*60)+(+ints[1]*60)+(+ints[2])+(+timeStamps[1].split(",", 2)[1]/1000));
       i++;
       //Set texts
-      while (lines[i] != "") {
+      while (lines[i].trim() != "") {
         newSub.text += lines[i]+"\n";
         i++;
       }

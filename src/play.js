@@ -145,13 +145,6 @@ function keypress(e)
   }
 }
 
-if (button) {
-  button = false;
-}
-else {
-  button = true;
-}
-
 function toggleFunction(func, force)
 {
   var object;
