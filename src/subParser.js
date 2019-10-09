@@ -51,7 +51,7 @@ function ParseSrt(song)
       i++;
       //Set texts
       while (lines[i].trim() != "") {
-        newSub.text += lines[i]+"\n";
+        newSub.text += Imd.MarkDownToHTML(lines[i])+"\n";
         i++;
       }
       subData.push(newSub);

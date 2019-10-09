@@ -51,7 +51,13 @@ function applySettings()
       jOptions[_options[i].name] = _options[i].checked;
     }
     else if (typeOfSetting == "value") {
-      jOptions[_options[i].name] = _options[i].value;
+      if (_options[i].getAttribute("id") == "musicDir") {
+        jOptions[_options[i].name] = _options[i].value.replace(/\\+|\/\/+/g, "/");
+        _options[i].value = jOptions[_options[i].name];
+      }
+      else {
+        jOptions[_options[i].name] = _options[i].value;
+      }
     }
   }
   var strOptions = JSON.stringify(jOptions);
@@ -78,7 +84,7 @@ function event_sliderUpdate(value)
 }
 
 function openMusicFolder(){
-  var _url = document.getElementById("musicDir").value.replace("\\","\\\\");
+  var _url = document.getElementById("musicDir").value.replace(/\\/g,"\\\\");
   if (_url == "") {
     //_url = document.getElementById("musicDir").getAttribute("placeholder").replace("\\","\\\\")
     _url = defaultMusicDir;
