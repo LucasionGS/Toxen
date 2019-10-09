@@ -64,6 +64,7 @@ function ParseSrt(song)
 
 var subtitleInterval;
 function RenderSubtitles(song) {
+  clearInterval(subtitleInterval);
   var subData = ParseSrt(song);
   var subText = document.getElementById("subBoxText");
   subText.innerHTML = "";
