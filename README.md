@@ -34,7 +34,7 @@ Subtitle files can include special properties which will work in Toxen.
 
 | Syntax | Description |
 | --- | --- |
-| (**TEXT**) = Greyed text, like background lyrics | mp3
+| (**TEXT**) | Greyed text, like background lyrics |
 | [color=#HEXCODE]**TEXT**[/color] | Change color to anything supported by CSS |
 | [font=FONTNAME]**TEXT**[/font] | Also any font supported by CSS |
 | [size=FONTSIZE]**TEXT**[size] | Font height in pixels |
