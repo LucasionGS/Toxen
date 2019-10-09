@@ -29,6 +29,20 @@ it will set it as background for the song.
 
 You can also drop a supported subtitle file to add it to a song.
 
+## Enchanted .srt Subtitles
+Subtitle files can include special properties which will work in Toxen.
+
+| Syntax | Description |
+| --- | --- |
+| (**TEXT**) = Greyed text, like background lyrics | mp3
+| [color=#HEXCODE]**TEXT**[/color] | Change color to anything supported by CSS |
+| [font=FONTNAME]**TEXT**[/font] | Also any font supported by CSS |
+| [size=FONTSIZE]**TEXT**[size] | Font height in pixels |
+| \*\***TEXT**\*\* | Bold Text |
+| \***TEXT**\* | Italic Text |
+| \~\~**TEXT**\~\~ | Strike Through Text |
+
+
 ## Options & Shortcuts
 
 | Shortcut | Action | Description |
