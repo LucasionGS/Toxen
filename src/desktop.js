@@ -369,14 +369,31 @@ function openSettings()
   lastWindow = window.open("settings.html");
 }
 
-function searchChange(search) {
+function searchChange(search, object) {
   var _songs = document.getElementsByClassName("music-item");
   for (var i = 0; i < _songs.length; i++) {
-    if (!_songs[i].childNodes[0].innerHTML.toLowerCase().includes(search.toLowerCase())) {
-      _songs[i].style.display = "none";
+    if (!search.startsWith("/")) {
+      object.style.color = "black";
+      if (_songs[i].childNodes[0].innerHTML.toLowerCase().includes(search.toLowerCase())) {
+        _songs[i].style.display = "block";
+      }
+      else {
+        _songs[i].style.display = "none";
+      }
     }
     else {
-      _songs[i].style.display = "block";
+      try {
+        object.style.color = "black";
+        if (_songs[i].childNodes[0].innerHTML.match(new RegExp(search.substring(1), "i"))) {
+          _songs[i].style.display = "block";
+        }
+        else {
+          _songs[i].style.display = "none";
+        }
+      }
+      catch (e) {
+        object.style.color = "red";
+      }
     }
   }
 }
