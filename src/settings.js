@@ -8,7 +8,7 @@ try {
   preset = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
 }
 catch (e) {
-  notification("No settings found", "It doesn't seem like you have set up your settings yet.\n"+
+  new Notif("No settings found", "It doesn't seem like you have set up your settings yet.\n"+
   "For this app to work, it's important you select a music folder (A folder that already exists)\n"+
   "");
 }

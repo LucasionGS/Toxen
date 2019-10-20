@@ -166,43 +166,6 @@ progress#curTime{
   margin: 0;
 }
 
-div._notification{
-  position: fixed;
-  left: 50%;
-  top: 0;
-  transform: translate(-50%, -100%);
-  min-width: 512px;
-  max-width: 768px;
-  min-height: 128px;
-  margin: auto;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 5px 5px 5px black;
-  transition: all 0.3s ease-out;
-}
-
-div._notification h1, div._notification p{
-  color:black;
-  text-align: center;
-}
-
-div._notification p.notifText{
-  padding-bottom: 36px;
-  white-space: pre-wrap;
-}
-
-div._notification[action="open"]{
-  left: 50%;
-  top: 5%;
-  transform: translateX(-50%);
-}
-
-div._notification[action="close"]{
-  left: 50%;
-  top: 0;
-  transform: translate(-50%, -100%);
-}
-
 div.Button{
   position: absolute;
   width: 128px;
