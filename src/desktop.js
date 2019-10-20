@@ -13,6 +13,9 @@ setInterval(() => {
     if (settings.musicDir == "") {
       settings.musicDir = defaultMusicDir;
     }
+    if (settings.musicDir === false) {
+      settings.musicDir = defaultMusicDir;
+    }
   } catch (e) {
     settings = {
       //Add default settings if no file.
@@ -78,7 +81,7 @@ function LoadMusic(){
   var musicFiles = [];
   otherWindow = document.getElementById("otherWindow");
   var _musicFiles;
-  if (settings.musicDir != undefined && settings.musicDir != "") {
+  if (settings.musicDir !== false && settings.musicDir != undefined && settings.musicDir != "") {
     fs.mkdirSync(settings.musicDir, {recursive: true});
     preMusicDirectory = settings.musicDir;
     pathDir = settings.musicDir.replace(/\\/g, "/")+"/";
@@ -86,6 +89,7 @@ function LoadMusic(){
   else {
     fs.mkdirSync(defaultMusicDir, {recursive: true});
     pathDir = defaultMusicDir;
+    settings.musicDir = defaultMusicDir;
     preMusicDirectory = pathDir;
   }
   _musicFiles = fs.readdirSync(pathDir, {withFileTypes:true});
@@ -132,7 +136,9 @@ function LoadMusic(){
       var srtFile = "";
       var bgFile = "";
       var parts = _title.split(" - ", 2);
-
+      if (!_musicFiles[i].isDirectory()) {
+        continue;
+      }
       var _songFolderFiles = fs.readdirSync(pathDir+"/"+_title);
       for (var i2 = 0; i2 < _songFolderFiles.length; i2++) {
         if (_songFolderFiles[i2].endsWith(".mp3")) {
@@ -216,6 +222,7 @@ function isFileCopyFinished(filesDetected, filesCopied, curFile) {
       }, 1000);
       setTimeout(function () {
         fileCopyProcessNotif.close();
+        fileCopyProcessNotif = undefined;
       }, 1500);
     }
   }
@@ -267,8 +274,10 @@ async function addMusic()
   name = isValid(name);
   var stream = ytdl(url);
   //const mp4 = pathDir+name+'.mp4'; //Add this IF i add video
-  const mp3 = pathDir+name+'.mp3';
-  const jpg = pathDir+name+".jpg";
+  var songFolderPath = pathDir+name+"/";
+  fs.mkdirSync(songFolderPath);
+  const mp3 = songFolderPath+name+'.mp3';
+  const jpg = songFolderPath+name+".jpg";
   if (dlImg) {
     const request = https.get("https://i.ytimg.com/vi/"+ytdl.getURLVideoID(url)+"/maxresdefault.jpg", function(response) {
     response.pipe(fs.createWriteStream(jpg));
@@ -284,12 +293,9 @@ async function addMusic()
     ffmpegPath = './src/ffmpeg.exe';
   }
 
-  new Notif("Downloading... Please wait", name, 1000);
+  new Notif("Downloading... Please wait", name, 2000);
   proc.setFfmpegPath(ffmpegPath);
-  /*var savedFile = proc.saveToFile(mp3);
 
-  savedFile = await savedFile;
-  console.log(savedFile);*/
   try {
 
   } catch (e) {
@@ -298,30 +304,31 @@ async function addMusic()
   proc.saveToFile(mp3, (stdout, stderr) => {
     if (stderr) {
       return console.log(stderr);
-      document.getElementById("addUrl").value = "";
-      document.getElementById("addName").value = "";
-      document.getElementById("addButton").disabled = false;
-      document.getElementById("addButton").innerHTML = "Add Music";
     }
     console.log(stdout);
     //Add file to music browser
+    document.getElementById("addUrl").value = "";
+    document.getElementById("addName").value = "";
+    document.getElementById("addButton").disabled = false;
+    document.getElementById("addButton").innerHTML = "Add Music";
     return console.log('Download complete!');
   })
   .on('end', function(err) {
     var _title = name;
+    var folderPath = songFolderPath;
     var artist;
     var title;
-    var file;
+    var file = mp3;
+    var bgFile = jpg;
+    var srtFile = "";
     var parts = _title.split(" - ", 2);
     if (parts.length > 1) {
       artist = parts[0];
       title = parts[1];
-      file = pathDir+_title+".mp3";
     }
     else {
       artist = "Unknown";
       title = parts[0];
-      file = pathDir+_title+".mp3";
     }
 
     var newItem = document.createElement("div");
@@ -333,9 +340,17 @@ async function addMusic()
     var newItemP = document.createElement("p");
     newItemP.innerHTML = artist + " - " + title;
     newItem.appendChild(newItemP);
-    newItem.addEventListener('contextmenu', musicMenuFunc(event), false);
+    //newItem.addEventListener('contextmenu', musicMenuFunc(event), false);
     document.getElementById("music-list").appendChild(newItem);
     songs[songCount] = file;
+    allMusicData.push({
+      "artist": artist,
+      "title": title,
+      "file": file,
+      "folderPath": folderPath,
+      "background": bgFile,
+    });
+    scrollToSong(songCount);
     songCount++;
 
     new Notif("Download Finished", name, 1000);
@@ -346,7 +361,9 @@ async function addMusic()
       document.getElementById("addButton").disabled = false;
       document.getElementById("addButton").innerHTML = "Add Music";
     }
-    document.getElementById("deleteOnNewLoad").parentNode.removeChild(document.getElementById("deleteOnNewLoad"));
+    if (document.getElementById("deleteOnNewLoad")) {
+      document.getElementById("deleteOnNewLoad").parentNode.removeChild(document.getElementById("deleteOnNewLoad"));
+    }
   });
 
   // Get ID:

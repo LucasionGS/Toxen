@@ -52,13 +52,15 @@ function stop(btn)
 }
 
 function deleteSong(id) {
-  // Delete files inside
-  var files = fs.readdirSync(allMusicData[id].folderPath);
-  for (var i = 0; i < files.length; i++) {
-    fs.unlinkSync(allMusicData[id].folderPath+"/"+files[i]);
-  }
-  // Delete Folder
-  fs.rmdirSync(allMusicData[id].folderPath);
+  try {
+    // Delete files inside
+    var files = fs.readdirSync(allMusicData[id].folderPath);
+    for (var i = 0; i < files.length; i++) {
+      fs.unlinkSync(allMusicData[id].folderPath+"/"+files[i]);
+    }
+    // Delete Folder
+    fs.rmdirSync(allMusicData[id].folderPath);
+  } catch (e) { console.log("No files to delete"); }
   const ref = document.getElementById("music-"+id);
   ref.parentNode.removeChild(ref);
 }

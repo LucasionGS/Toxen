@@ -59,13 +59,14 @@ for (var key in musicMenuList) {
 }
 
 function musicMenuFunc(e) {
-  e.preventDefault();
-  try { menu.parentNode.removeChild(menu); } catch (e){}
-  document.getElementsByTagName("body")[0].appendChild(musicMenu);
-  console.log(musicMenu);
-  musicMenu.style.left = mousePos.X+"px";
-  musicMenu.style.top = mousePos.Y+"px";
-  musicMenu.setAttribute("onmouseout", "this.parentNode.removeChild(this);");
+  if (e) {
+    try { menu.parentNode.removeChild(menu); } catch (e){}
+    document.getElementsByTagName("body")[0].appendChild(musicMenu);
+    console.log(musicMenu);
+    musicMenu.style.left = mousePos.X+"px";
+    musicMenu.style.top = mousePos.Y+"px";
+    musicMenu.setAttribute("onmouseout", "this.parentNode.removeChild(this);");
+  }
   return false;
 }
 
@@ -74,4 +75,10 @@ function menuFunction()
   //Close menu
   try { menu.parentNode.removeChild(menu); } catch (e){}
   //Do action here
+}
+
+function scrollToSong(id)
+{
+  var musicObject = document.getElementById("music-"+id);
+  musicObject.scrollIntoView();
 }

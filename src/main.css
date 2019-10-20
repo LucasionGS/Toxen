@@ -54,6 +54,7 @@ div.sidebar .music-list{
   max-height: 60%;
   overflow-y: hidden;
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
 div.sidebar .music-list:hover{
