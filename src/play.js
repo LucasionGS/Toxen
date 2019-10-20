@@ -51,26 +51,48 @@ function stop(btn)
   musicObject.pause();
 }
 
+function deleteSong(id) {
+  // Delete files inside
+  var files = fs.readdirSync(allMusicData[id].folderPath);
+  for (var i = 0; i < files.length; i++) {
+    fs.unlinkSync(allMusicData[id].folderPath+"/"+files[i]);
+  }
+  // Delete Folder
+  fs.rmdirSync(allMusicData[id].folderPath);
+  const ref = document.getElementById("music-"+id);
+  ref.parentNode.removeChild(ref);
+}
+
 function playSong(id)
 {
   const ref = document.getElementById("music-"+id);
   data = {
-    "id":id,
-    "song":ref.childNodes[0].innerHTML,
-    "file":songs[id],
+    "id": id,
+    "song": allMusicData[id].artist+" - "+allMusicData[id].title,
+    "file": allMusicData[id].file,
     //"duration":""
   };
+  var songTitle = allMusicData[id].artist+" - "+allMusicData[id].title;
+  if (!fs.existsSync(allMusicData[id].file)) {
+    new Notif(
+      "No mp3 found.",
+      [
+        "No mp3 file cound be found inside of the song folder \""+allMusicData[id].folderPath+"\".",
+        "Do you want to delete this folder?",
+        "<button onclick='deleteSong("+id+"); this.parentNode.parentNode.close();'>Delete song</button>"
+      ]
+    );
+  }
   var musicObject = document.getElementById("musicObject");
-  musicObject.src = data.file;
+  musicObject.src = allMusicData[id].file;
   musicObject.volume = 0.3;
-  //console.log(data);
-  if (data["song"].length <= 60) {
-    document.getElementById("song-title").innerHTML = data["song"];
+  if (songTitle.length <= 60) {
+    document.getElementById("song-title").innerHTML = songTitle;
   }
   else {
-    document.getElementById("song-title").innerHTML = data["song"].substring(0, 60)+"...";
+    document.getElementById("song-title").innerHTML = songTitle.substring(0, 60)+"...";
   }
-  setBG(data);
+  setBG(allMusicData[id].background);
   play(document.getElementById("play"));
   document.getElementById("now-playing").setAttribute("playingid", id);
   changeVolume();
@@ -91,7 +113,7 @@ function playSong(id)
   var musicListObject = document.getElementById("music-list");
   musicListObject.scrollTop = curMusicItem.offsetTop-Math.min(musicListObject.clientHeight, mousePos.Y);
   clearInterval(subtitleInterval);
-  RenderSubtitles(data);
+  RenderSubtitles(allMusicData[id].srt);
   Visualizer();
 }
 
@@ -222,11 +244,11 @@ function changeVolume()
   document.getElementById("volumeLabel").innerHTML = "- Volume + " + document.getElementById("volume").value;
 }
 
-function setBG(song, queryString, reset)
+function setBG(image, queryString, reset)
 {
   if (queryString == undefined) {
     try {
-      queryString = fs.statSync(song.file.substring(0,song.file.length-4)+".jpg").ctimeMs;
+      queryString = fs.statSync(image).ctimeMs;
     } catch (e) {
       queryString = "";
     }
@@ -237,7 +259,7 @@ function setBG(song, queryString, reset)
   }
   else {
     var body = document.getElementsByTagName('body')[0];
-    var curBG = song.file.substring(0,song.file.length-4)+".jpg";
+    var curBG = image;
     body.style.background = "url(\""+curBG+"?"+queryString+"\") no-repeat center center fixed";
     body.style.backgroundSize = "cover";
   }

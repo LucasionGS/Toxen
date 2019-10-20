@@ -12,9 +12,9 @@ setTimeout(function () {
   document.getElementsByTagName("body")[0].appendChild(subBox);
 }, 1);
 
-function ParseSrt(song)
+function ParseSrt(srtFile)
 {
-  var srtPath = song.file.substring(0, song.file.length - 4)+".srt";
+  var srtPath = srtFile;
   try {
     var srtText = fs.readFileSync(srtPath, "utf8");
   } catch (e) {
@@ -63,9 +63,9 @@ function ParseSrt(song)
 }
 
 var subtitleInterval;
-function RenderSubtitles(song) {
+function RenderSubtitles(srtFile) {
   clearInterval(subtitleInterval);
-  var subData = ParseSrt(song);
+  var subData = ParseSrt(srtFile);
   var subText = document.getElementById("subBoxText");
   subText.innerHTML = "";
   if (!subData) {

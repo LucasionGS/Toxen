@@ -54,6 +54,7 @@ window.onload = function(){
 var allFoundFiles = []; // Used for deleting after...
 //Loads all music in a folder
 function LoadMusic(){
+  allFoundFiles = [];
   songCount = 0;
   try {
     settings = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
@@ -90,6 +91,8 @@ function LoadMusic(){
   _musicFiles = fs.readdirSync(pathDir, {withFileTypes:true});
 
   var newMp3Count = 0;
+  filesDetected = 0;
+  filesCopied = 0;
   for (var i = 0; i < _musicFiles.length; i++) {
     var thisMusicDir = settings.musicDir+"/"+_musicFiles[i].name+"/";
     if (
@@ -117,29 +120,50 @@ function LoadMusic(){
         isFileCopyFinished(filesDetected, filesCopied, allFoundFiles[filesCopied-1]);
       });
     }
-    else if (false) {
-      musicFiles[musicFiles.length] = _musicFiles[i].name;
+    else {
+      //musicFiles[musicFiles.length] = _musicFiles[i].name;
 
       //Creating JSON as string
       var _title = _musicFiles[i].name;
+      var folderPath = pathDir+"/"+_title+"/";
       var artist;
       var title;
-      var file;
+      var mp3File = pathDir+"/"+_title+"/"+_title+".mp3";
+      var srtFile = "";
+      var bgFile = "";
       var parts = _title.split(" - ", 2);
+
+      var _songFolderFiles = fs.readdirSync(pathDir+"/"+_title);
+      for (var i2 = 0; i2 < _songFolderFiles.length; i2++) {
+        if (_songFolderFiles[i2].endsWith(".mp3")) {
+          mp3File = pathDir+"/"+_title+"/"+_songFolderFiles[i2];
+        }
+        else if (_songFolderFiles[i2].endsWith(".srt")) {
+          srtFile = pathDir+"/"+_title+"/"+_songFolderFiles[i2];
+        }
+        else if (
+          _songFolderFiles[i2].endsWith(".png")
+          || _songFolderFiles[i2].endsWith(".jpeg")
+          || _songFolderFiles[i2].endsWith(".jpg")
+        ) {
+          bgFile = pathDir+"/"+_title+"/"+_songFolderFiles[i2];
+        }
+      }
       if (parts.length > 1) {
         artist = parts[0];
         title = parts[1];
-        file = pathDir+"/"+_title+".mp3";
       }
       else {
         artist = "Unknown";
         title = parts[0];
-        file = pathDir+"/"+_title+".mp3";
       }
       musicFiles[newMp3Count] = {
-        "artist":artist,
-        "title":title,
-        "file":file
+        "folderPath": folderPath,
+        "artist": artist,
+        "title": title,
+        "file": mp3File,
+        "srt": srtFile,
+        "background": bgFile,
       };
       newMp3Count++;
     }
@@ -185,9 +209,14 @@ function isFileCopyFinished(filesDetected, filesCopied, curFile) {
     }
     else {
       document.querySelector("#TEMP_FILECOPYPROCESS").innerHTML = "All files copied!";
+      LoadMusic();
+      setTimeout(function () {
+        fileCopyProcessNotif.titleObject.innerHTML = "Reloaded Music Folder";
+        fileCopyProcessNotif.descriptionObject.innerHTML = "";
+      }, 1000);
       setTimeout(function () {
         fileCopyProcessNotif.close();
-      }, 1000);
+      }, 1500);
     }
   }
   else {
@@ -342,42 +371,42 @@ function fileDropped(e)
   //Background files
   if (isExt(".jpg") || isExt(".png")) {
     var curId = document.getElementById("now-playing").getAttribute("playingid");
-    var fileName = songs[curId].split("/")[songs[curId].split("/").length-1];
-    fileName = fileName.substring(0,fileName.length-4);
-    fs.copyFileSync(file.path, pathDir+fileName+".jpg");
-    setBG({"file":songs[curId]});
+    //var fileName = allMusicData[curId].split("/")[songs[curId].split("/").length-1];
+    // fileName = fileName.substring(0,fileName.length-4);
+    fs.copyFileSync(file.path, allMusicData[curId].folderPath+file.name);
+    allMusicData[curId].background = allMusicData[curId].folderPath+file.name;
+    setBG(allMusicData[curId].background);
   }
   //Subtitle files
   else if (isExt(".srt")) {
     var curId = document.getElementById("now-playing").getAttribute("playingid");
-    var fileName = songs[curId].split("/")[songs[curId].split("/").length-1];
-    fileName = fileName.substring(0,fileName.length-4);
-    fs.copyFileSync(file.path, pathDir+fileName+".srt");
-    new Notif("Added Subtitles", "Successfully added subtitles added for \""+fileName+"\"", 1000);
-    console.log(allMusicData);
-    console.log(allMusicData[curId]);
-    RenderSubtitles(allMusicData[curId]);
+    //var fileName = allMusicData[curId].split("/")[songs[curId].split("/").length-1];
+    // fileName = fileName.substring(0,fileName.length-4);
+    fs.copyFileSync(file.path, allMusicData[curId].folderPath+file.name);
+    allMusicData[curId].srt = allMusicData[curId].folderPath+file.name;
+    new Notif("Added Subtitles", "Successfully added subtitles added for \""+allMusicData[curId].title+"\"", 1000);
+    RenderSubtitles(allMusicData[curId].srt);
   }
   //Music Files
   else if (isExt(".mp3")) {
     //console.log(file);
-    fs.copyFileSync(file.path, pathDir+file.name);
+    fs.mkdirSync(pathDir+"/"+file.name.substring(0,file.name.length-4), {recursive:true});
+    fs.copyFileSync(file.path, pathDir+"/"+file.name.substring(0,file.name.length-4)+"/"+file.name);
     //Adding the file, i swear make a fucking function >_>
     {
       var _title = file.name.substring(0,file.name.length-4);
+      var folderPath = pathDir+"/"+file.name.substring(0,file.name.length-4)+"/";
       var artist;
       var title;
-      var filePath;
+      var filePath = folderPath+file.name;
       var parts = _title.split(" - ", 2);
       if (parts.length > 1) {
         artist = parts[0];
         title = parts[1];
-        filePath = pathDir+_title+".mp3";
       }
       else {
         artist = "Unknown";
         title = parts[0];
-        filePath = pathDir+_title+".mp3";
       }
 
       var newItem = document.createElement("div");
@@ -392,9 +421,10 @@ function fileDropped(e)
       document.getElementById("music-list").appendChild(newItem);
       songs[songCount] = filePath;
       allMusicData.push({
-        "artist":artist,
-        "title":title,
-        "file":filePath
+        "artist": artist,
+        "title": title,
+        "file": filePath,
+        "folderPath": folderPath,
       });
       songCount++;
     }
