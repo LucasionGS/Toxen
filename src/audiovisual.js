@@ -49,11 +49,11 @@ function Visualizer(){
       for (var i = 0; i < bufferLength; i++) {
         barHeight = (dataArray[i]*intensity-(10*intensity));
 
-        var r = barHeight + (25 * (i/bufferLength));
-        var g = 0 * (i/bufferLength);
-        var b = 250 - (barHeight/5);
+        var r = VisualizerProperties.r;
+        var g = VisualizerProperties.g;
+        var b = VisualizerProperties.b;
 
-        ctx.fillStyle = "rgba(" + r + "," + g + "," + b + ", 0.5)";
+        ctx.fillStyle = "rgba(" + r + "," + g + "," + b + ", " + 0.3 + ")";
         ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
 
         x += barWidth + 1;
