@@ -254,8 +254,14 @@ function musicEnd()
         _availableSongs.push(i);
       }
     }
-    console.log(_availableSongs);
-    playSong(_availableSongs[Math.floor((Math.random() * _availableSongs.length))]);
+    var songIdToPlay = _id;
+    while (songIdToPlay == _id && _availableSongs.length > 1) {
+      songIdToPlay = _availableSongs[Math.floor((Math.random() * _availableSongs.length))];
+    }
+    if (_availableSongs.length == 1) {
+      songIdToPlay = _availableSongs[0];
+    }
+    playSong(songIdToPlay);
   }
 }
 
