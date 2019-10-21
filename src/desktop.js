@@ -259,7 +259,7 @@ async function addMusic()
   else {
     return new Notif("Invalid URL", "\""+url+"\" is not a valid URL");
   }
-  var name = document.getElementById("addName").value/*.replace("&", "and")*/;
+  var name = document.getElementById("addName").value;
   var button = document.getElementById("addButton");
   var dlImg = document.getElementById("dlImg").checked;
   button.innerHTML = "Downloading... Please wait";

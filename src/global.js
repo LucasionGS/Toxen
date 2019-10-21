@@ -1,12 +1,7 @@
 const http = require('https');
 var proc = require('child_process');
-console.log(process.env);
 var defaultMusicDir = process.env.HOMEDRIVE+process.env.HOMEPATH+"/Music/";
 defaultMusicDir = defaultMusicDir.replace(/(\\+)/g, "/");
-/*while (defaultMusicDir.includes("\\")) {
-  defaultMusicDir = defaultMusicDir.replace("\\","/");
-  console.log("removed \\ from "+ defaultMusicDir);
-}*/
 
 //Default check for update on startup
 setTimeout(function () {
@@ -24,9 +19,9 @@ function checkUpdate()
   .then(data => {
     const newVers = data.tag_name;
     const dlUrl = data.assets[0].browser_download_url;
-    //console.log(curVers);
-    //console.log(newVers);
-    //console.log(dlUrl);
+
+
+
     if (curVers != newVers) {
       new Notif("New Update Available", "<a href=\""+dlUrl+"\">Click here to download</a>\nOr <a onclick=\"proc.spawn('cmd.exe start \"\" ToxenInstall.exe', [], {detacted:true, stdio: 'ignore'});\" href=\"#\">Open the installer</a> to update automatically.");
     }
@@ -58,24 +53,26 @@ for (var key in musicMenuList) {
   i++;
 }
 
-function musicMenuFunc(e) {
+/*function musicMenuFunc(e) {
   if (e) {
     try { menu.parentNode.removeChild(menu); } catch (e){}
     document.getElementsByTagName("body")[0].appendChild(musicMenu);
-    console.log(musicMenu);
+
     musicMenu.style.left = mousePos.X+"px";
     musicMenu.style.top = mousePos.Y+"px";
-    musicMenu.setAttribute("onmouseout", "this.parentNode.removeChild(this);");
+    musicMenu.onmouseout = function () {
+      this.parentNode.removeChild(this);
+    };
   }
   return false;
-}
+}*/
 
-function menuFunction()
+/*function menuFunction()
 {
   //Close menu
   try { menu.parentNode.removeChild(menu); } catch (e){}
   //Do action here
-}
+}*/
 
 function scrollToSong(id)
 {

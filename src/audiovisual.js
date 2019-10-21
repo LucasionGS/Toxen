@@ -3,14 +3,26 @@ function VisualizerChangeSrc()
 
 }
 
+var _context = new AudioContext();
+var _src;
+var analyser;
+var _contextSrcInterval = setInterval(function () {
+  if (document.getElementById("musicObject")) {
+    _src = _context.createMediaElementSource(document.getElementById("musicObject"));
+    analyser = _context.createAnalyser();
+    clearInterval(_contextSrcInterval);
+  }
+}, 0);
+
+
 function Visualizer(){
+  if (!document.getElementById("musicObject")) {
+    return console.error("musicObject doesn't exist");
+  }
   audio = document.getElementById("musicObject");
   //audio.load();
-  audio.play();
-  var context = new AudioContext();
-  var src = context.createMediaElementSource(audio);
-  var analyser = context.createAnalyser();
-  //console.log(context);
+  //audio.play();
+  //console.log(_context);
   //console.log(HTMLMediaElement);
   var canvas = document.getElementById("canvas");
   canvas.width = window.innerWidth;
@@ -18,10 +30,10 @@ function Visualizer(){
   var ctx = canvas.getContext("2d");
 
 
-  src.connect(analyser);
-  analyser.connect(context.destination);
+  _src.connect(analyser);
+  analyser.connect(_context.destination);
 
-  analyser.fftSize = 256;
+  analyser.fftSize = 512;
 
   var bufferLength = analyser.frequencyBinCount;
   //console.log(bufferLength);

@@ -76,7 +76,7 @@ function playSong(id)
     "id": id,
     "song": allMusicData[id].artist+" - "+allMusicData[id].title,
     "file": allMusicData[id].file,
-    //"duration":""
+
   };
   var songTitle = allMusicData[id].artist+" - "+allMusicData[id].title;
   if (!fs.existsSync(allMusicData[id].file)) {
@@ -105,7 +105,7 @@ function playSong(id)
   if (playHistory[playHistory.length-1] != id) {
     playHistory[playHistory.length] = id;
   }
-  //console.log(playHistory);
+
   var allMusicItems = document.getElementsByClassName("music-item");
   for (var i = 0; i < allMusicItems.length; i++) {
     if (allMusicItems[i].getAttribute("playing") != "new") {
@@ -311,7 +311,7 @@ function setBG(image, queryString, reset)
     body.style.background = "url(\""+curBG+"?"+queryString+"\") no-repeat center center fixed";
     body.style.backgroundSize = "cover";
   }
-  //console.log(body.style.backgroundImage);
+
 }
 
 function onMenuHover()

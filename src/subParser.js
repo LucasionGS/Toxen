@@ -1,5 +1,6 @@
 //Create subtitle box for spawning and displaying
-setTimeout(function () {
+var createSubBoxInterval = setTimeout(function () {
+  if (document.getElementsByTagName("body")[0]) {
   var subBox = document.createElement("div");
   var subBoxText = document.createElement("p");
   subBox.setAttribute("id", "subBox");
@@ -9,7 +10,9 @@ setTimeout(function () {
   subBoxText.innerHTML = "";
 
   subBox.appendChild(subBoxText);
-  document.getElementsByTagName("body")[0].appendChild(subBox);
+    document.getElementsByTagName("body")[0].appendChild(subBox);
+    clearInterval(createSubBoxInterval);
+  }
 }, 1);
 
 function ParseSrt(srtFile)
@@ -67,7 +70,9 @@ function RenderSubtitles(srtFile) {
   clearInterval(subtitleInterval);
   var subData = ParseSrt(srtFile);
   var subText = document.getElementById("subBoxText");
-  subText.innerHTML = "";
+  if (subText.innerHTML) {
+    subText.innerHTML = "";
+  }
   if (!subData) {
     return;
   }
