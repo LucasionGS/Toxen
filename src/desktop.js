@@ -203,6 +203,7 @@ function LoadMusic(){
     console.log("No music found!");
   }
   allMusicData = musicFiles;
+  searchChange(document.getElementById("searchField").value, document.getElementById("searchField"));
 }
 
 var filesDetected = 0;

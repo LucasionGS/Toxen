@@ -68,6 +68,10 @@ function deleteSong(id) {
 function playSong(id)
 {
   const ref = document.getElementById("music-"+id);
+  if (ref.style.display == "none") {
+    musicEnd();
+    return null;
+  }
   data = {
     "id": id,
     "song": allMusicData[id].artist+" - "+allMusicData[id].title,
@@ -208,14 +212,50 @@ function musicEnd()
   }
   if (!randomize) {
     if (songCount > _id+1) {
+      var musicObject = document.getElementById("music-"+(_id+1));
+      while(musicObject.style.display == "none") {
+        _id++;
+        if (songCount > _id+1) {
+          musicObject = document.getElementById("music-"+(_id+1));
+        }
+        else {
+          _id = 0;
+          musicObject = document.getElementById("music-"+(_id));
+          while(musicObject.style.display == "none") {
+            _id++;
+            if (songCount > _id+1) {
+              musicObject = document.getElementById("music-"+(_id));
+            }
+          }
+          playSong(_id);
+          return undefined;
+        }
+      }
       playSong(_id+1);
     }
     else {
-      playSong(0);
+      _id = 0;
+      musicObject = document.getElementById("music-"+(_id));
+      while(musicObject.style.display == "none") {
+        _id++;
+        if (songCount > _id+1) {
+          musicObject = document.getElementById("music-"+(_id));
+        }
+      }
+      playSong(_id);
+      return undefined;
     }
   }
   else {
-    playSong(Math.floor((Math.random() * songCount)));
+    var _availableSongs = [];
+    for (var i = 0; i < songCount; i++) {
+      var musicObject = document.getElementById("music-"+i);
+      if (musicObject.style.display != "none") {
+        _availableSongs.push(i);
+      }
+    }
+    console.log(_availableSongs);
+    playSong(_availableSongs[Math.floor((Math.random() * _availableSongs.length))]);
   }
 }
 
