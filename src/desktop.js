@@ -34,7 +34,7 @@ setInterval(() => {
 //Loading music and other startup events
 window.onload = function(){
   Notif.addStyle({theme:"dark"});
-  LoadMusic();
+
   //Create drop area
   var dropHereNotif;
   let dropArea = document.getElementsByTagName("html")[0];
@@ -52,6 +52,14 @@ window.onload = function(){
     event.stopPropagation();
     event.preventDefault();
   }, false);
+
+  var loadingMusicNotif = new Notif("Loading Music...", "", 10000);
+  setTimeout(function () {
+    LoadMusic();
+    loadingMusicNotif.close();
+    toggleFunction("shuffle");
+    musicEnd();
+  }, 1);
 }
 
 var allFoundFiles = []; // Used for deleting after...
@@ -182,7 +190,7 @@ function LoadMusic(){
       newItem.setAttribute("class", "music-item");
       newItem.setAttribute("id","music-"+ i);
       newItem.setAttribute("onclick", "playSong("+ i +");");
-      newItem.setAttribute("oncontextmenu", "musicMenuFunc(event);");
+      newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
       var newItemP = document.createElement("p");
       newItemP.innerHTML = musicFiles[i].artist + " - " + musicFiles[i].title;
       newItem.appendChild(newItemP);
@@ -336,7 +344,7 @@ async function addMusic()
     newItem.setAttribute("class", "music-item");
     newItem.setAttribute("id","music-"+ songCount);
     newItem.setAttribute("onclick", "playSong("+ songCount +");");
-    newItem.setAttribute("oncontextmenu", "musicMenuFunc(event);");
+    newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
     newItem.setAttribute("playing", "new");
     var newItemP = document.createElement("p");
     newItemP.innerHTML = artist + " - " + title;
@@ -355,6 +363,7 @@ async function addMusic()
     songCount++;
 
     new Notif("Download Finished", name, 1000);
+    new Notification("Download Finished");
     _finished();
     function _finished() {
       document.getElementById("addUrl").value = "";
@@ -463,9 +472,7 @@ function openSettings()
 {
   try {
     lastWindow.close();
-  } catch (e) {
-
-  }
+  } catch (e) {}
   lastWindow = window.open("settings.html");
 }
 
@@ -496,4 +503,59 @@ function searchChange(search, object) {
       }
     }
   }
+}
+
+function renameSong(object, e) {
+  e.preventDefault()
+  var id = object.getAttribute("id").replace("music-", "");
+  var info = allMusicData[id];
+  const input = document.createElement("input");
+  input.value = info.artist +" - "+info.title;
+  input.style.width = "80%";
+  input.style.textAlign = "center";
+  const btn = document.createElement("Button");
+  btn.innerHTML = "Rename";
+  new Notif("Rename",
+  [
+    "Renaming \""+info.artist +" - "+info.title+" to\"\n",
+    input,
+    btn
+  ]);
+
+  btn.onclick = function () {
+    renameAction(object, input.value, {input:input});
+  }
+  input.onkeydown = function (ev) {
+    if (ev.key == "Enter") {
+      ev.preventDefault();
+      renameAction(object, input.value, {input:input});
+    }
+  }
+  input.focus();
+  input.setSelectionRange(0, input.value.length);
+}
+
+function renameAction(object, newName, other) {
+  var id = object.getAttribute("id").replace("music-", "");
+
+  fs.access(pathDir+newName, function(err) {
+    if (!err) {
+      if (other && other.input) {
+        console.log(other.input.parentNode.parentNode);
+        other.input.parentNode.parentNode.instance.titleObject.innerHTML = "Song already exists";
+        other.input.focus();
+        other.input.setSelectionRange(0, other.input.value.length);
+      }
+
+      return console.log("Song Exists");
+    }
+    // If no song is named that
+    fs.rename(allMusicData[id].folderPath, pathDir+newName, function (err) {
+      if (err) { console.log(err); }
+      other.input.parentNode.parentNode.close();
+      new Notif("Renamed", ["Changed \""+allMusicData[id].folderPath+"\"\nto\n"+"\""+pathDir+newName+"\""], 1000);
+      onMenuHover();
+      LoadMusic();
+    });
+  });
 }
