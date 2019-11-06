@@ -144,6 +144,14 @@ function keypress(e)
     onMenuHover();
     document.querySelector(".settingsList").scrollIntoView();
   }
+  else if (e.ctrlKey && e.key == "m") {
+    onMenuHover();
+    document.querySelector(".music-list").scrollIntoViewIfNeeded();
+  }
+  else if (e.ctrlKey && e.key == "y") {
+    onMenuHover();
+    document.querySelector(".addMusic").scrollIntoViewIfNeeded();
+  }
   else if (e.ctrlKey && e.key == "u") {
     checkUpdate();
   }
