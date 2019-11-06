@@ -7,7 +7,7 @@ var preMusicDirectory = null;
 var allMusicData = [];
 var pathDir;
 
-setInterval(() => {
+function reloadSettings(){
   try {
     settings = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
     if (settings.musicDir == "") {
@@ -29,7 +29,7 @@ setInterval(() => {
     LoadMusic();
     new Notif("Updated Music Folder", "", 2000);
   }
-}, 250);
+}
 
 //Loading music and other startup events
 window.onload = function(){

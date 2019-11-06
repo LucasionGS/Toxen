@@ -1,5 +1,5 @@
 //Create subtitle box for spawning and displaying
-var createSubBoxInterval = setTimeout(function () {
+var createSubBoxInterval = setInterval(function () {
   if (document.getElementsByTagName("body")[0]) {
   var subBox = document.createElement("div");
   var subBoxText = document.createElement("p");
@@ -70,7 +70,7 @@ function RenderSubtitles(srtFile) {
   clearInterval(subtitleInterval);
   var subData = ParseSrt(srtFile);
   var subText = document.getElementById("subBoxText");
-  if (subText.innerHTML) {
+  if (subText && subText.innerHTML) {
     subText.innerHTML = "";
   }
   if (!subData) {

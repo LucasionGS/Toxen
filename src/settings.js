@@ -1,5 +1,5 @@
-const fs = require('fs');
-var proc = require('child_process');
+//const fs = require('fs');
+var __proc = require('child_process');
 var preset;
 setTimeout(function () {
   document.getElementById("musicDir").setAttribute('placeholder', defaultMusicDir);
@@ -15,7 +15,7 @@ catch (e) {
 
 
 const options = document.getElementsByClassName("setting");
-window.onload = function()
+window.addEventListener("load", function()
 {
   event_sliderUpdate(-1);
   for (var i = 0; i < options.length; i++) {
@@ -38,7 +38,7 @@ window.onload = function()
     }
   }
   //console.log(preset);
-}
+}, false);
 
 function applySettings()
 {
@@ -65,10 +65,9 @@ function applySettings()
   fs.writeFileSync("./settings.json", strOptions);
 
   var button = document.getElementById("applyButton");
-  button.innerHTML = "<p>Applied!</p>";
-  document.getElementById("backButton").innerHTML = "<p>Close</p>";
+  button.innerHTML = "<p>Saved!</p>";
   setTimeout(function () {
-    button.innerHTML = "<p>Apply</p>";
+    button.innerHTML = "<p>Save</p>";
   }, 2000);
 }
 
@@ -81,6 +80,12 @@ function event_sliderUpdate(value)
     document.getElementById("bgdim").innerHTML = "Background Dim: "+preset["backgroundDim"]+"%";
     document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+preset["visualizerIntensity"];
   }
+  try {
+    settings.backgroundDim = document.getElementById("bgdimslider").value;
+    settings.visualizerIntensity = document.getElementById("visualizerintensity").value;
+  } catch (error) {
+    
+  }
 }
 
 function openMusicFolder(){
@@ -92,5 +97,5 @@ function openMusicFolder(){
   while (_url.startsWith("/") || _url.startsWith("\\")) {
     _url = _url.substring(1);
   }
-  proc.exec('start "" "'+_url+'"');
+  __proc.exec('start "" "'+_url+'"');
 }

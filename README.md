@@ -1,5 +1,4 @@
 # ![Toxen Logo](https://raw.githubusercontent.com/LucasionGS/Toxen/master/icon.ico) Toxen
-So basically, music.
 ## What is Toxen?
 Toxen is a music player to play local music from your computer. It supports individual backgrounds for each song.
 It has an audio visualizer which works for every mp3 you insert.
@@ -47,6 +46,7 @@ Subtitle files can include special properties which will work in Toxen.
 
 | Shortcut | Action | Description |
 | --- | --- | --- |
+| F1 | Restarts the software | Refreshes the software, reloading all new files added or edited |
 | Ctrl + S | Open Settings | Opens the settings panel where you can customize Toxen |
 | Ctrl + R | Toggle Shuffle | Toggle randomly shuffling through songs instead of linearly |
 | Ctrl + Left Arrow | Previous song | Goes to the last song you played, this goes all the way back to the first song you played in this session |
@@ -82,7 +82,6 @@ A scale of how intense the visualizer should be. The higher it is, the taller th
 - Self-updator (Created separately in C# most likely, packaged with the software)
   - Optimally, only download files that are eithe missing or different to save time
   - If the updator needs to be updated as well, Toxen should download it upon startup.
-- Change "Usage" button to direct to this page, instead of the build-in page
 - Allow remote music files
   - Will require a list of file metadata, including the URL to the music file and background if any
 - Store settings and some other files in a separate directory from the downloaded files
@@ -94,7 +93,6 @@ A scale of how intense the visualizer should be. The higher it is, the taller th
   - Allow multiple link downloads
   - Separate Artist and Title into 2 input fields
 - Allow more music formats
-- Search through music
 - Allow to add more metadata info
   - Contributors
   - Source
@@ -104,12 +102,12 @@ A scale of how intense the visualizer should be. The higher it is, the taller th
   - Delete
   - Edit Metadata
 - Store music paths in a database for quick access
-- Full Song Refresh list (For when adding or removing music manually)
 
 ## Working on
 - Song settings
 
 ## Completed from Todo List
+- Updator (For now an external software you download on the side, but will make Toxen download it by itself later)
 - New tag for music finished being added (Shows a green highlight on new files)
 - Lyrics Display (A file that you can put onto a song, and it will be parsed into lyrics, much like .srt files)
 - Session listen history (For "previous" button to remember what to go back to)
@@ -123,12 +121,14 @@ A scale of how intense the visualizer should be. The higher it is, the taller th
   - Previous
   - Skip
   - Repeat
+- Search through music
+- Full Song Refresh list (For when adding or removing music manually)
 
 ## Known bugs
 - ~~Visualizer~~
   - ~~Visualizer being offset by some random amount, both small amounts and drastic amounts~~
-- YouTube downloader
-  - If the app deems the URL valid, but the video doesn't exist, can't be found or any error during, it will get stuck at downloading and won't proceed, restart required to download new files, if so
+- YouTube downloader.
+  - If the app deems the URL valid, but the video doesn't exist, can't be found or any error during, it will get stuck at downloading and won't proceed, restart required to download new files, if so.
 
 ## Library Credits
 **Audio Visualizer** based on [**JS Audio Visualizer**](https://codepen.io/nfj525/pen/rVBaab) created by [Nick Jones](https://codepen.io/nfj525).

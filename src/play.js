@@ -92,12 +92,8 @@ function playSong(id)
   var musicObject = document.getElementById("musicObject");
   musicObject.src = allMusicData[id].file;
   musicObject.volume = 0.3;
-  if (songTitle.length <= 60) {
-    document.getElementById("song-title").innerHTML = songTitle;
-  }
-  else {
-    document.getElementById("song-title").innerHTML = songTitle.substring(0, 60)+"...";
-  }
+
+  document.getElementById("song-title").innerHTML = songTitle;
   setBG(allMusicData[id].background);
   play(document.getElementById("play"));
   document.getElementById("now-playing").setAttribute("playingid", id);
@@ -145,7 +141,8 @@ function keypress(e)
     toggleFunction("shuffle");
   }
   else if (e.ctrlKey && e.key == "o") {
-    openSettings();
+    onMenuHover();
+    document.querySelector(".settingsList").scrollIntoView();
   }
   else if (e.ctrlKey && e.key == "u") {
     checkUpdate();
@@ -267,10 +264,13 @@ function musicEnd()
 
 function update()
 {
-  if (audio.duration > 0 && document.getElementById("curTime").max != audio.duration) {
+  if (audio && audio.duration && audio.duration > 0 && document.getElementById("curTime").max != audio.duration) {
     document.getElementById("curTime").max = audio.duration;
   }
-  document.getElementById("curTime").value = audio.currentTime;
+  if (audio && audio.currentTime && audio.duration) {
+    document.getElementById("curTime").value = audio.currentTime;
+    document.getElementById("song-digital-progress").innerHTML = ConvertSecondsToDigitalClock(audio.currentTime, true)+"/"+ConvertSecondsToDigitalClock(audio.duration, true);
+  }
 }
 
 //Execute update()
@@ -282,8 +282,11 @@ setInterval(() => {
 
 function changeProgress(e)
 {
-  var procent = e.offsetX / e.target.clientWidth;
-  audio.currentTime = audio.duration * procent;
+  if (e.buttons == 1) {
+    e.preventDefault();
+    var procent = e.offsetX / e.target.clientWidth;
+    audio.currentTime = audio.duration * procent;
+  }
 }
 
 function changeVolume()
@@ -322,4 +325,71 @@ function onMenuHover()
 function offMenuHover()
 {
   document.getElementById("sidebar").setAttribute("hover", "false");
+}
+
+function ConvertSecondsToDigitalClock(seconds = 0, trim = false) {
+  milliseconds = seconds * 1000;
+  time = "";
+  curNumber = 0;
+
+  // Convert into hours
+  while (milliseconds >= 3600000) {
+    curNumber++;
+    milliseconds -= 3600000;
+  }
+  if (curNumber < 10) {
+    time += "0" + (curNumber) + ":";
+  }
+  else {
+    time += curNumber + ":";
+  }
+  curNumber = 0;
+
+  // Convert into minutes
+  while (milliseconds >= 60000) {
+    curNumber++;
+    milliseconds -= 60000;
+  }
+  if (curNumber < 10) {
+    time += "0" + (curNumber) + ":";
+  }
+  else {
+    time += curNumber + ":";
+  }
+  curNumber = 0;
+
+  // Convert into seconds
+  while (milliseconds >= 1000) {
+    curNumber++;
+    milliseconds -= 1000;
+  }
+  if (curNumber < 10) {
+    time += "0" + (curNumber) + ",";
+  }
+  else {
+    time += curNumber + ",";
+  }
+  curNumber = 0;
+
+  // Use rest as decimal
+  milliseconds = Math.round(milliseconds);
+  if (milliseconds >= 100) {
+    time += ""+milliseconds;
+  }
+  else if (milliseconds >= 10) {
+    time += "0"+milliseconds;
+  }
+  else if (milliseconds < 10) {
+    time += "00"+milliseconds;
+  }
+
+  if (trim == true) {
+    while (time.startsWith("00:")) {
+      time = time.substring(3);
+      if (time.startsWith("0") && !time.startsWith("0:")) {
+        time = time.substring(1);
+      }
+    }
+  }
+  return time;
 }

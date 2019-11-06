@@ -13,6 +13,7 @@
     <script src="./src/subParser.js" charset="utf-8"></script>
     <script src="./src/global.js" charset="utf-8"></script>
     <script src="./lib/ionMarkDown.js" charset="utf-8"></script>
+    <script src="./src/settings.js"></script>
     <title>Toxen</title>
   </head>
   <body onkeydown="keypress(event);" onload="onload();">
@@ -21,7 +22,7 @@
     http://i3.ytimg.com/vi/lL33M9e-g8Q/maxresdefault.jpg
     -->
     <div id="sidebar" class="sidebar" onmouseover="onMenuHover();" onmouseout="offMenuHover();" hover="true">
-      <h1 id="title" class="title">Toxen Music</h1>
+      <h1 id="title" class="title">T<img src="icon.png" style="width: 25px;">xen Music</h1>
       <button type="button" onclick="LoadMusic()">Reload Music Folder</button>
       <input id="searchField" type="text" name="search" value="" oninput="searchChange(this.value, this);" placeholder="Search...">
       <div class="music-list" id="music-list">
@@ -51,9 +52,42 @@
       <h1 id="subtitle" class="subtitle">Options</h1>
       <label id="volumeLabel">- Volume +</label><br>
       <input id="volume" type="range" name="volume" min="0" max="100" value="30" oninput="changeVolume()">
-      <div class="Button btnDefault" onclick="openSettings()">
+      <!-- <div class="Button btnDefault" onclick="openSettings()">
         <p>Settings</p>
+      </div> -->
+
+      <!-- Settings List -->
+      <div class="settingsList">
+        <label>Music Directory</label><br>
+        <input type="text" id="musicDir" class="setting value" settype="value" name="musicDir" value="" placeholder="/Folder/Path/">
+        <button type="button" name="button" onclick="openMusicFolder()">Open Music Folder</button>
+        <div class="separator"></div>
+
+        <input class="setting setBox" type="checkbox" settype="checkbox"
+        name="visualizer" checked onclick='settings.visualizer = this.checked;'>
+        <label>Visualizer</label>
+
+        <div class="separator"></div>
+
+        <label id="bgdim">Background Dim: %</label><br>
+        <input class="setting slider" type="range" settype="value" id="bgdimslider"
+        name="backgroundDim" min="0" max="100" value="50"
+        oninput="event_sliderUpdate();">
+        <br>
+        <label id="visualintense">Visualizer Intensity</label><br>
+        <input class="setting slider" type="range" settype="value" id="visualizerintensity"
+        name="visualizerIntensity" min="1" max="50" value="15"
+        oninput="event_sliderUpdate();">
+
+        <div style="overflow: hidden;">
+          <!-- Buttons -->
+          <!-- Apply button -->
+          <div id="applyButton" class="Button btnDefault float-left" onclick="applySettings(); reloadSettings();">
+            <p>Save</p>
+          </div>
+        </div>
       </div>
+      <!-- Settings List END -->
       <div class="separator"></div>
       <h1 id="subtitle" class="subtitle">YouTube Downloader</h1>
       <div class="addMusic">
@@ -70,7 +104,8 @@
   <div class="player" id="player">
     <div id="now-playing" class="now-playing" playingid="-1">
       <p id="song-title"></p>
-      <progress id="curTime" value="0" max="100" onmousedown="changeProgress(event);"></progress>
+      <progress id="curTime" value="0" max="100" onmousemove="changeProgress(event);" onmousedown="changeProgress(event);"></progress>
+      <p id="song-digital-progress" style="margin: 0; padding: 0;">0:00/0:00</p>
     </div>
     <div id="play" class="play" onclick="playToggle();" mode="stop"></div>
     <audio id="musicObject" src="" onended="musicEnd();" canplay="isReady = true;"></audio>
