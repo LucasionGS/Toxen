@@ -207,7 +207,7 @@ function musicEnd()
   if (repeat) {
     playSong(_id);
   }
-  if (!randomize) {
+  else if (!randomize) {
     if (songCount > _id+1) {
       var musicObject = document.getElementById("music-"+(_id+1));
       while(musicObject.style.display == "none") {
