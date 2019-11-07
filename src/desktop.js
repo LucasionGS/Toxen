@@ -515,16 +515,22 @@ function renameSong(object, e) {
   input.style.textAlign = "center";
   const btn = document.createElement("Button");
   btn.innerHTML = "Rename";
-  new Notif("Rename",
+  var n = new Notif("Rename",
   [
     "Renaming \""+info.artist +" - "+info.title+" to\"\n",
     input,
-    btn
+    // btn
   ]);
 
   btn.onclick = function () {
     renameAction(object, input.value, {input:input});
   }
+
+  n.buttonObject.setText("Rename");
+  n.buttonObject.onclick =  function() {
+    renameAction(object, input.value, {input:input});
+  };
+
   input.onkeydown = function (ev) {
     if (ev.key == "Enter") {
       ev.preventDefault();

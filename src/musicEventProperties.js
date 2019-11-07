@@ -21,12 +21,12 @@ class VisualizerProperties {
 
 setInterval(function () {
   if (VisualizerProperties.r != VisualizerProperties.toR) {
-    VisualizerProperties.r -= ((VisualizerProperties.r - VisualizerProperties.toR)/100);
+    VisualizerProperties.r -= ((VisualizerProperties.r - VisualizerProperties.toR)/50);
   }
   if (VisualizerProperties.g != VisualizerProperties.toG) {
-    VisualizerProperties.g -= ((VisualizerProperties.g - VisualizerProperties.toG)/100);
+    VisualizerProperties.g -= ((VisualizerProperties.g - VisualizerProperties.toG)/50);
   }
   if (VisualizerProperties.b != VisualizerProperties.toB) {
-    VisualizerProperties.b -= ((VisualizerProperties.b - VisualizerProperties.toB)/100);
+    VisualizerProperties.b -= ((VisualizerProperties.b - VisualizerProperties.toB)/50);
   }
 }, 1);

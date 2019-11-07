@@ -130,6 +130,12 @@ function keypress(e)
       addMusic();
     }
   }
+  else if (e.key == "Escape") {
+    try {
+      Notif.closeNewest();
+    }
+    catch {}
+  }
   else if(e.keyCode == 32 && !isFocusInput)
   {
     playToggle();
@@ -140,9 +146,13 @@ function keypress(e)
   else if (e.ctrlKey && e.key == "s") {
     toggleFunction("shuffle");
   }
+  else if (e.ctrlKey && e.key == "f") {
+    onMenuHover();
+    document.querySelector("[playing=true]").scrollIntoViewIfNeeded();
+  }
   else if (e.ctrlKey && e.key == "o") {
     onMenuHover();
-    document.querySelector(".settingsList").scrollIntoView();
+    document.querySelector(".settingsList").scrollIntoViewIfNeeded();
   }
   else if (e.ctrlKey && e.key == "m") {
     onMenuHover();
@@ -155,10 +165,10 @@ function keypress(e)
   else if (e.ctrlKey && e.key == "u") {
     checkUpdate();
   }
-  else if ((e.ctrlKey && e.key == "ArrowLeft") || e.key == "MediaTrackPrevious") {
+  else if ((e.ctrlKey && e.key == "ArrowLeft" && !isFocusInput) || e.key == "MediaTrackPrevious") {
     toggleFunction("previous");
   }
-  else if ((e.ctrlKey && e.key == "ArrowRight") || e.key == "MediaTrackNext") {
+  else if ((e.ctrlKey && e.key == "ArrowRight" && !isFocusInput) || e.key == "MediaTrackNext") {
     toggleFunction("next");
   }
   else if (e.key == "F5") {

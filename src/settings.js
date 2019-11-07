@@ -42,6 +42,12 @@ window.addEventListener("load", function()
 
 function applySettings()
 {
+  if (document.querySelector("#subtitleFont").value == "") {
+    document.querySelector("#subBox").style.fontFamily = "Arial";
+  }
+  else{
+    document.querySelector("#subBox").style.fontFamily = document.querySelector("#subtitleFont").value;
+  }
   const _options = document.getElementsByClassName("setting");
   var jOptions = {};
   console.log(_options);
@@ -74,18 +80,31 @@ function applySettings()
 function event_sliderUpdate(value)
 {
   //New Setting
-  document.getElementById("bgdim").innerHTML = "Background Dim: "+document.getElementById("bgdimslider").value+"%";
-  document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+document.getElementById("visualizerintensity").value;
-  if (value == -1) { //Default setting
-    document.getElementById("bgdim").innerHTML = "Background Dim: "+preset["backgroundDim"]+"%";
-    document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+preset["visualizerIntensity"];
-  }
+  setTimeout(function(){
+    document.getElementById("bgdim").innerHTML = "Background Dim: "+document.getElementById("bgdimslider").value+"%";
+    document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+document.getElementById("visualizerintensity").value;
+    
+    document.getElementById("visualcolor").innerHTML = "Visualizer Color: "+
+    document.getElementById("visualizerRed").value+"/"+
+    document.getElementById("visualizerGreen").value+"/"+
+    document.getElementById("visualizerBlue").value;
+    VisualizerProperties.rgb(
+      document.getElementById("visualizerRed").value,
+      document.getElementById("visualizerGreen").value,
+      document.getElementById("visualizerBlue").value
+    );
+    if (value == -1) { //Default setting
+      document.getElementById("bgdim").innerHTML = "Background Dim: "+preset["backgroundDim"]+"%";
+      document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+preset["visualizerIntensity"];
+    }
+  }, 1);
   try {
     settings.backgroundDim = document.getElementById("bgdimslider").value;
     settings.visualizerIntensity = document.getElementById("visualizerintensity").value;
   } catch (error) {
-    
+    //new Notif("Error", error);
   }
+  document.querySelector("#applyButton").querySelector("p").innerHTML = "Save*";
 }
 
 function openMusicFolder(){
