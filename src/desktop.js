@@ -440,6 +440,7 @@ function fileDropped(e)
       newItem.setAttribute("class", "music-item");
       newItem.setAttribute("id","music-"+ songCount);
       newItem.setAttribute("onclick", "playSong("+ songCount +");");
+      newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
       newItem.setAttribute("playing", "new");
       var newItemP = document.createElement("p");
       newItemP.innerHTML = artist + " - " + title;
@@ -557,11 +558,23 @@ function renameAction(object, newName, other) {
     }
     // If no song is named that
     fs.rename(allMusicData[id].folderPath, pathDir+newName, function (err) {
-      if (err) { console.log(err); }
-      other.input.parentNode.parentNode.close();
-      new Notif("Renamed", ["Changed \""+allMusicData[id].folderPath+"\"\nto\n"+"\""+pathDir+newName+"\""], 1000);
-      onMenuHover();
-      LoadMusic();
+      if (err) { 
+        console.error(err);
+        var _button = document.createElement("button");
+        _button.innerHTML = "Show Technical Error";
+        _button.onclick = function() {
+          this.parentNode.parentNode.instance.titleObject.innerHTML = "Technical Details";
+          this.parentNode.innerHTML = err;
+        };
+        new Notif("Couldn't rename song", ["Make sure you are not currently listening to the song you are trying to rename, as this will fail.\n", _button]);
+
+      }
+      else{
+        other.input.parentNode.parentNode.close();
+        new Notif("Renamed", ["Changed \""+allMusicData[id].folderPath+"\"\nto\n"+"\""+pathDir+newName+"\""], 1000);
+        onMenuHover();
+        LoadMusic();
+      }
     });
   });
 }
