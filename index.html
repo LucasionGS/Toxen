@@ -49,36 +49,60 @@
       </div>
 
       <div class="separator"></div>
-      <h1 id="subtitle" class="subtitle">Options</h1>
-      <label id="volumeLabel">- Volume +</label><br>
-      <input id="volume" type="range" name="volume" min="0" max="100" value="30" oninput="changeVolume()">
-      <!-- <div class="Button btnDefault" onclick="openSettings()">
-        <p>Settings</p>
-      </div> -->
-
       <!-- Settings List -->
       <div class="settingsList">
+        <h1 id="subtitle" class="subtitle">Settings</h1>
+        <label id="volumeLabel">- Volume +</label><br>
+        <input id="volume" class="setting slider" settype="value" type="range" name="volume" min="0" max="100" value="30" oninput="changeVolume(); event_sliderUpdate();">
+        <br>
         <label>Music Directory</label><br>
         <input type="text" id="musicDir" class="setting value" settype="value" name="musicDir" value="" placeholder="/Folder/Path/">
         <button type="button" name="button" onclick="openMusicFolder()">Open Music Folder</button>
         <div class="separator"></div>
 
-        <input class="setting setBox" type="checkbox" settype="checkbox"
-        name="visualizer" checked onclick='settings.visualizer = this.checked;'>
-        <label>Visualizer</label>
-
-        <div class="separator"></div>
-
+        
         <label id="bgdim">Background Dim: %</label><br>
         <input class="setting slider" type="range" settype="value" id="bgdimslider"
         name="backgroundDim" min="0" max="100" value="50"
         oninput="event_sliderUpdate();">
         <br>
+        <div class="separator"></div>
+        <h3>Visualizer</h3>
+        <input class="setting setBox" type="checkbox" settype="checkbox"
+        name="visualizer" checked onclick='settings.visualizer = this.checked;'>
+        <label>Enabled</label>
+        <br>
         <label id="visualintense">Visualizer Intensity</label><br>
         <input class="setting slider" type="range" settype="value" id="visualizerintensity"
         name="visualizerIntensity" min="1" max="50" value="15"
         oninput="event_sliderUpdate();">
+        <br>
+        <label id="visualcolor">Visualizer Color</label><br>
+        <label>Red</label>
+        <br>
+        <input class="setting slider" type="range" settype="value" id="visualizerRed"
+        name="visualizerRed" min="0" max="255" value="255"
+        oninput="event_sliderUpdate();">
+        <br>
+        <label>Green</label>
+        <br>
+        <input class="setting slider" type="range" settype="value" id="visualizerGreen"
+        name="visualizerGreen" min="0" max="255" value="255"
+        oninput="event_sliderUpdate();">
+        <br>
+        <label>Blue</label>
+        <br>
+        <input class="setting slider" type="range" settype="value" id="visualizerBlue"
+        name="visualizerBlue" min="0" max="255" value="255"
+        oninput="event_sliderUpdate();">
 
+        <div class="separator"></div>
+
+        <h3>Subtitles</h3>
+        <label>Subtitle Font</label><br>
+        <input type="text" id="subtitleFont" class="setting value" settype="value" name="subtitleFont" value="Arial" placeholder="Default: Arial">
+
+        <div class="separator"></div>
         <div style="overflow: hidden;">
           <!-- Buttons -->
           <!-- Apply button -->
@@ -92,7 +116,7 @@
       <h1 id="subtitle" class="subtitle">YouTube Downloader</h1>
       <div class="addMusic">
         <input id="addUrl" class="addMusicItem" type="text" name="url" value="" placeholder="YouTube URL" required autocomplete="off"><br>
-        <input id="addName" class="addMusicItem" type="text" name="name" value="" placeholder="Artist (If known) - Title of the song" autocomplete="off"><br>
+        <input id="addName" class="addMusicItem" type="text" name="name" value="" placeholder="Artist (If known) - Title of the song" title="Artist (If known) - Title of the song" autocomplete="off"><br>
         <input type="checkbox" id="dlImg" name="dlImg" checked><label>Download Thumbnail</label><br>
         <button type="button" id="addButton" class="addMusicItem" onclick="addMusic();">Add Music...</button>
       </div>

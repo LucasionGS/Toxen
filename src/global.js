@@ -77,5 +77,5 @@ for (var key in musicMenuList) {
 function scrollToSong(id)
 {
   var musicObject = document.getElementById("music-"+id);
-  musicObject.scrollIntoView();
+  musicObject.scrollIntoViewIfNeeded();
 }
