@@ -518,7 +518,7 @@ function renameSong(object, e) {
   btn.innerHTML = "Rename";
   var n = new Notif("Rename",
   [
-    "Renaming \""+info.artist +" - "+info.title+" to\"\n",
+    "Renaming \""+info.artist +" - "+info.title+"\" to\n",
     input,
     // btn
   ]);

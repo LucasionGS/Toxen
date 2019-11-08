@@ -113,7 +113,8 @@ function playSong(id)
     curMusicItem.setAttribute("playing", true);
   }
   var musicListObject = document.getElementById("music-list");
-  musicListObject.scrollTop = curMusicItem.offsetTop-Math.min(musicListObject.clientHeight, mousePos.Y);
+  //musicListObject.scrollTop = curMusicItem.offsetTop-Math.min(musicListObject.clientHeight, mousePos.Y);
+  curMusicItem.scrollIntoViewIfNeeded();
   clearInterval(subtitleInterval);
   RenderSubtitles(allMusicData[id].srt);
   Visualizer();
