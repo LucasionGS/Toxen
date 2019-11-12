@@ -383,7 +383,6 @@ async function addMusic()
 }
 
 //Insert picture drop-in areas
-var bgChanged = {};
 function fileDropped(e)
 {
   e.stopPropagation();
