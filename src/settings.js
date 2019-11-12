@@ -37,7 +37,6 @@ window.addEventListener("load", function()
       }
     }
   }
-  //console.log(preset);
 }, false);
 
 function applySettings()
@@ -50,7 +49,6 @@ function applySettings()
   }
   const _options = document.getElementsByClassName("setting");
   var jOptions = {};
-  console.log(_options);
   for (var i = 0; i < _options.length; i++) {
     var typeOfSetting = _options[i].getAttribute("settype");
     if (typeOfSetting == "checkbox") {
@@ -67,7 +65,6 @@ function applySettings()
     }
   }
   var strOptions = JSON.stringify(jOptions);
-  console.log(strOptions);
   fs.writeFileSync("./settings.json", strOptions);
 
   var button = document.getElementById("applyButton");

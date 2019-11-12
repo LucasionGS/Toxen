@@ -56,13 +56,13 @@ async function DownloadUpdate(url, object) {
   DL.OnClose = function() {
     setTimeout(() => {
       // proc.spawn('cmd.exe start \"\" ToxenInstall.exe', ["/c"], {detacted:true, stdio: 'ignore'});
-      proc.spawn('cmd.exe', [], {detacted:true, stdio: 'ignore'});
-      // proc.spawn("./ToxenInstall.exe", [], {
-      //   // cwd: this.parentNode.instance.path,
-      //   detached: true,
-      //   stdio: 'ignore'
-      // });
-    }, 1000);
+      // proc.spawn('cmd.exe', [], {detacted:true, stdio: 'ignore'});
+      proc.spawn('cmd', ["/C", "start cmd.exe /c ToxenInstall.exe"], {
+        // cwd: this.parentNode.instance.path,
+        // detached: true,
+        // stdio: 'ignore'
+      });
+    }, 1);
   }
   DL.OnData = function(data) {
     object.descriptionObject.innerHTML = DL.DownloadPercent()+"%";
