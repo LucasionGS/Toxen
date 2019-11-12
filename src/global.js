@@ -1,17 +1,24 @@
 const http = require('https');
+// const fs = require("fs");
+const Download = require("../lib/ionLibNode.js");
 var proc = require('child_process');
 var defaultMusicDir = process.env.HOMEDRIVE+process.env.HOMEPATH+"/Music/";
 defaultMusicDir = defaultMusicDir.replace(/(\\+)/g, "/");
 
 //Default check for update on startup
 setTimeout(function () {
-  //checkUpdate();
+  checkUpdate();
 }, 0);
 
 //Check for updates
 function checkUpdate()
 {
-  const curVers = JSON.parse(fs.readFileSync("./resources/app/package.json", "utf8")).version;
+  var packageFile = "./resources/app/package.json";
+  if (!fs.existsSync(packageFile)) {
+    // new Notif("Updating disabled for developer");
+    return;
+  }
+  const curVers = JSON.parse(fs.readFileSync(packageFile, "utf8")).version;
   fetch("https://api.github.com/repos/LucasionGS/Toxen/releases/latest")
   .then(response => {
     return response.json();
@@ -23,12 +30,31 @@ function checkUpdate()
 
 
     if (curVers != newVers) {
-      new Notif("New Update Available", "<a href=\""+dlUrl+"\">Click here to download</a>\nOr <a onclick=\"proc.spawn('cmd.exe start \"\" ToxenInstall.exe', [], {detacted:true, stdio: 'ignore'});\" href=\"#\">Open the installer</a> to update automatically.");
+      var link = document.createElement("a");
+      link.innerHTML = "Click here to download update";
+      link.onclick = function() {
+        fetch("https://api.github.com/repos/LucasionGS/ToxenInstall/releases/latest")
+        .then(response => {
+          return response.json();
+        })
+        .then(data => {
+          const installerUrl = data.assets[0].browser_download_url;
+          DownloadUpdate(installerUrl);
+        });
+      }
+      new Notif("New Update Available", "<a href=\"DownloadUpdate('"+dlUrl+"')\">Click here to download</a>");
     }
   })
   .catch(err => {
     new Notif("Check Update failed", err);
   });
+}
+
+function DownloadUpdate(url) {
+  var DL = new Download(installerUrl, "./ToxenInstall.exe");
+  DL.OnEnd = function() {
+    proc.spawn('cmd.exe start "" ToxenInstall.exe', [], {detacted:true, stdio: 'ignore'});
+  }
 }
 
 //Global Context Menu
@@ -52,27 +78,6 @@ for (var key in musicMenuList) {
   musicMenu.appendChild(item);
   i++;
 }
-
-/*function musicMenuFunc(e) {
-  if (e) {
-    try { menu.parentNode.removeChild(menu); } catch (e){}
-    document.getElementsByTagName("body")[0].appendChild(musicMenu);
-
-    musicMenu.style.left = mousePos.X+"px";
-    musicMenu.style.top = mousePos.Y+"px";
-    musicMenu.onmouseout = function () {
-      this.parentNode.removeChild(this);
-    };
-  }
-  return false;
-}*/
-
-/*function menuFunction()
-{
-  //Close menu
-  try { menu.parentNode.removeChild(menu); } catch (e){}
-  //Do action here
-}*/
 
 function scrollToSong(id)
 {
