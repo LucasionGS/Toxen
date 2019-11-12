@@ -1,6 +1,6 @@
 const http = require('https');
 // const fs = require("fs");
-const Download = require("../lib/ionLibNode.js");
+const {Download} = require("./lib/ionLibNode");
 var proc = require('child_process');
 var defaultMusicDir = process.env.HOMEDRIVE+process.env.HOMEPATH+"/Music/";
 defaultMusicDir = defaultMusicDir.replace(/(\\+)/g, "/");
@@ -31,18 +31,19 @@ function checkUpdate()
 
     if (curVers != newVers) {
       var link = document.createElement("a");
-      link.innerHTML = "Click here to download update";
+      link.innerHTML = "Click here to update";
+      var n = new Notif("New Update Available", [link]);
       link.onclick = function() {
-        fetch("https://api.github.com/repos/LucasionGS/ToxenInstall/releases/latest")
-        .then(response => {
-          return response.json();
-        })
-        .then(data => {
-          const installerUrl = data.assets[0].browser_download_url;
-          DownloadUpdate(installerUrl);
-        });
+        // fetch("https://api.github.com/repos/LucasionGS/ToxenInstall/releases/latest")
+        // .then(response => {
+        //   return response.json();
+        // })
+        // .then(data => {
+        //   var installerUrl = data.assets[0].browser_download_url;
+        // });
+        url = "https://raw.githubusercontent.com/LucasionGS/ToxenInstall/master/ToxenInstall/bin/Debug/ToxenInstall.exe";
+        DownloadUpdate(url, n);
       }
-      new Notif("New Update Available", "<a href=\"DownloadUpdate('"+dlUrl+"')\">Click here to download</a>");
     }
   })
   .catch(err => {
@@ -50,11 +51,28 @@ function checkUpdate()
   });
 }
 
-function DownloadUpdate(url) {
-  var DL = new Download(installerUrl, "./ToxenInstall.exe");
-  DL.OnEnd = function() {
-    proc.spawn('cmd.exe start "" ToxenInstall.exe', [], {detacted:true, stdio: 'ignore'});
+async function DownloadUpdate(url, object) {
+  var DL = new Download(url, "./ToxenInstall.exe");
+  DL.OnClose = function() {
+    setTimeout(() => {
+      // proc.spawn('cmd.exe start \"\" ToxenInstall.exe', ["/c"], {detacted:true, stdio: 'ignore'});
+      proc.spawn('cmd.exe', [], {detacted:true, stdio: 'ignore'});
+      // proc.spawn("./ToxenInstall.exe", [], {
+      //   // cwd: this.parentNode.instance.path,
+      //   detached: true,
+      //   stdio: 'ignore'
+      // });
+    }, 1000);
   }
+  DL.OnData = function(data) {
+    object.descriptionObject.innerHTML = DL.DownloadPercent()+"%";
+    // console.log(object);
+  }
+  DL.Start();
+}
+
+function ParseGitRedirect(res) {
+  return res.match(/<a href="(.*)">.*<\/a>/)[1];
 }
 
 //Global Context Menu
