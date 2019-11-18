@@ -17,6 +17,10 @@ class VisualizerProperties {
       b:b
     };
   }
+
+  static setIntensity(value){
+    settings.visualizerIntensity = value;
+  }
 }
 
 setInterval(function () {
@@ -30,3 +34,11 @@ setInterval(function () {
     VisualizerProperties.b -= ((VisualizerProperties.b - VisualizerProperties.toB)/50);
   }
 }, 1);
+
+
+// Extra exports for control
+try {
+  exports.VisualizerProperties = VisualizerProperties;
+} catch (error) {
+  
+}

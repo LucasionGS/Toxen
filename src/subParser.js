@@ -80,14 +80,14 @@ function RenderSubtitles(srtFile) {
     var hasSub = false;
     for (var i = 0; i < subData.length; i++) {
       if (audio.currentTime > subData[i].startTime && audio.currentTime < subData[i].endTime) {
-        if (subText.innerHTML != subData[i].text) {
+        if (subText.innerHTML.replace(/\"/g, "\'") != subData[i].text.replace(/\"/g, "\'")) {
           subText.innerHTML = subData[i].text;
         }
         hasSub = true;
       }
-      if (!hasSub) {
-        subText.innerHTML = "";
-      }
+    }
+    if (!hasSub) {
+      subText.innerHTML = "";
     }
   }, 5);
 }

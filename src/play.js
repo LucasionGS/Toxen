@@ -118,6 +118,13 @@ function playSong(id)
   clearInterval(subtitleInterval);
   RenderSubtitles(allMusicData[id].srt);
   Visualizer();
+
+  // Resetting settings after script modification
+  event_sliderUpdate();
+  if (fs.existsSync(allMusicData[id].folderPath+"/script.js")) {
+    var script = require(allMusicData[id].folderPath+"/script.js");
+    script.script();
+  }
 }
 
 //Keypresses
