@@ -32,8 +32,8 @@ div.sidebar{
   box-sizing: border-box;
   background: #202020;
   height: 92vh;
-  min-width: 400px;
-  max-width: 30%;
+  width: 500px;
+  max-width: 50%;
   border-style: solid;
   border-width: 1px;
   overflow: hidden;
@@ -74,7 +74,7 @@ div.sidebar[hover="false"]{
   min-width: 10%;
   opacity: 0;
   overflow: hidden;
-  transition: all 1.0s ease-out;
+  transition: all 0.75s ease-out;
 }
 
 div.sidebar[hover="true"]{

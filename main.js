@@ -48,7 +48,7 @@ function createWindow () {
       label:"Usage",
       click(){
         //Open github page
-        process.exec('start "" "https://github.com/LucasionGS/Toxen/blob/master/README.md"');
+        process.exec('start "" "https://github.com/LucasionGS/Toxen/blob/alpha/README.md"');
       }
     },
     {

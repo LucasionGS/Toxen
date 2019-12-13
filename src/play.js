@@ -129,7 +129,7 @@ function playSong(id)
 }
 
 //Keypresses
-function keypress(e)
+function keypress(/**@type {KeyboardEvent} */e)
 {
   var curFocus = document.activeElement;
   var curFocusTag = curFocus.tagName.toLowerCase();
@@ -197,6 +197,24 @@ function keypress(e)
       document.getElementById("content").after(document.getElementById("player"))
       document.getElementById("canvas").style.height = "92vh";
     }
+  }
+  else if (e.ctrlKey && e.key == "0") {
+    var mo = document.getElementById("musicObject");
+    var mSpd = document.getElementById("musicspeedslider");
+    mSpd.value = 100;
+    event_sliderUpdate();
+  }
+  else if (e.ctrlKey && e.key == "+") {
+    var mo = document.getElementById("musicObject");
+    var mSpd = document.getElementById("musicspeedslider");
+    mSpd.value = ((Math.round(mo.playbackRate*10)/10)+0.1)*100;
+    event_sliderUpdate();
+  }
+  else if (e.ctrlKey && e.key == "-") {
+    var mo = document.getElementById("musicObject");
+    var mSpd = document.getElementById("musicspeedslider");
+    mSpd.value = ((Math.round(mo.playbackRate*10)/10)-0.1)*100;
+    event_sliderUpdate();
   }
 }
 

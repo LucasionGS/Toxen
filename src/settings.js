@@ -79,8 +79,11 @@ function event_sliderUpdate(value)
   //New Setting
   setTimeout(function(){
     document.getElementById("bgdim").innerHTML = "Background Dim: "+document.getElementById("bgdimslider").value+"%";
-    document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+document.getElementById("visualizerintensity").value;
     
+    document.getElementById("musicspeed").innerHTML = "Playback Rate: "+(document.getElementById("musicspeedslider").value/100)+"x";
+    document.getElementById("musicObject").playbackRate = (document.getElementById("musicspeedslider").value/100);
+
+    document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+document.getElementById("visualizerintensity").value;
     document.getElementById("visualcolor").innerHTML = "Visualizer Color: "+
     document.getElementById("visualizerRed").value+"/"+
     document.getElementById("visualizerGreen").value+"/"+
@@ -90,6 +93,8 @@ function event_sliderUpdate(value)
       document.getElementById("visualizerGreen").value,
       document.getElementById("visualizerBlue").value
     );
+
+
     if (value == -1) { //Default setting
       document.getElementById("bgdim").innerHTML = "Background Dim: "+preset["backgroundDim"]+"%";
       document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+preset["visualizerIntensity"];
