@@ -12,16 +12,21 @@ function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
     title:"Toxen",
-    minWidth:800,
-    minHeight:768,
-    width: winWidth,
-    height: winHeight,
-    icon:"./icon.ico",
+    minWidth: 400,
+    minHeight: 384,
+    width: winWidth*2,
+    height: winHeight*2,
     webPreferences: {
       nodeIntegration: true
     },
     show:false
   });
+
+  try {
+    win.setIcon("./icon.ico");
+  } catch (error) {
+    console.error("No icon accessible");
+  }
 
   win.once('ready-to-show', () => {
     //This will prevent the white startup screen before the page loads in fully

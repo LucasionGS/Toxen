@@ -13,6 +13,17 @@
         "kind": "build",
         "isDefault": true
       }
+    },
+    {
+      "type": "shell",
+      "label": "Build Electron for Windows",
+      "command": "electron-packager ./ \"${workspaceFolderBasename}\" --out=../builds/ --platform=win32",
+      "problemMatcher": []
+    },
+    {
+      "type": "shell",
+      "label": "Build Electron for Linux",
+      "command": "electron-packager ./ \"${workspaceFolderBasename}\" --out=../builds/ --arch=armv7l --platform=linux"
     }
   ]
 }
