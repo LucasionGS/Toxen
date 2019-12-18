@@ -85,29 +85,31 @@ function createWindow () {
     });*/
 
     var appIcon = null;
-    appIcon = new Tray("./icon.ico");
-    var contextMenu = Menu.buildFromTemplate([
-      {
-        label: "Restore",
-        type: "radio",
-        click(){
-          win.show();
+    try {
+      appIcon = new Tray("./icon.ico");
+      var contextMenu = Menu.buildFromTemplate([
+        {
+          label: "Restore",
+          type: "radio",
+          click(){
+            win.show();
+          }
+        },
+        {
+          label: "Quit",
+          type: "radio",
+          click(){
+            app.quit();
+          }
         }
-      },
-      {
-        label: "Quit",
-        type: "radio",
-        click(){
-          app.quit();
-        }
-      }
-    ]);
-    appIcon.setToolTip("Toxen♫");
-    appIcon.setContextMenu(contextMenu);
+      ]);
+      appIcon.setToolTip("Toxen♫");
+      appIcon.setContextMenu(contextMenu);
 
-    appIcon.on("click", () => {
-      win.show();
-    });
+      appIcon.on("click", () => {
+        win.show();
+      });
+    } catch (error) {}
 
 }
 

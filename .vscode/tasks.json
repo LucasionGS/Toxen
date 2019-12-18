@@ -23,7 +23,8 @@
     {
       "type": "shell",
       "label": "Build Electron for Linux",
-      "command": "electron-packager ./ \"${workspaceFolderBasename}\" --out=../builds/ --arch=armv7l --platform=linux --overwrite"
+      "command": "electron-packager ./ \"${workspaceFolderBasename}\" --out=../builds/ --arch=armv7l --platform=linux --overwrite --icon=./icon.ico",
+      "problemMatcher": []
     }
   ]
 }
