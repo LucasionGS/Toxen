@@ -14,11 +14,15 @@ var _contextSrcInterval = setInterval(function () {
   }
 }, 0);
 
-
+var visualizerActive = false;
 function Visualizer(){
   if (!document.getElementById("musicObject")) {
     return console.error("musicObject doesn't exist");
   }
+  if (visualizerActive) {
+    return;
+  }
+  visualizerActive = true;
   audio = document.getElementById("musicObject");
   //audio.load();
   //audio.play();
