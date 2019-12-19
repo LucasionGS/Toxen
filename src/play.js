@@ -124,7 +124,10 @@ function playSong(id)
   event_sliderUpdate();
   if (fs.existsSync(allMusicData[id].folderPath+"/script.js")) {
     var script = require(allMusicData[id].folderPath+"/script.js");
-    script.script();
+    /**
+     * __dirname is the root directory of toxen.
+     */
+    script.script(__dirname+"/src/scriptControl.js");
   }
 }
 

@@ -1,5 +1,3 @@
-
-
 class Control{
   static startEventCheckingInterval = undefined;
   static startEventChecking(){
@@ -51,11 +49,11 @@ class Control{
   {
     if (typeof startPoint == "string") {
       startPoint = timeStampToSeconds(startPoint);
-      console.log(startPoint);
+      // console.log(startPoint);
     }
     if (typeof endPoint == "string") {
       endPoint = timeStampToSeconds(endPoint);
-      console.log(endPoint);
+      // console.log(endPoint);
     }
     if (typeof fn != "function") {
       return console.error("Parameter fn must be a function");
@@ -68,26 +66,31 @@ class Control{
      */
     function timeStampToSeconds(timestamp)
     {
-      var seconds = 0;
-      var parts = timestamp.split(":");
-      for (let i = 0; i < parts.length; i++) {
-        const time = +parts[i];
-        let x = parts.length-i-1;
-        if (x == 0) {
-          seconds += time;
+      try {
+        var seconds = 0;
+        var parts = timestamp.split(":");
+        for (let i = 0; i < parts.length; i++) {
+          const time = +parts[i];
+          let x = parts.length-i-1;
+          if (x == 0) {
+            seconds += time;
+          }
+          if (x == 1) {
+            seconds += time*60;
+          }
+          if (x == 2) {
+            seconds += time*60*60;
+          }
+          if (x == 3) {
+            seconds += time*60*60*24;
+          }
         }
-        if (x == 1) {
-          seconds += time*60;
-        }
-        if (x == 2) {
-          seconds += time*60*60;
-        }
-        if (x == 3) {
-          seconds += time*60*60*24;
-        }
+        return seconds;
       }
-
-      return seconds;
+      catch (error) {
+        var n = new Notif("Music Script Error", error.toString());
+        n.setButtonText("welp");
+      }
     }
   }
 
