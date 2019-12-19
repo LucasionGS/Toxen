@@ -66,7 +66,8 @@ div.sidebar .music-list:hover{
 }
 
 div.sidebar .music-list p{
-  white-space: nowrap;
+  /* white-space: nowrap; */
+  text-overflow: ellipsis;
 }
 
 div.sidebar[hover="false"]{

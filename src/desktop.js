@@ -192,8 +192,9 @@ function LoadMusic(){
       newItem.setAttribute("onclick", "playSong("+ i +");");
       newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
       var newItemP = document.createElement("p");
-      newItemP.innerHTML = musicFiles[i].artist + " - " + musicFiles[i].title;
+      newItemP.innerText = musicFiles[i].artist + " - " + musicFiles[i].title;
       newItem.appendChild(newItemP);
+      newItem.title = newItemP.innerText;
       document.getElementById("music-list").appendChild(newItem);
       songs[i] = musicFiles[i].file;
       songCount++;
