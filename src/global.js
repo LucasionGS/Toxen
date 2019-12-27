@@ -75,27 +75,27 @@ function ParseGitRedirect(res) {
   return res.match(/<a href="(.*)">.*<\/a>/)[1];
 }
 
-//Global Context Menu
-var musicMenu = document.createElement("div");
-musicMenu.setAttribute("id", "contextMenu");
-musicMenu.setAttribute("class", "contextMenu");
-//Create Music Menu List
-var musicMenuList = {
-  "Rename": "rename",
-  "Delete": "delete",
-};
-var i = 0;
-for (var key in musicMenuList) {
-  var item = document.createElement("div");
-  item.setAttribute("id", "contextMenuItem-"+i);
-  item.setAttribute("class", "contextMenuItem");
-  item.setAttribute("onclick", "menuFunction(\""+musicMenuList[key]+"\");");
-  var itemP = document.createElement("p");
-  itemP.innerHTML = key;
-  item.appendChild(itemP);
-  musicMenu.appendChild(item);
-  i++;
-}
+// //Global Context Menu
+// var musicMenu = document.createElement("div");
+// musicMenu.setAttribute("id", "contextMenu");
+// musicMenu.setAttribute("class", "contextMenu");
+// //Create Music Menu List
+// var musicMenuList = {
+//   "Rename": "rename",
+//   "Delete": "delete",
+// };
+// var i = 0;
+// for (var key in musicMenuList) {
+//   var item = document.createElement("div");
+//   item.setAttribute("id", "contextMenuItem-"+i);
+//   item.setAttribute("class", "contextMenuItem");
+//   item.setAttribute("onclick", "menuFunction(\""+musicMenuList[key]+"\");");
+//   var itemP = document.createElement("p");
+//   itemP.innerHTML = key;
+//   item.appendChild(itemP);
+//   musicMenu.appendChild(item);
+//   i++;
+// }
 
 function scrollToSong(id)
 {

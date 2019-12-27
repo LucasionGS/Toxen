@@ -1,11 +1,24 @@
 const fs = require("fs");
 const ytdl = require("ytdl-core");
 const https = require('https');
-var otherWindow;
+const {ContextMenu} = require("ionlib");
 var settings;
 var preMusicDirectory = null;
 var allMusicData = [];
 var pathDir;
+
+var musicItemCm = new ContextMenu([
+  {
+    "name": "Rename song",
+    "click": function(ev, ref) {
+      renameSong(ref, ev);
+    },
+    "runOnThis": function(ref) {
+      console.log(ref.id);
+      
+    }
+  }
+]);
 
 function reloadSettings(){
   try {
@@ -190,7 +203,8 @@ function LoadMusic(){
       newItem.setAttribute("class", "music-item");
       newItem.setAttribute("id","music-"+ i);
       newItem.setAttribute("onclick", "playSong("+ i +");");
-      newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
+      // newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
+      musicItemCm.attachContextMenu(newItem);
       var newItemP = document.createElement("p");
       newItemP.innerText = musicFiles[i].artist + " - " + musicFiles[i].title;
       newItem.appendChild(newItemP);
@@ -345,8 +359,8 @@ async function addMusic()
     newItem.setAttribute("class", "music-item");
     newItem.setAttribute("id","music-"+ songCount);
     newItem.setAttribute("onclick", "playSong("+ songCount +");");
-    newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
-    newItem.setAttribute("playing", "new");
+    // newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
+    musicItemCm.attachContextMenu(newItem);
     var newItemP = document.createElement("p");
     newItemP.innerHTML = artist + " - " + title;
     newItem.appendChild(newItemP);
@@ -440,8 +454,8 @@ function fileDropped(e)
       newItem.setAttribute("class", "music-item");
       newItem.setAttribute("id","music-"+ songCount);
       newItem.setAttribute("onclick", "playSong("+ songCount +");");
-      newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
-      newItem.setAttribute("playing", "new");
+      // newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
+      musicItemCm.attachContextMenu(newItem);
       var newItemP = document.createElement("p");
       newItemP.innerHTML = artist + " - " + title;
       newItem.appendChild(newItemP);
