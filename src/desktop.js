@@ -1,13 +1,50 @@
 const fs = require("fs");
 const ytdl = require("ytdl-core");
 const https = require('https');
-var otherWindow;
+const {ContextMenu} = require("ionlib");
+/**
+ * @type {{string: string | number}}
+ */
 var settings;
 var preMusicDirectory = null;
-setInterval(() => {
+var allMusicData = [];
+/**
+ * @type {string}
+ */
+var pathDir;
+
+var musicItemCm = new ContextMenu([
+  {
+    "name": "Song actions"
+  },
+  {
+    "name": "Play song",
+    "click": (ev, ref) => {
+      ref.onclick();
+    }
+  },
+  {
+    "name": "Rename song",
+    "click": function(ev, ref) {
+      renameSong(ref, ev);
+    }
+  }
+]);
+
+musicItemCm.menu.onmouseover = function() {
+  onMenuHover();
+}
+
+/**
+ * Reloads the current settings.
+ */
+function reloadSettings(){
   try {
     settings = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
     if (settings.musicDir == "") {
+      settings.musicDir = defaultMusicDir;
+    }
+    if (settings.musicDir === false) {
       settings.musicDir = defaultMusicDir;
     }
   } catch (e) {
@@ -21,22 +58,21 @@ setInterval(() => {
   }
   if (preMusicDirectory != settings.musicDir) {
     LoadMusic();
-    notification("Updated Music Folder", "", 2000);
+    new Notif("Updated Music Folder", "", 2000);
   }
-}, 250);
-var allMusicData = [];
-var pathDir;
+}
 
 //Loading music and other startup events
 window.onload = function(){
-  LoadMusic();
+  Notif.addStyle({theme:"dark"});
+
   //Create drop area
   var dropHereNotif;
   let dropArea = document.getElementsByTagName("html")[0];
   dropArea.addEventListener('drop', fileDropped, false);
 
   dropArea.addEventListener('dragenter', function(event){
-    //dropHereNotif = notification("Drop a file","mp3 files for music\njpg & png for backgrounds");
+    //dropHereNotif = new Notif("Drop a file","mp3 files for music\njpg & png for backgrounds");
   }, false);
 
   dropArea.addEventListener('dragleave', function() {
@@ -47,10 +83,20 @@ window.onload = function(){
     event.stopPropagation();
     event.preventDefault();
   }, false);
+
+  var loadingMusicNotif = new Notif("Loading Music...", "", 10000);
+  setTimeout(function () {
+    LoadMusic();
+    loadingMusicNotif.close();
+    toggleFunction("shuffle");
+    musicEnd();
+  }, 1);
 }
 
+var allFoundFiles = []; // Used for deleting after...
 //Loads all music in a folder
 function LoadMusic(){
+  allFoundFiles = [];
   songCount = 0;
   try {
     settings = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
@@ -74,62 +120,113 @@ function LoadMusic(){
   var musicFiles = [];
   otherWindow = document.getElementById("otherWindow");
   var _musicFiles;
-  if (settings.musicDir != undefined && settings.musicDir != "") {
+  if (settings.musicDir !== false && settings.musicDir != undefined && settings.musicDir != "") {
     fs.mkdirSync(settings.musicDir, {recursive: true});
     preMusicDirectory = settings.musicDir;
-    pathDir = settings.musicDir.replace("\\", "/")+"/";
+    pathDir = settings.musicDir.replace(/\\/g, "/")+"/";
   }
   else {
     fs.mkdirSync(defaultMusicDir, {recursive: true});
     pathDir = defaultMusicDir;
+    settings.musicDir = defaultMusicDir;
     preMusicDirectory = pathDir;
   }
-  _musicFiles = fs.readdirSync(pathDir);
+  _musicFiles = fs.readdirSync(pathDir, {withFileTypes:true});
 
   var newMp3Count = 0;
+  filesDetected = 0;
+  filesCopied = 0;
   for (var i = 0; i < _musicFiles.length; i++) {
-    if (_musicFiles[i].endsWith(".mp3")) {
-      musicFiles[musicFiles.length] = _musicFiles[i].substring(0, _musicFiles[i].length-4);
+    var thisMusicDir = settings.musicDir+"/"+_musicFiles[i].name+"/";
+    if (
+      _musicFiles[i].name.endsWith(".mp3")
+      || _musicFiles[i].name.endsWith(".srt")
+      || _musicFiles[i].name.endsWith(".jpeg")
+      || _musicFiles[i].name.endsWith(".jpg")
+      || _musicFiles[i].name.endsWith(".png")
+    ) {
+      var fileRegExp = /\.mp3$|\.srt$|\.jpeg|\.jpg|\.png/gm;
+      var foundFile = thisMusicDir.replace(/\/$/g, "");
+      thisMusicDir = settings.musicDir+"/"+_musicFiles[i].name.replace(fileRegExp, "")+"/";
+      fs.mkdirSync(thisMusicDir, {recursive: true});
+      filesDetected++;
+      allFoundFiles.push(foundFile);
+      fs.copyFile(foundFile, thisMusicDir+_musicFiles[i].name, function (err) {
+        if (err) {
+          console.log(err);
+          return false;
+        }
+        filesCopied++;
+        fs.unlink(allFoundFiles[filesCopied-1], function (err) {
+          if (err) { console.log(err); }
+        });
+        isFileCopyFinished(filesDetected, filesCopied, allFoundFiles[filesCopied-1]);
+      });
+    }
+    else {
+      //musicFiles[musicFiles.length] = _musicFiles[i].name;
 
       //Creating JSON as string
-      var _title = _musicFiles[i].substring(0, _musicFiles[i].length-4);
+      var _title = _musicFiles[i].name;
+      var folderPath = pathDir+"/"+_title+"/";
       var artist;
       var title;
-      var file;
+      var mp3File = pathDir+"/"+_title+"/"+_title+".mp3";
+      var srtFile = "";
+      var bgFile = "";
       var parts = _title.split(" - ", 2);
+      if (!_musicFiles[i].isDirectory()) {
+        continue;
+      }
+      var _songFolderFiles = fs.readdirSync(pathDir+"/"+_title);
+      for (var i2 = 0; i2 < _songFolderFiles.length; i2++) {
+        if (_songFolderFiles[i2].endsWith(".mp3")) {
+          mp3File = pathDir+"/"+_title+"/"+_songFolderFiles[i2];
+        }
+        else if (_songFolderFiles[i2].endsWith(".srt")) {
+          srtFile = pathDir+"/"+_title+"/"+_songFolderFiles[i2];
+        }
+        else if (
+          _songFolderFiles[i2].endsWith(".png")
+          || _songFolderFiles[i2].endsWith(".jpeg")
+          || _songFolderFiles[i2].endsWith(".jpg")
+        ) {
+          bgFile = pathDir+"/"+_title+"/"+_songFolderFiles[i2];
+        }
+      }
       if (parts.length > 1) {
         artist = parts[0];
         title = parts[1];
-        file = pathDir+"/"+_title+".mp3";
       }
       else {
         artist = "Unknown";
         title = parts[0];
-        file = pathDir+"/"+_title+".mp3";
       }
       musicFiles[newMp3Count] = {
-        "artist":artist,
-        "title":title,
-        "file":file
+        "folderPath": folderPath,
+        "artist": artist,
+        "title": title,
+        "file": mp3File,
+        "srt": srtFile,
+        "background": bgFile,
       };
       newMp3Count++;
     }
   }
 
   //Inserting music
-
-  //musicFiles = JSON.parse(musicJson);
-  //console.log(musicFiles);
   if (musicFiles.length > 0) {
     for (var i = 0; i < musicFiles.length; i++) {
       var newItem = document.createElement("div");
       newItem.setAttribute("class", "music-item");
       newItem.setAttribute("id","music-"+ i);
       newItem.setAttribute("onclick", "playSong("+ i +");");
-      newItem.setAttribute("oncontextmenu", "musicMenuFunc(event);");
+      // newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
+      musicItemCm.attachContextMenu(newItem);
       var newItemP = document.createElement("p");
-      newItemP.innerHTML = musicFiles[i].artist + " - " + musicFiles[i].title;
+      newItemP.innerText = musicFiles[i].artist + " - " + musicFiles[i].title;
       newItem.appendChild(newItemP);
+      newItem.title = newItemP.innerText;
       document.getElementById("music-list").appendChild(newItem);
       songs[i] = musicFiles[i].file;
       songCount++;
@@ -147,6 +244,39 @@ function LoadMusic(){
     console.log("No music found!");
   }
   allMusicData = musicFiles;
+  searchChange(document.getElementById("searchField").value, document.getElementById("searchField"));
+}
+
+var filesDetected = 0;
+var filesCopied = 0;
+var fileCopyProcessNotif = undefined;
+function isFileCopyFinished(filesDetected, filesCopied, curFile) {
+  if (fileCopyProcessNotif != undefined) {
+    if (filesDetected != filesCopied) {
+      document.querySelector("#TEMP_FILECOPYPROCESS").innerHTML = filesCopied+"/"+filesDetected+" files copied<br>"+curFile;
+    }
+    else {
+      document.querySelector("#TEMP_FILECOPYPROCESS").innerHTML = "All files copied!";
+      LoadMusic();
+      setTimeout(function () {
+        fileCopyProcessNotif.titleObject.innerHTML = "Reloaded Music Folder";
+        fileCopyProcessNotif.descriptionObject.innerHTML = "";
+      }, 1000);
+      setTimeout(function () {
+        fileCopyProcessNotif.close();
+        fileCopyProcessNotif = undefined;
+      }, 1500);
+    }
+  }
+  else {
+    fileCopyProcessNotif = new Notif(
+      "Found files in Music folder",
+      "Copying files from folder to a valid location...<br>"+
+      "<div id='TEMP_FILECOPYPROCESS'>"+filesCopied+"/"+filesDetected+" files copied<br>"+curFile+"</div>"+
+      "<br>Please wait", 1000000
+    );
+    isFileCopyFinished(filesDetected, filesCopied);
+  }
 }
 
 //Test for illegal chars
@@ -155,7 +285,7 @@ function isValid(str){
   let reg = /[\\\/\:\*\?\"\<\>\|]/g;
   if (reg.test(str)) {
     str = str.replace(reg, "");
-    notification("Invalid Characters Detected", "Changed \""+orgStr+"\"\nto \""+str+"\"");
+    new Notif("Invalid Characters Detected", "Changed \""+orgStr+"\"\nto \""+str+"\"");
   }
   return str;
 }
@@ -168,9 +298,9 @@ async function addMusic()
   var url = document.getElementById("addUrl").value;
   if (ytdl.validateURL(url)) {}
   else {
-    return notification("Invalid URL", "\""+url+"\" is not a valid URL");
+    return new Notif("Invalid URL", "\""+url+"\" is not a valid URL");
   }
-  var name = document.getElementById("addName").value/*.replace("&", "and")*/;
+  var name = document.getElementById("addName").value;
   var button = document.getElementById("addButton");
   var dlImg = document.getElementById("dlImg").checked;
   button.innerHTML = "Downloading... Please wait";
@@ -186,8 +316,10 @@ async function addMusic()
   name = isValid(name);
   var stream = ytdl(url);
   //const mp4 = pathDir+name+'.mp4'; //Add this IF i add video
-  const mp3 = pathDir+name+'.mp3';
-  const jpg = pathDir+name+".jpg";
+  var songFolderPath = pathDir+name+"/";
+  fs.mkdirSync(songFolderPath);
+  const mp3 = songFolderPath+name+'.mp3';
+  const jpg = songFolderPath+name+".jpg";
   if (dlImg) {
     const request = https.get("https://i.ytimg.com/vi/"+ytdl.getURLVideoID(url)+"/maxresdefault.jpg", function(response) {
     response.pipe(fs.createWriteStream(jpg));
@@ -203,12 +335,9 @@ async function addMusic()
     ffmpegPath = './src/ffmpeg.exe';
   }
 
-  notification("Downloading... Please wait", name, 1000);
+  new Notif("Downloading... Please wait", name, 2000);
   proc.setFfmpegPath(ffmpegPath);
-  /*var savedFile = proc.saveToFile(mp3);
 
-  savedFile = await savedFile;
-  console.log(savedFile);*/
   try {
 
   } catch (e) {
@@ -217,47 +346,57 @@ async function addMusic()
   proc.saveToFile(mp3, (stdout, stderr) => {
     if (stderr) {
       return console.log(stderr);
-      document.getElementById("addUrl").value = "";
-      document.getElementById("addName").value = "";
-      document.getElementById("addButton").disabled = false;
-      document.getElementById("addButton").innerHTML = "Add Music";
     }
     console.log(stdout);
     //Add file to music browser
+    document.getElementById("addUrl").value = "";
+    document.getElementById("addName").value = "";
+    document.getElementById("addButton").disabled = false;
+    document.getElementById("addButton").innerHTML = "Add Music";
     return console.log('Download complete!');
   })
   .on('end', function(err) {
     var _title = name;
+    var folderPath = songFolderPath;
     var artist;
     var title;
-    var file;
+    var file = mp3;
+    var bgFile = jpg;
+    var srtFile = "";
     var parts = _title.split(" - ", 2);
     if (parts.length > 1) {
       artist = parts[0];
       title = parts[1];
-      file = pathDir+_title+".mp3";
     }
     else {
       artist = "Unknown";
       title = parts[0];
-      file = pathDir+_title+".mp3";
     }
 
     var newItem = document.createElement("div");
     newItem.setAttribute("class", "music-item");
     newItem.setAttribute("id","music-"+ songCount);
     newItem.setAttribute("onclick", "playSong("+ songCount +");");
-    newItem.setAttribute("oncontextmenu", "musicMenuFunc(event);");
-    newItem.setAttribute("playing", "new");
+    // newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
+    musicItemCm.attachContextMenu(newItem);
     var newItemP = document.createElement("p");
     newItemP.innerHTML = artist + " - " + title;
     newItem.appendChild(newItemP);
-    newItem.addEventListener('contextmenu', musicMenuFunc(event), false);
+    //newItem.addEventListener('contextmenu', musicMenuFunc(event), false);
     document.getElementById("music-list").appendChild(newItem);
     songs[songCount] = file;
+    allMusicData.push({
+      "artist": artist,
+      "title": title,
+      "file": file,
+      "folderPath": folderPath,
+      "background": bgFile,
+    });
+    scrollToSong(songCount);
     songCount++;
 
-    notification("Download Finished", name, 1000);
+    new Notif("Download Finished", name, 1000);
+    new Notification("Download Finished");
     _finished();
     function _finished() {
       document.getElementById("addUrl").value = "";
@@ -265,7 +404,9 @@ async function addMusic()
       document.getElementById("addButton").disabled = false;
       document.getElementById("addButton").innerHTML = "Add Music";
     }
-    document.getElementById("deleteOnNewLoad").parentNode.removeChild(document.getElementById("deleteOnNewLoad"));
+    if (document.getElementById("deleteOnNewLoad")) {
+      document.getElementById("deleteOnNewLoad").parentNode.removeChild(document.getElementById("deleteOnNewLoad"));
+    }
   });
 
   // Get ID:
@@ -275,7 +416,6 @@ async function addMusic()
 }
 
 //Insert picture drop-in areas
-var bgChanged = {};
 function fileDropped(e)
 {
   e.stopPropagation();
@@ -290,49 +430,50 @@ function fileDropped(e)
   //Background files
   if (isExt(".jpg") || isExt(".png")) {
     var curId = document.getElementById("now-playing").getAttribute("playingid");
-    var fileName = songs[curId].split("/")[songs[curId].split("/").length-1];
-    fileName = fileName.substring(0,fileName.length-4);
-    fs.copyFileSync(file.path, pathDir+fileName+".jpg");
-    setBG({"file":songs[curId]});
+    //var fileName = allMusicData[curId].split("/")[songs[curId].split("/").length-1];
+    // fileName = fileName.substring(0,fileName.length-4);
+    fs.copyFileSync(file.path, allMusicData[curId].folderPath+file.name);
+    allMusicData[curId].background = allMusicData[curId].folderPath+file.name;
+    setBG(allMusicData[curId].background);
   }
   //Subtitle files
   else if (isExt(".srt")) {
     var curId = document.getElementById("now-playing").getAttribute("playingid");
-    var fileName = songs[curId].split("/")[songs[curId].split("/").length-1];
-    fileName = fileName.substring(0,fileName.length-4);
-    fs.copyFileSync(file.path, pathDir+fileName+".srt");
-    notification("Added Subtitles", "Successfully added subtitles added for \""+fileName+"\"", 1000);
-    console.log(allMusicData);
-    console.log(allMusicData[curId]);
-    RenderSubtitles(allMusicData[curId]);
+    //var fileName = allMusicData[curId].split("/")[songs[curId].split("/").length-1];
+    // fileName = fileName.substring(0,fileName.length-4);
+    fs.copyFileSync(file.path, allMusicData[curId].folderPath+file.name);
+    allMusicData[curId].srt = allMusicData[curId].folderPath+file.name;
+    new Notif("Added Subtitles", "Successfully added subtitles added for \""+allMusicData[curId].title+"\"", 1000);
+    RenderSubtitles(allMusicData[curId].srt);
   }
   //Music Files
   else if (isExt(".mp3")) {
     //console.log(file);
-    fs.copyFileSync(file.path, pathDir+file.name);
+    fs.mkdirSync(pathDir+"/"+file.name.substring(0,file.name.length-4), {recursive:true});
+    fs.copyFileSync(file.path, pathDir+"/"+file.name.substring(0,file.name.length-4)+"/"+file.name);
     //Adding the file, i swear make a fucking function >_>
     {
       var _title = file.name.substring(0,file.name.length-4);
+      var folderPath = pathDir+"/"+file.name.substring(0,file.name.length-4)+"/";
       var artist;
       var title;
-      var filePath;
+      var filePath = folderPath+file.name;
       var parts = _title.split(" - ", 2);
       if (parts.length > 1) {
         artist = parts[0];
         title = parts[1];
-        filePath = pathDir+_title+".mp3";
       }
       else {
         artist = "Unknown";
         title = parts[0];
-        filePath = pathDir+_title+".mp3";
       }
 
       var newItem = document.createElement("div");
       newItem.setAttribute("class", "music-item");
       newItem.setAttribute("id","music-"+ songCount);
       newItem.setAttribute("onclick", "playSong("+ songCount +");");
-      newItem.setAttribute("playing", "new");
+      // newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
+      musicItemCm.attachContextMenu(newItem);
       var newItemP = document.createElement("p");
       newItemP.innerHTML = artist + " - " + title;
       newItem.appendChild(newItemP);
@@ -340,20 +481,21 @@ function fileDropped(e)
       document.getElementById("music-list").appendChild(newItem);
       songs[songCount] = filePath;
       allMusicData.push({
-        "artist":artist,
-        "title":title,
-        "file":filePath
+        "artist": artist,
+        "title": title,
+        "file": filePath,
+        "folderPath": folderPath,
       });
       songCount++;
     }
-    notification("Your song has been added", "", 1000);
+    new Notif("Your song has been added", "", 1000);
     try {
       document.getElementById("deleteOnNewLoad").parentNode.removeChild(document.getElementById("deleteOnNewLoad"));
     } catch (e) {}
   }
   //If none of the above
   else {
-    notification("Invalid file",
+    new Notif("Invalid file",
     "Music files: .mp3,\nBackgrounds: .png, .jpg\nSubtitles: .srt");
   }
 }
@@ -363,9 +505,7 @@ function openSettings()
 {
   try {
     lastWindow.close();
-  } catch (e) {
-
-  }
+  } catch (e) {}
   lastWindow = window.open("settings.html");
 }
 
@@ -396,4 +536,77 @@ function searchChange(search, object) {
       }
     }
   }
+}
+
+function renameSong(object, e) {
+  e.preventDefault()
+  var id = object.getAttribute("id").replace("music-", "");
+  var info = allMusicData[id];
+  const input = document.createElement("input");
+  input.value = info.artist +" - "+info.title;
+  input.style.width = "80%";
+  input.style.textAlign = "center";
+  const btn = document.createElement("Button");
+  btn.innerHTML = "Rename";
+  var n = new Notif("Rename",
+  [
+    "Renaming \""+info.artist +" - "+info.title+"\" to\n",
+    input,
+    // btn
+  ]);
+
+  btn.onclick = function () {
+    renameAction(object, input.value, {input:input});
+  }
+
+  n.buttonObject.setText("Rename");
+  n.buttonObject.onclick =  function() {
+    renameAction(object, input.value, {input:input});
+  };
+
+  input.onkeydown = function (ev) {
+    if (ev.key == "Enter") {
+      ev.preventDefault();
+      renameAction(object, input.value, {input:input});
+    }
+  }
+  input.focus();
+  input.setSelectionRange(0, input.value.length);
+}
+
+function renameAction(object, newName, other) {
+  var id = object.getAttribute("id").replace("music-", "");
+
+  fs.access(pathDir+newName, function(err) {
+    if (!err) {
+      if (other && other.input) {
+        console.log(other.input.parentNode.parentNode);
+        other.input.parentNode.parentNode.instance.titleObject.innerHTML = "Song already exists";
+        other.input.focus();
+        other.input.setSelectionRange(0, other.input.value.length);
+      }
+
+      return console.log("Song Exists");
+    }
+    // If no song is named that
+    fs.rename(allMusicData[id].folderPath, pathDir+newName, function (err) {
+      if (err) { 
+        console.error(err);
+        var _button = document.createElement("button");
+        _button.innerHTML = "Show Technical Error";
+        _button.onclick = function() {
+          this.parentNode.parentNode.instance.titleObject.innerHTML = "Technical Details";
+          this.parentNode.innerHTML = err;
+        };
+        new Notif("Couldn't rename song", ["Make sure you are not currently listening to the song you are trying to rename, as this will fail.\n", _button]);
+
+      }
+      else{
+        other.input.parentNode.parentNode.close();
+        new Notif("Renamed", ["Changed \""+allMusicData[id].folderPath+"\"\nto\n"+"\""+pathDir+newName+"\""], 1000);
+        onMenuHover();
+        LoadMusic();
+      }
+    });
+  });
 }

@@ -1,5 +1,5 @@
-const fs = require('fs');
-var proc = require('child_process');
+//const fs = require('fs');
+var __proc = require('child_process');
 var preset;
 setTimeout(function () {
   document.getElementById("musicDir").setAttribute('placeholder', defaultMusicDir);
@@ -8,14 +8,14 @@ try {
   preset = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
 }
 catch (e) {
-  notification("No settings found", "It doesn't seem like you have set up your settings yet.\n"+
+  new Notif("No settings found", "It doesn't seem like you have set up your settings yet.\n"+
   "For this app to work, it's important you select a music folder (A folder that already exists)\n"+
   "");
 }
 
 
 const options = document.getElementsByClassName("setting");
-window.onload = function()
+window.addEventListener("load", function()
 {
   event_sliderUpdate(-1);
   for (var i = 0; i < options.length; i++) {
@@ -37,14 +37,18 @@ window.onload = function()
       }
     }
   }
-  //console.log(preset);
-}
+}, false);
 
 function applySettings()
 {
+  if (document.querySelector("#subtitleFont").value == "") {
+    document.querySelector("#subBox").style.fontFamily = "Arial";
+  }
+  else{
+    document.querySelector("#subBox").style.fontFamily = document.querySelector("#subtitleFont").value;
+  }
   const _options = document.getElementsByClassName("setting");
   var jOptions = {};
-  console.log(_options);
   for (var i = 0; i < _options.length; i++) {
     var typeOfSetting = _options[i].getAttribute("settype");
     if (typeOfSetting == "checkbox") {
@@ -61,26 +65,48 @@ function applySettings()
     }
   }
   var strOptions = JSON.stringify(jOptions);
-  console.log(strOptions);
   fs.writeFileSync("./settings.json", strOptions);
 
   var button = document.getElementById("applyButton");
-  button.innerHTML = "<p>Applied!</p>";
-  document.getElementById("backButton").innerHTML = "<p>Close</p>";
+  button.innerHTML = "<p>Saved!</p>";
   setTimeout(function () {
-    button.innerHTML = "<p>Apply</p>";
+    button.innerHTML = "<p>Save</p>";
   }, 2000);
 }
 
 function event_sliderUpdate(value)
 {
   //New Setting
-  document.getElementById("bgdim").innerHTML = "Background Dim: "+document.getElementById("bgdimslider").value+"%";
-  document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+document.getElementById("visualizerintensity").value;
-  if (value == -1) { //Default setting
-    document.getElementById("bgdim").innerHTML = "Background Dim: "+preset["backgroundDim"]+"%";
-    document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+preset["visualizerIntensity"];
+  setTimeout(function(){
+    document.getElementById("bgdim").innerHTML = "Background Dim: "+document.getElementById("bgdimslider").value+"%";
+    
+    document.getElementById("musicspeed").innerHTML = "Playback Rate: "+(document.getElementById("musicspeedslider").value/100)+"x";
+    document.getElementById("musicObject").playbackRate = (document.getElementById("musicspeedslider").value/100);
+
+    document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+document.getElementById("visualizerintensity").value;
+    document.getElementById("visualcolor").innerHTML = "Visualizer Color: "+
+    document.getElementById("visualizerRed").value+"/"+
+    document.getElementById("visualizerGreen").value+"/"+
+    document.getElementById("visualizerBlue").value;
+    VisualizerProperties.rgb(
+      document.getElementById("visualizerRed").value,
+      document.getElementById("visualizerGreen").value,
+      document.getElementById("visualizerBlue").value
+    );
+
+
+    if (value == -1) { //Default setting
+      document.getElementById("bgdim").innerHTML = "Background Dim: "+preset["backgroundDim"]+"%";
+      document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+preset["visualizerIntensity"];
+    }
+  }, 1);
+  try {
+    settings.backgroundDim = document.getElementById("bgdimslider").value;
+    settings.visualizerIntensity = document.getElementById("visualizerintensity").value;
+  } catch (error) {
+    //new Notif("Error", error);
   }
+  document.querySelector("#applyButton").querySelector("p").innerHTML = "Save*";
 }
 
 function openMusicFolder(){
@@ -92,5 +118,5 @@ function openMusicFolder(){
   while (_url.startsWith("/") || _url.startsWith("\\")) {
     _url = _url.substring(1);
   }
-  proc.exec('start "" "'+_url+'"');
+  __proc.exec('start "" "'+_url+'"');
 }

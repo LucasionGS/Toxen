@@ -12,16 +12,21 @@ function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
     title:"Toxen",
-    minWidth:800,
-    minHeight:768,
+    minWidth: 400,
+    minHeight: 384,
     width: winWidth,
     height: winHeight,
-    icon:"./icon.ico",
     webPreferences: {
       nodeIntegration: true
     },
     show:false
   });
+
+  try {
+    win.setIcon("./icon.ico");
+  } catch (error) {
+    console.error("No icon accessible");
+  }
 
   win.once('ready-to-show', () => {
     //This will prevent the white startup screen before the page loads in fully
@@ -48,7 +53,7 @@ function createWindow () {
       label:"Usage",
       click(){
         //Open github page
-        process.exec('start "" "https://github.com/LucasionGS/Toxen/blob/master/README.md"');
+        process.exec('start "" "https://github.com/LucasionGS/Toxen/blob/alpha/README.md"');
       }
     },
     {
@@ -80,29 +85,31 @@ function createWindow () {
     });*/
 
     var appIcon = null;
-    appIcon = new Tray("./icon.ico");
-    var contextMenu = Menu.buildFromTemplate([
-      {
-        label: "Restore",
-        type: "radio",
-        click(){
-          win.show();
+    try {
+      appIcon = new Tray("./icon.ico");
+      var contextMenu = Menu.buildFromTemplate([
+        {
+          label: "Restore",
+          type: "radio",
+          click(){
+            win.show();
+          }
+        },
+        {
+          label: "Quit",
+          type: "radio",
+          click(){
+            app.quit();
+          }
         }
-      },
-      {
-        label: "Quit",
-        type: "radio",
-        click(){
-          app.quit();
-        }
-      }
-    ]);
-    appIcon.setToolTip("Toxen♫");
-    appIcon.setContextMenu(contextMenu);
+      ]);
+      appIcon.setToolTip("Toxen♫");
+      appIcon.setContextMenu(contextMenu);
 
-    appIcon.on("click", () => {
-      win.show();
-    });
+      appIcon.on("click", () => {
+        win.show();
+      });
+    } catch (error) {}
 
 }
 

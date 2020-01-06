@@ -14,7 +14,7 @@ var mousePos = {
 };
 
 //Get mouse position
-window.onmousemove = function(e)
+window.onmousemove = function(/**@type {MouseEvent}*/e)
 {
   mousePos.X = e.clientX;
   mousePos.Y = e.clientY;
@@ -51,33 +51,57 @@ function stop(btn)
   musicObject.pause();
 }
 
+function deleteSong(id) {
+  try {
+    // Delete files inside
+    var files = fs.readdirSync(allMusicData[id].folderPath);
+    for (var i = 0; i < files.length; i++) {
+      fs.unlinkSync(allMusicData[id].folderPath+"/"+files[i]);
+    }
+    // Delete Folder
+    fs.rmdirSync(allMusicData[id].folderPath);
+  } catch (e) { console.log("No files to delete"); }
+  const ref = document.getElementById("music-"+id);
+  ref.parentNode.removeChild(ref);
+}
+
 function playSong(id)
 {
   const ref = document.getElementById("music-"+id);
+  if (ref.style.display == "none") {
+    musicEnd();
+    return null;
+  }
   data = {
-    "id":id,
-    "song":ref.childNodes[0].innerHTML,
-    "file":songs[id],
-    //"duration":""
+    "id": id,
+    "song": allMusicData[id].artist+" - "+allMusicData[id].title,
+    "file": allMusicData[id].file,
+
   };
+  var songTitle = allMusicData[id].artist+" - "+allMusicData[id].title;
+  if (!fs.existsSync(allMusicData[id].file)) {
+    new Notif(
+      "No mp3 found.",
+      [
+        "No mp3 file cound be found inside of the song folder \""+allMusicData[id].folderPath+"\".",
+        "Do you want to delete this folder?",
+        "<button onclick='deleteSong("+id+"); this.parentNode.parentNode.close();'>Delete song</button>"
+      ]
+    );
+  }
   var musicObject = document.getElementById("musicObject");
-  musicObject.src = data.file;
+  musicObject.src = allMusicData[id].file;
   musicObject.volume = 0.3;
-  //console.log(data);
-  if (data["song"].length <= 60) {
-    document.getElementById("song-title").innerHTML = data["song"];
-  }
-  else {
-    document.getElementById("song-title").innerHTML = data["song"].substring(0, 60)+"...";
-  }
-  setBG(data);
+
+  document.getElementById("song-title").innerHTML = songTitle;
+  setBG(allMusicData[id].background);
   play(document.getElementById("play"));
   document.getElementById("now-playing").setAttribute("playingid", id);
   changeVolume();
   if (playHistory[playHistory.length-1] != id) {
     playHistory[playHistory.length] = id;
   }
-  //console.log(playHistory);
+
   var allMusicItems = document.getElementsByClassName("music-item");
   for (var i = 0; i < allMusicItems.length; i++) {
     if (allMusicItems[i].getAttribute("playing") != "new") {
@@ -89,14 +113,26 @@ function playSong(id)
     curMusicItem.setAttribute("playing", true);
   }
   var musicListObject = document.getElementById("music-list");
-  musicListObject.scrollTop = curMusicItem.offsetTop-Math.min(musicListObject.clientHeight, mousePos.Y);
+  //musicListObject.scrollTop = curMusicItem.offsetTop-Math.min(musicListObject.clientHeight, mousePos.Y);
+  curMusicItem.scrollIntoViewIfNeeded();
   clearInterval(subtitleInterval);
-  RenderSubtitles(data);
+  RenderSubtitles(allMusicData[id].srt);
   Visualizer();
+
+  // Resetting settings after script modification
+  Control.functionEvents = [];
+  event_sliderUpdate();
+  if (fs.existsSync(allMusicData[id].folderPath+"/script.js")) {
+    var script = require(allMusicData[id].folderPath+"/script.js");
+    /**
+     * __dirname is the root directory of toxen.
+     */
+    script.script(__dirname+"/src/scriptControl.js");
+  }
 }
 
 //Keypresses
-function keypress(e)
+function keypress(/**@type {KeyboardEvent} */e)
 {
   var curFocus = document.activeElement;
   var curFocusTag = curFocus.tagName.toLowerCase();
@@ -105,6 +141,12 @@ function keypress(e)
     if (!document.getElementById("addButton").disabled) {
       addMusic();
     }
+  }
+  else if (e.key == "Escape") {
+    try {
+      Notif.closeNewest();
+    }
+    catch {}
   }
   else if(e.keyCode == 32 && !isFocusInput)
   {
@@ -116,16 +158,29 @@ function keypress(e)
   else if (e.ctrlKey && e.key == "s") {
     toggleFunction("shuffle");
   }
+  else if (e.ctrlKey && e.key == "f") {
+    onMenuHover();
+    document.querySelector("[playing=true]").scrollIntoViewIfNeeded();
+  }
   else if (e.ctrlKey && e.key == "o") {
-    openSettings();
+    onMenuHover();
+    document.querySelector(".settingsList").scrollIntoViewIfNeeded();
+  }
+  else if (e.ctrlKey && e.key == "m") {
+    onMenuHover();
+    document.querySelector(".music-list").scrollIntoViewIfNeeded();
+  }
+  else if (e.ctrlKey && e.key == "y") {
+    onMenuHover();
+    document.querySelector(".addMusic").scrollIntoViewIfNeeded();
   }
   else if (e.ctrlKey && e.key == "u") {
     checkUpdate();
   }
-  else if ((e.ctrlKey && e.key == "ArrowLeft") || e.key == "MediaTrackPrevious") {
+  else if ((e.ctrlKey && e.key == "ArrowLeft" && !isFocusInput) || e.key == "MediaTrackPrevious") {
     toggleFunction("previous");
   }
-  else if ((e.ctrlKey && e.key == "ArrowRight") || e.key == "MediaTrackNext") {
+  else if ((e.ctrlKey && e.key == "ArrowRight" && !isFocusInput) || e.key == "MediaTrackNext") {
     toggleFunction("next");
   }
   else if (e.key == "F5") {
@@ -145,6 +200,24 @@ function keypress(e)
       document.getElementById("content").after(document.getElementById("player"))
       document.getElementById("canvas").style.height = "92vh";
     }
+  }
+  else if (e.ctrlKey && e.key == "0") {
+    var mo = document.getElementById("musicObject");
+    var mSpd = document.getElementById("musicspeedslider");
+    mSpd.value = 100;
+    event_sliderUpdate();
+  }
+  else if (e.ctrlKey && e.key == "+") {
+    var mo = document.getElementById("musicObject");
+    var mSpd = document.getElementById("musicspeedslider");
+    mSpd.value = ((Math.round(mo.playbackRate*10)/10)+0.1)*100;
+    event_sliderUpdate();
+  }
+  else if (e.ctrlKey && e.key == "-") {
+    var mo = document.getElementById("musicObject");
+    var mSpd = document.getElementById("musicspeedslider");
+    mSpd.value = ((Math.round(mo.playbackRate*10)/10)-0.1)*100;
+    event_sliderUpdate();
   }
 }
 
@@ -182,25 +255,70 @@ function musicEnd()
   if (repeat) {
     playSong(_id);
   }
-  if (!randomize) {
+  else if (!randomize) {
     if (songCount > _id+1) {
+      var musicObject = document.getElementById("music-"+(_id+1));
+      while(musicObject.style.display == "none") {
+        _id++;
+        if (songCount > _id+1) {
+          musicObject = document.getElementById("music-"+(_id+1));
+        }
+        else {
+          _id = 0;
+          musicObject = document.getElementById("music-"+(_id));
+          while(musicObject.style.display == "none") {
+            _id++;
+            if (songCount > _id+1) {
+              musicObject = document.getElementById("music-"+(_id));
+            }
+          }
+          playSong(_id);
+          return undefined;
+        }
+      }
       playSong(_id+1);
     }
     else {
-      playSong(0);
+      _id = 0;
+      musicObject = document.getElementById("music-"+(_id));
+      while(musicObject.style.display == "none") {
+        _id++;
+        if (songCount > _id+1) {
+          musicObject = document.getElementById("music-"+(_id));
+        }
+      }
+      playSong(_id);
+      return undefined;
     }
   }
   else {
-    playSong(Math.floor((Math.random() * songCount)));
+    var _availableSongs = [];
+    for (var i = 0; i < songCount; i++) {
+      var musicObject = document.getElementById("music-"+i);
+      if (musicObject.style.display != "none") {
+        _availableSongs.push(i);
+      }
+    }
+    var songIdToPlay = _id;
+    while (songIdToPlay == _id && _availableSongs.length > 1) {
+      songIdToPlay = _availableSongs[Math.floor((Math.random() * _availableSongs.length))];
+    }
+    if (_availableSongs.length == 1) {
+      songIdToPlay = _availableSongs[0];
+    }
+    playSong(songIdToPlay);
   }
 }
 
 function update()
 {
-  if (audio.duration > 0 && document.getElementById("curTime").max != audio.duration) {
+  if (audio && audio.duration && audio.duration > 0 && document.getElementById("curTime").max != audio.duration) {
     document.getElementById("curTime").max = audio.duration;
   }
-  document.getElementById("curTime").value = audio.currentTime;
+  if (audio && audio.currentTime && audio.duration) {
+    document.getElementById("curTime").value = audio.currentTime;
+    document.getElementById("song-digital-progress").innerHTML = ConvertSecondsToDigitalClock(audio.currentTime, true)+"/"+ConvertSecondsToDigitalClock(audio.duration, true);
+  }
 }
 
 //Execute update()
@@ -212,8 +330,11 @@ setInterval(() => {
 
 function changeProgress(e)
 {
-  var procent = e.offsetX / e.target.clientWidth;
-  audio.currentTime = audio.duration * procent;
+  if (e.buttons == 1) {
+    e.preventDefault();
+    var procent = e.offsetX / e.target.clientWidth;
+    audio.currentTime = audio.duration * procent;
+  }
 }
 
 function changeVolume()
@@ -222,11 +343,11 @@ function changeVolume()
   document.getElementById("volumeLabel").innerHTML = "- Volume + " + document.getElementById("volume").value;
 }
 
-function setBG(song, queryString, reset)
+function setBG(image, queryString, reset)
 {
   if (queryString == undefined) {
     try {
-      queryString = fs.statSync(song.file.substring(0,song.file.length-4)+".jpg").ctimeMs;
+      queryString = fs.statSync(image).ctimeMs;
     } catch (e) {
       queryString = "";
     }
@@ -237,11 +358,11 @@ function setBG(song, queryString, reset)
   }
   else {
     var body = document.getElementsByTagName('body')[0];
-    var curBG = song.file.substring(0,song.file.length-4)+".jpg";
+    var curBG = image;
     body.style.background = "url(\""+curBG+"?"+queryString+"\") no-repeat center center fixed";
     body.style.backgroundSize = "cover";
   }
-  //console.log(body.style.backgroundImage);
+
 }
 
 function onMenuHover()
@@ -252,4 +373,71 @@ function onMenuHover()
 function offMenuHover()
 {
   document.getElementById("sidebar").setAttribute("hover", "false");
+}
+
+function ConvertSecondsToDigitalClock(seconds = 0, trim = false) {
+  milliseconds = seconds * 1000;
+  time = "";
+  curNumber = 0;
+
+  // Convert into hours
+  while (milliseconds >= 3600000) {
+    curNumber++;
+    milliseconds -= 3600000;
+  }
+  if (curNumber < 10) {
+    time += "0" + (curNumber) + ":";
+  }
+  else {
+    time += curNumber + ":";
+  }
+  curNumber = 0;
+
+  // Convert into minutes
+  while (milliseconds >= 60000) {
+    curNumber++;
+    milliseconds -= 60000;
+  }
+  if (curNumber < 10) {
+    time += "0" + (curNumber) + ":";
+  }
+  else {
+    time += curNumber + ":";
+  }
+  curNumber = 0;
+
+  // Convert into seconds
+  while (milliseconds >= 1000) {
+    curNumber++;
+    milliseconds -= 1000;
+  }
+  if (curNumber < 10) {
+    time += "0" + (curNumber) + ",";
+  }
+  else {
+    time += curNumber + ",";
+  }
+  curNumber = 0;
+
+  // Use rest as decimal
+  milliseconds = Math.round(milliseconds);
+  if (milliseconds >= 100) {
+    time += ""+milliseconds;
+  }
+  else if (milliseconds >= 10) {
+    time += "0"+milliseconds;
+  }
+  else if (milliseconds < 10) {
+    time += "00"+milliseconds;
+  }
+
+  if (trim == true) {
+    while (time.startsWith("00:")) {
+      time = time.substring(3);
+      if (time.startsWith("0") && !time.startsWith("0:")) {
+        time = time.substring(1);
+      }
+    }
+  }
+  return time;
 }

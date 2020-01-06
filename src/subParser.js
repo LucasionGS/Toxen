@@ -1,5 +1,6 @@
 //Create subtitle box for spawning and displaying
-setTimeout(function () {
+var createSubBoxInterval = setInterval(function () {
+  if (document.getElementsByTagName("body")[0]) {
   var subBox = document.createElement("div");
   var subBoxText = document.createElement("p");
   subBox.setAttribute("id", "subBox");
@@ -9,12 +10,14 @@ setTimeout(function () {
   subBoxText.innerHTML = "";
 
   subBox.appendChild(subBoxText);
-  document.getElementsByTagName("body")[0].appendChild(subBox);
+    document.getElementsByTagName("body")[0].appendChild(subBox);
+    clearInterval(createSubBoxInterval);
+  }
 }, 1);
 
-function ParseSrt(song)
+function ParseSrt(srtFile)
 {
-  var srtPath = song.file.substring(0, song.file.length - 4)+".srt";
+  var srtPath = srtFile;
   try {
     var srtText = fs.readFileSync(srtPath, "utf8");
   } catch (e) {
@@ -63,11 +66,13 @@ function ParseSrt(song)
 }
 
 var subtitleInterval;
-function RenderSubtitles(song) {
+function RenderSubtitles(srtFile) {
   clearInterval(subtitleInterval);
-  var subData = ParseSrt(song);
+  var subData = ParseSrt(srtFile);
   var subText = document.getElementById("subBoxText");
-  subText.innerHTML = "";
+  if (subText && subText.innerHTML) {
+    subText.innerHTML = "";
+  }
   if (!subData) {
     return;
   }
@@ -75,14 +80,14 @@ function RenderSubtitles(song) {
     var hasSub = false;
     for (var i = 0; i < subData.length; i++) {
       if (audio.currentTime > subData[i].startTime && audio.currentTime < subData[i].endTime) {
-        if (subText.innerHTML != subData[i].text) {
+        if (subText.innerHTML.replace(/\"/g, "\'") != subData[i].text.replace(/\"/g, "\'")) {
           subText.innerHTML = subData[i].text;
         }
         hasSub = true;
       }
-      if (!hasSub) {
-        subText.innerHTML = "";
-      }
+    }
+    if (!hasSub) {
+      subText.innerHTML = "";
     }
   }, 5);
 }

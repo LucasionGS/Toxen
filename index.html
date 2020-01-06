@@ -5,12 +5,16 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="./src/main.css">
     <link rel="stylesheet" href="./src/audiovisual.css">
+    <script src="./lib/notif.js" charset="utf-8"></script>
+    <script src="./src/musicEventProperties.js" charset="utf-8"></script>
     <script src="./src/play.js" charset="utf-8"></script>
     <script src="./src/audiovisual.js" charset="utf-8"></script>
     <script src="./src/desktop.js" charset="utf-8"></script>
     <script src="./src/subParser.js" charset="utf-8"></script>
     <script src="./src/global.js" charset="utf-8"></script>
     <script src="./lib/ionMarkDown.js" charset="utf-8"></script>
+    <script src="./src/settings.js"></script>
+    <script src="./src/scriptControl.js"></script>
     <title>Toxen</title>
   </head>
   <body onkeydown="keypress(event);" onload="onload();">
@@ -19,8 +23,9 @@
     http://i3.ytimg.com/vi/lL33M9e-g8Q/maxresdefault.jpg
     -->
     <div id="sidebar" class="sidebar" onmouseover="onMenuHover();" onmouseout="offMenuHover();" hover="true">
-      <h1 id="title" class="title">Toxen Music</h1>
-      <input type="text" name="search" value="" oninput="searchChange(this.value, this);" placeholder="Search...">
+      <h1 id="title" class="title">T<img src="icon.png" style="width: 25px;">xen Music</h1>
+      <button type="button" onclick="LoadMusic()">Reload Music Folder</button>
+      <input id="searchField" type="text" name="search" value="" oninput="searchChange(this.value, this);" placeholder="Search...">
       <div class="music-list" id="music-list">
         <!-- Music gets inserted here -->
       </div>
@@ -37,25 +42,87 @@
       <!-- Previous & Next -->
       <div class="divBox" style="overflow: hidden;">
         <div id="btnPrevious" class="Button btnDefault float-left" onclick="toggleFunction('previous')">
-          <p>&laquo;Previous</p>
+          <p>&laquo;</p>
         </div>
         <div id="btnNext" class="Button btnDefault float-left" onclick="toggleFunction('next')">
-          <p>Next&raquo;</p>
+          <p>&raquo;</p>
         </div>
       </div>
 
       <div class="separator"></div>
-      <h1 id="subtitle" class="subtitle">Options</h1>
-      <label id="volumeLabel">- Volume +</label><br>
-      <input id="volume" type="range" name="volume" min="0" max="100" value="30" oninput="changeVolume()">
-      <div class="Button btnDefault" onclick="openSettings()">
-        <p>Settings</p>
+      <!-- Settings List -->
+      <div class="settingsList">
+        <h1 id="subtitle" class="subtitle">Settings</h1>
+        <label id="volumeLabel">- Volume +</label><br>
+        <input id="volume" class="setting slider" settype="value" type="range" name="volume" min="0" max="100" value="30" oninput="changeVolume(); event_sliderUpdate();">
+        <br>
+        <label>Music Directory</label><br>
+        <input type="text" id="musicDir" class="setting value" settype="value" name="musicDir" value="" placeholder="/Folder/Path/">
+        <button type="button" name="button" onclick="openMusicFolder()">Open Music Folder</button>
+        <div class="separator"></div>
+
+        
+        <label id="bgdim">Background Dim: %</label><br>
+        <input class="setting slider" type="range" settype="value" id="bgdimslider"
+        name="backgroundDim" min="0" max="100" value="50"
+        oninput="event_sliderUpdate();">
+        <br>
+        <label id="musicspeed">Playback Rate: x</label><br>
+        <input class="setting slider" type="range" settype="value" id="musicspeedslider"
+        name="playbackRate" min="25" max="200" value="100"
+        oninput="event_sliderUpdate();">
+        <br>
+        <div class="separator"></div>
+        <h3>Visualizer</h3>
+        <input class="setting setBox" type="checkbox" settype="checkbox"
+        name="visualizer" checked onclick='settings.visualizer = this.checked;'>
+        <label>Enabled</label>
+        <br>
+        <label id="visualintense">Visualizer Intensity</label><br>
+        <input class="setting slider" type="range" settype="value" id="visualizerintensity"
+        name="visualizerIntensity" min="1" max="50" value="15"
+        oninput="event_sliderUpdate();">
+        <br>
+        <label id="visualcolor">Visualizer Color</label><br>
+        <label>Red</label>
+        <br>
+        <input class="setting slider" type="range" settype="value" id="visualizerRed"
+        name="visualizerRed" min="0" max="255" value="255"
+        oninput="event_sliderUpdate();">
+        <br>
+        <label>Green</label>
+        <br>
+        <input class="setting slider" type="range" settype="value" id="visualizerGreen"
+        name="visualizerGreen" min="0" max="255" value="255"
+        oninput="event_sliderUpdate();">
+        <br>
+        <label>Blue</label>
+        <br>
+        <input class="setting slider" type="range" settype="value" id="visualizerBlue"
+        name="visualizerBlue" min="0" max="255" value="255"
+        oninput="event_sliderUpdate();">
+
+        <div class="separator"></div>
+
+        <h3>Subtitles</h3>
+        <label>Subtitle Font</label><br>
+        <input type="text" id="subtitleFont" class="setting value" settype="value" name="subtitleFont" value="Arial" placeholder="Default: Arial">
+
+        <div class="separator"></div>
+        <div style="overflow: hidden;">
+          <!-- Buttons -->
+          <!-- Apply button -->
+          <div id="applyButton" class="Button btnDefault float-left" onclick="applySettings(); reloadSettings();">
+            <p>Save</p>
+          </div>
+        </div>
       </div>
+      <!-- Settings List END -->
       <div class="separator"></div>
       <h1 id="subtitle" class="subtitle">YouTube Downloader</h1>
       <div class="addMusic">
         <input id="addUrl" class="addMusicItem" type="text" name="url" value="" placeholder="YouTube URL" required autocomplete="off"><br>
-        <input id="addName" class="addMusicItem" type="text" name="name" value="" placeholder="Artist (If known) - Title of the song" autocomplete="off"><br>
+        <input id="addName" class="addMusicItem" type="text" name="name" value="" placeholder="Artist (If known) - Title of the song" title="Artist (If known) - Title of the song" autocomplete="off"><br>
         <input type="checkbox" id="dlImg" name="dlImg" checked><label>Download Thumbnail</label><br>
         <button type="button" id="addButton" class="addMusicItem" onclick="addMusic();">Add Music...</button>
       </div>
@@ -66,11 +133,11 @@
   </body>
   <div class="player" id="player">
     <div id="now-playing" class="now-playing" playingid="-1">
-      <p id="song-title">text</p>
-      <progress id="curTime" value="0" max="100" onmousedown="changeProgress(event);"></progress>
+      <p id="song-title"></p>
+      <progress id="curTime" value="0" max="100" onmousemove="changeProgress(event);" onmousedown="changeProgress(event);"></progress>
+      <p id="song-digital-progress" style="margin: 0; padding: 0;">0:00/0:00</p>
     </div>
     <div id="play" class="play" onclick="playToggle();" mode="stop"></div>
     <audio id="musicObject" src="" onended="musicEnd();" canplay="isReady = true;"></audio>
   </div>
-  <footer></footer>
 </html>

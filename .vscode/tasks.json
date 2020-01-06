@@ -1,0 +1,30 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558 
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "start",
+      "problemMatcher": [
+        "$jshint"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "type": "shell",
+      "label": "Build Electron for Windows",
+      "command": "electron-packager ./ \"${workspaceFolderBasename}\" --out=../builds/ --platform=win32 --overwrite --icon=./icon.ico",
+      "problemMatcher": []
+    },
+    {
+      "type": "shell",
+      "label": "Build Electron for Linux",
+      "command": "electron-packager ./ \"${workspaceFolderBasename}\" --out=../builds/ --arch=armv7l --platform=linux --overwrite --icon=./icon.ico",
+      "problemMatcher": []
+    }
+  ]
+}
