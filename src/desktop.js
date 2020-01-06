@@ -2,24 +2,42 @@ const fs = require("fs");
 const ytdl = require("ytdl-core");
 const https = require('https');
 const {ContextMenu} = require("ionlib");
+/**
+ * @type {{string: string | number}}
+ */
 var settings;
 var preMusicDirectory = null;
 var allMusicData = [];
+/**
+ * @type {string}
+ */
 var pathDir;
 
 var musicItemCm = new ContextMenu([
   {
+    "name": "Song actions"
+  },
+  {
+    "name": "Play song",
+    "click": (ev, ref) => {
+      ref.onclick();
+    }
+  },
+  {
     "name": "Rename song",
     "click": function(ev, ref) {
       renameSong(ref, ev);
-    },
-    "runOnThis": function(ref) {
-      console.log(ref.id);
-      
     }
   }
 ]);
 
+musicItemCm.menu.onmouseover = function() {
+  onMenuHover();
+}
+
+/**
+ * Reloads the current settings.
+ */
 function reloadSettings(){
   try {
     settings = JSON.parse(fs.readFileSync("./settings.json", "utf8"));

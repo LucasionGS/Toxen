@@ -14,8 +14,8 @@ function createWindow () {
     title:"Toxen",
     minWidth: 400,
     minHeight: 384,
-    width: winWidth*2,
-    height: winHeight*2,
+    width: winWidth,
+    height: winHeight,
     webPreferences: {
       nodeIntegration: true
     },

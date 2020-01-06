@@ -14,7 +14,7 @@ var mousePos = {
 };
 
 //Get mouse position
-window.onmousemove = function(e)
+window.onmousemove = function(/**@type {MouseEvent}*/e)
 {
   mousePos.X = e.clientX;
   mousePos.Y = e.clientY;
