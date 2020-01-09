@@ -368,11 +368,14 @@ function setBG(image, queryString, reset)
 function onMenuHover()
 {
   document.getElementById("sidebar").setAttribute("hover", "true");
+  document.getElementById("canvas").setAttribute("hover", "true");
+  
 }
 
 function offMenuHover()
 {
   document.getElementById("sidebar").setAttribute("hover", "false");
+  document.getElementById("canvas").setAttribute("hover", "false");
 }
 
 function ConvertSecondsToDigitalClock(seconds = 0, trim = false) {
