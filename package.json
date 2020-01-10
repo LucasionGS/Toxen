@@ -12,6 +12,7 @@
     "ffmpeg": "0.0.4",
     "fluent-ffmpeg": "^2.1.2",
     "ionlib": "^1.0.9",
+    "ionodelib": "^1.0.0",
     "ytdl-core": "^0.29.5"
   }
 }
