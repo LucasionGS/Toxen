@@ -1,6 +1,6 @@
 {
   "name": "toxen",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
@@ -11,7 +11,7 @@
   "dependencies": {
     "ffmpeg": "0.0.4",
     "fluent-ffmpeg": "^2.1.2",
-    "ionlib": "^1.0.6",
+    "ionlib": "^1.0.9",
     "ytdl-core": "^0.29.5"
   }
 }

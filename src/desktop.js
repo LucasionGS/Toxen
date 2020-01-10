@@ -2,6 +2,7 @@ const fs = require("fs");
 const ytdl = require("ytdl-core");
 const https = require('https');
 const {ContextMenu} = require("ionlib");
+var Notif = require("ionlib").Popup;
 /**
  * @type {{string: string | number}}
  */
@@ -27,6 +28,21 @@ var musicItemCm = new ContextMenu([
     "name": "Rename song",
     "click": function(ev, ref) {
       renameSong(ref, ev);
+    }
+  },
+  {
+    "name": "Delete song",
+    "click": function(ev, ref) {
+      let id = +ref.id.substring(6);
+      new Notif(
+        "No mp3 found.",
+        [
+          "Do you really want to delete \""+allMusicData[id].artist+" - "+allMusicData[id].title+"\"?",
+          "<strong>This cannot be undone?</strong>",
+          "<button onclick='deleteSong("+id+"); this.parentNode.parentNode.close();'>Delete song</button>",
+          "<button onclick='this.parentNode.parentNode.close();'>Noooo</button>"
+        ]
+      );
     }
   },
   {
