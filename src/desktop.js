@@ -28,6 +28,12 @@ var musicItemCm = new ContextMenu([
     "click": function(ev, ref) {
       renameSong(ref, ev);
     }
+  },
+  {
+    "name": "Open song folder",
+    "click": function(ev, ref) {
+      openMusicFolder(+ref.id.substring(6));
+    }
   }
 ]);
 

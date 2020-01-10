@@ -109,14 +109,19 @@ function event_sliderUpdate(value)
   document.querySelector("#applyButton").querySelector("p").innerHTML = "Save*";
 }
 
-function openMusicFolder(){
-  var _url = document.getElementById("musicDir").value.replace(/\\/g,"\\\\");
-  if (_url == "") {
-    //_url = document.getElementById("musicDir").getAttribute("placeholder").replace("\\","\\\\")
-    _url = defaultMusicDir;
+function openMusicFolder(songId = -1) {
+  if (songId < 0) {
+    var _url = document.getElementById("musicDir").value.replace(/\\/g,"\\\\");
+    if (_url == "") {
+      //_url = document.getElementById("musicDir").getAttribute("placeholder").replace("\\","\\\\")
+      _url = defaultMusicDir;
+    }
+    while (_url.startsWith("/") || _url.startsWith("\\")) {
+      _url = _url.substring(1);
+    }
+    __proc.exec('start "" "'+_url+'"');
   }
-  while (_url.startsWith("/") || _url.startsWith("\\")) {
-    _url = _url.substring(1);
+  else {
+    __proc.exec('start "" "'+allMusicData[songId].folderPath+'"');
   }
-  __proc.exec('start "" "'+_url+'"');
 }
