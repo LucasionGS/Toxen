@@ -1,17 +1,96 @@
 const ffmpeg = require('fluent-ffmpeg');
-var nowPlaying = "";
-var songs = {};
-var songCount = 0;
-var data;
-var isReady = false;
-var randomize = false;
-var repeat = false;
-var audio;
-var playHistory = [];
-var mousePos = {
+let nowPlaying = "";
+let songs = {};
+let songCount = 0;
+let data;
+let isReady = false;
+let randomize = false;
+let repeat = false;
+let audio;
+let playHistory = [];
+let mousePos = {
   "X":0,
   "Y":0
 };
+/**
+ * Title of the playlist.
+ * @type {string}
+ */
+let curPlaylist = false;
+/**
+ * @type {{"song": string}}
+ */
+let playlists = {};
+const fs = require("fs");
+const ytdl = require("ytdl-core");
+const https = require('https');
+const {ContextMenu, Path} = require("ionlib");
+var Notif = require("ionlib").Popup;
+/**
+ * @type {{string: string | number}}
+ */
+var settings;
+var preMusicDirectory = null;
+var allMusicData = [];
+/**
+ * @type {string}
+ */
+var pathDir;
+
+var musicItemCm = new ContextMenu([
+  {
+    "name": "Song actions"
+  },
+  {
+    "name": "Play song",
+    "click": (ev, ref) => {
+      ref.onclick();
+    }
+  },
+  {
+    "name": "Add to playlist...",
+    "click": function(ev, ref) {
+      addPlaylist(ref.innerText);
+    }
+  },
+  {
+    "name": "Remove from current playlist",
+    "click": function(ev, ref) {
+      removeFromPlaylist(curPlaylist, ref.innerText);
+    }
+  },
+  {
+    "name": "Rename song",
+    "click": function(ev, ref) {
+      renameSong(ref, ev);
+    }
+  },
+  {
+    "name": "Delete song",
+    "click": function(ev, ref) {
+      let id = +ref.id.substring(6);
+      new Notif(
+        "No mp3 found.",
+        [
+          "Do you really want to delete \""+allMusicData[id].artist+" - "+allMusicData[id].title+"\"?",
+          "<strong>This cannot be undone?</strong>",
+          "<button onclick='deleteSong("+id+"); this.parentNode.parentNode.close();'>Delete song</button>",
+          "<button onclick='this.parentNode.parentNode.close();'>Noooo</button>"
+        ]
+      ).setButtonText(false);
+    }
+  },
+  {
+    "name": "Open song folder",
+    "click": function(ev, ref) {
+      openMusicFolder(+ref.id.substring(6));
+    }
+  }
+]);
+
+musicItemCm.menu.onmouseover = function() {
+  onMenuHover();
+}
 
 //Get mouse position
 window.onmousemove = function(/**@type {MouseEvent}*/e)
@@ -24,6 +103,13 @@ function onload()
 {
   audio = document.getElementById("musicObject");
 }
+
+setTimeout(() => {
+  document.getElementById("playlistSelector").addEventListener("change", (ev) => {
+    switchPlaylist(ev.target.value);
+  });
+  loadPlaylist();
+}, 1000);
 
 function playToggle()
 {
@@ -445,65 +531,6 @@ function ConvertSecondsToDigitalClock(seconds = 0, trim = false) {
   return time;
 }
 
-const fs = require("fs");
-const ytdl = require("ytdl-core");
-const https = require('https');
-const {ContextMenu} = require("ionlib");
-var Notif = require("ionlib").Popup;
-/**
- * @type {{string: string | number}}
- */
-var settings;
-var preMusicDirectory = null;
-var allMusicData = [];
-/**
- * @type {string}
- */
-var pathDir;
-
-var musicItemCm = new ContextMenu([
-  {
-    "name": "Song actions"
-  },
-  {
-    "name": "Play song",
-    "click": (ev, ref) => {
-      ref.onclick();
-    }
-  },
-  {
-    "name": "Rename song",
-    "click": function(ev, ref) {
-      renameSong(ref, ev);
-    }
-  },
-  {
-    "name": "Delete song",
-    "click": function(ev, ref) {
-      let id = +ref.id.substring(6);
-      new Notif(
-        "No mp3 found.",
-        [
-          "Do you really want to delete \""+allMusicData[id].artist+" - "+allMusicData[id].title+"\"?",
-          "<strong>This cannot be undone?</strong>",
-          "<button onclick='deleteSong("+id+"); this.parentNode.parentNode.close();'>Delete song</button>",
-          "<button onclick='this.parentNode.parentNode.close();'>Noooo</button>"
-        ]
-      );
-    }
-  },
-  {
-    "name": "Open song folder",
-    "click": function(ev, ref) {
-      openMusicFolder(+ref.id.substring(6));
-    }
-  }
-]);
-
-musicItemCm.menu.onmouseover = function() {
-  onMenuHover();
-}
-
 /**
  * Reloads the current settings.
  */
@@ -563,10 +590,23 @@ window.onload = function(){
 }
 
 var allFoundFiles = []; // Used for deleting after...
-//Loads all music in a folder
+/**
+ * Loads and reloads all music in a folder.
+ */
 function LoadMusic(){
+  if (!fs.existsSync("./playlists.json")) {
+    fs.writeFileSync("./playlists.json", "{}");
+  }
+  else {
+    try {
+      playlists = JSON.parse(fs.readFileSync("./playlists.json"));
+    } catch (error) {
+      new Notif("Failed loading playlists", "", 2000);
+    }
+  }
   allFoundFiles = [];
   songCount = 0;
+
   try {
     settings = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
   } catch (e) {
@@ -696,11 +736,27 @@ function LoadMusic(){
       newItemP.innerText = musicFiles[i].artist + " - " + musicFiles[i].title;
       newItem.appendChild(newItemP);
       newItem.title = newItemP.innerText;
+      
+      if (typeof curPlaylist != "string") {
+        // 
+      }
+      else {
+        for (let titleIndex = 0; titleIndex < playlists[curPlaylist].length; titleIndex++) {
+          /**
+           * @type {string}
+           */
+          const songTitle = playlists[curPlaylist][titleIndex];
+          
+          if (songTitle == newItem.innerText) {
+            // Add music
+          }
+        }
+      }
+
       document.getElementById("music-list").appendChild(newItem);
       songs[i] = musicFiles[i].file;
       songCount++;
     }
-    //console.log(musicFiles);
   }
   else {
     var newItem = document.createElement("div");
@@ -764,13 +820,12 @@ function downloadFFMPEG(dlAfter = false) {
     "recursive": true
   });
   var d = new Download("http://files.lucasion.xyz/software/ffmpeg/ffmpeg.exe", "./resources/app/src/ffmpeg.exe");  
-  d.start();
   const div = document.createElement("div");
   div.innerText = "Starting Download";
   var n = new Notif("Downloading FFMPEG", [div]);
 
   d.onData = function(data) {
-    div.innerText = d.downloadPercent+"% | "+d.downloadedInAuto;
+    div.innerText = Math.round(d.downloadPercent())+"% Downloaded";
   };
 
   d.onError = function(err) {
@@ -785,6 +840,9 @@ function downloadFFMPEG(dlAfter = false) {
       addMusic();
     }
   }
+  // d.onEnd = d.onClose;
+
+  d.start();
 }
 
 /**
@@ -822,6 +880,7 @@ async function addMusic()
 
     n.object.querySelector("button#_ffmpegdownloadbutton").onclick = function() {
       downloadFFMPEG(true);
+      n.close();
     };
 
     n.object.querySelector("button#_ffmpegresetbuttons").onclick = function() {
@@ -1024,13 +1083,32 @@ function openSettings()
   } catch (e) {}
   lastWindow = window.open("settings.html");
 }
-
-function searchChange(search, object) {
+function searchChange(search = document.getElementById("searchField").value, object = document.getElementById("searchField")) {
   var _songs = document.getElementsByClassName("music-item");
   for (var i = 0; i < _songs.length; i++) {
+
+    // Remove if not in playlist
+    if (typeof curPlaylist == "string") {
+      var inPlaylist = false;
+      for (let titleIndex = 0; titleIndex < playlists[curPlaylist].length; titleIndex++) {
+        /**
+         * @type {string}
+         */
+        const songTitle = playlists[curPlaylist][titleIndex];
+        
+        if (songTitle == _songs[i].childNodes[0].innerText) {
+          inPlaylist = true;
+          break;
+        }
+      }
+      if (!inPlaylist) {
+        _songs[i].style.display = "none";
+        continue;
+      }
+    }
     if (!search.startsWith("/")) {
       object.style.color = "black";
-      if (_songs[i].childNodes[0].innerHTML.toLowerCase().includes(search.toLowerCase())) {
+      if (_songs[i].childNodes[0].innerText.toLowerCase().includes(search.toLowerCase())) {
         _songs[i].style.display = "block";
       }
       else {
@@ -1040,7 +1118,7 @@ function searchChange(search, object) {
     else {
       try {
         object.style.color = "black";
-        if (_songs[i].childNodes[0].innerHTML.match(new RegExp(search.substring(1), "i"))) {
+        if (_songs[i].childNodes[0].innerText.match(new RegExp(search.substring(1), "i"))) {
           _songs[i].style.display = "block";
         }
         else {
@@ -1092,7 +1170,6 @@ function renameSong(object, e) {
 
 function renameAction(object, newName, other) {
   var id = object.getAttribute("id").replace("music-", "");
-
   fs.access(pathDir+newName, function(err) {
     if (!err) {
       if (other && other.input) {
@@ -1119,6 +1196,28 @@ function renameAction(object, newName, other) {
       }
       else{
         other.input.parentNode.parentNode.close();
+
+        for (const key in playlists) {
+          if (playlists.hasOwnProperty(key)) {
+            const playlist = playlists[key];
+            for (let i = 0; i < playlist.length; i++) {
+              const song = playlist[i];
+              var songName = allMusicData[id].folderPath;
+              while (songName.endsWith("/")) {
+                songName = songName.substring(0, songName.length-1);
+              }
+              songName = Path.basename(songName);
+              console.log(songName);
+              
+              if (song == songName) {
+                playlists[key][i] = newName;
+                console.log("Updated \""+key+"\" playlist");
+              }
+            }
+          }
+        }
+        savePlaylists();
+
         new Notif("Renamed", ["Changed \""+allMusicData[id].folderPath+"\"\nto\n"+"\""+pathDir+newName+"\""], 1000);
         onMenuHover();
         LoadMusic();
@@ -1479,4 +1578,137 @@ function RenderSubtitles(srtFile) {
       subText.innerHTML = "";
     }
   }, 5);
+}
+
+function addPlaylist(title) {
+  if (!fs.existsSync("./playlists.json")) {
+    fs.writeFileSync("./playlists.json", "{}");
+  }
+  
+  const select = document.createElement("select");
+  const alreadyIn = document.createElement("p");
+  alreadyIn.innerHTML = "";
+  for (const key in playlists) {
+    if (playlists.hasOwnProperty(key)) {
+      /**
+       * @type {curPlaylist[]}
+       */
+      const playlist = playlists[key];
+      var exists = false;
+      for (let i = 0; i < playlist.length; i++) {
+        const item = playlist[i];
+        if (title == item) {
+          exists = true;
+          break;
+        }
+      }
+      if (!exists) {
+        const option = document.createElement("option");
+        option.text = key;
+        option.value = key;
+        select.appendChild(option);
+      }
+      else {
+        alreadyIn.innerHTML += key+"<br>";
+      }
+    }
+  }
+
+  if (alreadyIn.innerHTML == "") {
+    alreadyIn.innerHTML = "Already in:<br>None";
+  }
+  else {
+    alreadyIn.innerHTML = "Already in:<br>"+alreadyIn.innerHTML;
+  }
+
+  const optionNew = document.createElement("option");
+  optionNew.text = "New playlist...";
+  optionNew.value = "$_newPlaylist";
+  select.appendChild(optionNew);
+
+  const customPlaylist = document.createElement("input");
+  var n = new Notif("Add Playlist", [
+    `Add "${title}" to...<br>`,
+    select,
+    "<br>",
+    // customPlaylist,
+    // "<br>",
+    alreadyIn
+  ]);
+  n.setButtonText("Add to playlist");
+
+  // customPlaylist.addEventListener("keydown", (ev) => {
+  //   select.value = "$_newPlaylist";
+  // });
+  n.buttonObject.onclick = function() {
+    if (select.value == "$_newPlaylist") {
+      playlists["New Playlist"] = [title];
+      // playlists["New Playlist"].push(title);
+    }
+    else {
+      playlists[select.value].push(title);
+      console.log(select.value);
+      
+    }
+    savePlaylists();
+    n.close();
+  }
+}
+
+function savePlaylists() {
+  loadPlaylist();
+  fs.writeFileSync("./playlists.json", JSON.stringify(playlists));
+}
+
+function switchPlaylist(playlistName) {
+  if (playlistName == "$_none") {
+    playlistName = false;
+  }
+  curPlaylist = playlistName;
+  // LoadMusic();
+  searchChange();
+}
+
+/**
+ * Load the playlist into the settings tab.
+ * @param {string} value Optional value to select as default
+ */
+function loadPlaylist(value) {
+  var playlistSelector = document.getElementById("playlistSelector");
+  playlistSelector.innerHTML = "";
+
+  const optionNone = document.createElement("option");
+  optionNone.value = "$_none";
+  optionNone.text = "None";
+  playlistSelector.appendChild(optionNone);
+  for (const playlist in playlists) {
+    if (playlists.hasOwnProperty(playlist)) {
+      const option = document.createElement("option");
+      option.value = playlist;
+      option.text = playlist;
+      playlistSelector.appendChild(option);
+      if (playlist == curPlaylist) {
+        playlistSelector.value = playlist;
+      }
+    }
+  }
+}
+
+function removeFromPlaylist(playlistName, songName) {
+  if (playlistName == false) {
+    new Notif("No playlist", "You haven't selected any playlist yet.", 2000);
+    return;
+  }
+  for (let i = 0; i < playlists[playlistName].length; i++) {
+    const _songName = playlists[playlistName][i];
+    if (songName == _songName) {
+      new Notif("Removed from playlist", `"${songName}" was removed from "${playlistName}"`, 2000);
+      delete playlists[playlistName][i];
+      [].
+      savePlaylists();
+      searchChange();
+      // console.log(playlists[playlistName][i]);
+      break;
+    }
+  }
 }

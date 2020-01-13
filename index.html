@@ -28,6 +28,11 @@
       <h1 id="title" class="title">T<img src="icon.png" style="width: 25px;">xen Music</h1>
       <button type="button" onclick="LoadMusic()">Reload Music Folder</button>
       <input id="searchField" type="text" name="search" value="" oninput="searchChange(this.value, this);" placeholder="Search...">
+      <div class="playlistSection">
+        <label>Playlist</label>
+        <select name="playlist" id="playlistSelector"></select>
+      </div>
+      <div class="separator"></div>
       <div class="music-list" id="music-list">
         <!-- Music gets inserted here -->
       </div>
