@@ -1,6 +1,6 @@
 {
   "name": "toxen",
-  "version": "1.2.9",
+  "version": "1.2.10",
   "main": "main.js",
   "scripts": {
     "start": "electron ."

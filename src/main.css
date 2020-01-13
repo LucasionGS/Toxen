@@ -57,7 +57,7 @@ div.sidebar .music-list{
   scroll-behavior: smooth;
 }
 
-div.sidebar .music-list:hover{
+div.sidebar[hover=true] .music-list{
   overflow-y: auto;
 }
 
@@ -70,7 +70,7 @@ div.sidebar .music-list p{
   pointer-events: none;
 }
 
-div.sidebar .music-list:hover p{
+div.sidebar[hover=true] .music-list p{
   white-space: normal;
   text-overflow: ellipsis;
   pointer-events: none;

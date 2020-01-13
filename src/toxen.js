@@ -12,6 +12,8 @@ let mousePos = {
   "X":0,
   "Y":0
 };
+var playlistFile = "./playlists.json";
+
 /**
  * Title of the playlist.
  * @type {string}
@@ -594,16 +596,6 @@ var allFoundFiles = []; // Used for deleting after...
  * Loads and reloads all music in a folder.
  */
 function LoadMusic(){
-  if (!fs.existsSync("./playlists.json")) {
-    fs.writeFileSync("./playlists.json", "{}");
-  }
-  else {
-    try {
-      playlists = JSON.parse(fs.readFileSync("./playlists.json"));
-    } catch (error) {
-      new Notif("Failed loading playlists", "", 2000);
-    }
-  }
   allFoundFiles = [];
   songCount = 0;
 
@@ -618,6 +610,7 @@ function LoadMusic(){
       "visualizerIntensity":15,
     };
   }
+
   //Remove all previous songs (if any)
   var e = document.getElementById("music-list");
   var _preMusic = e.lastElementChild;
@@ -640,6 +633,24 @@ function LoadMusic(){
     settings.musicDir = defaultMusicDir;
     preMusicDirectory = pathDir;
   }
+
+  if (settings.musicDir) {
+    playlistFile = (settings.musicDir+"/playlists.json").replace(/\\+|\/\/+/g, "/");
+  }
+
+  // Add playlist file if it doesn't exist
+  if (!fs.existsSync(playlistFile)) {
+    fs.writeFileSync(playlistFile, "{}");
+  }
+  else {
+    try {
+      // Read file.
+      playlists = JSON.parse(fs.readFileSync(playlistFile));
+    } catch (error) {
+      new Notif("Failed loading playlists", "", 2000);
+    }
+  }
+
   _musicFiles = fs.readdirSync(pathDir, {withFileTypes:true});
 
   var newMp3Count = 0;
@@ -1581,11 +1592,11 @@ function RenderSubtitles(srtFile) {
 }
 
 function addPlaylist(title) {
-  if (!fs.existsSync("./playlists.json")) {
-    fs.writeFileSync("./playlists.json", "{}");
+  if (!fs.existsSync(playlistFile)) {
+    fs.writeFileSync(playlistFile, "{}");
   }
   
-  const select = document.createElement("select");
+  var select = document.createElement("select");
   const alreadyIn = document.createElement("p");
   alreadyIn.innerHTML = "";
   for (const key in playlists) {
@@ -1626,29 +1637,49 @@ function addPlaylist(title) {
   optionNew.value = "$_newPlaylist";
   select.appendChild(optionNew);
 
-  const customPlaylist = document.createElement("input");
+  var customPlaylist = document.createElement("input");
+  customPlaylist.placeholder = "New Playlist name...";
+  customPlaylist.id = "customPlaylist";
+  select.id = "selectPlaylist";
   var n = new Notif("Add Playlist", [
-    `Add "${title}" to...<br>`,
-    select,
-    "<br>",
-    // customPlaylist,
-    // "<br>",
-    alreadyIn
+    `Add "${title}" to...`,
+    select.outerHTML,
+    customPlaylist.outerHTML,
+    alreadyIn.outerHTML,
   ]);
   n.setButtonText("Add to playlist");
 
-  // customPlaylist.addEventListener("keydown", (ev) => {
-  //   select.value = "$_newPlaylist";
-  // });
+  select = document.getElementById("selectPlaylist");
+  customPlaylist = document.getElementById("customPlaylist");
+  customPlaylist.addEventListener("keydown", (ev) => {
+    select.value = "$_newPlaylist";
+  });
   n.buttonObject.onclick = function() {
     if (select.value == "$_newPlaylist") {
-      playlists["New Playlist"] = [title];
+      if (customPlaylist.value.trim() == "") {
+        error("You need to fill out a name for a new playlist!");
+        return;
+      }
+      else if (customPlaylist.value.trim().startsWith("$_")) {
+        error("You cannot call a playlist anything starting with \"$_\"");
+        return;
+      }
+
+      function error(msg) {
+        n.descriptionObject.children[n.descriptionObject.children.length-1].innerText = msg;
+      }
+      customPlaylist.value = customPlaylist.value.trim();
+      if (playlists[customPlaylist.value]) {
+        playlists[customPlaylist.value].push(title);
+      }
+      else {
+        playlists[customPlaylist.value] = [title];
+      }
       // playlists["New Playlist"].push(title);
     }
     else {
       playlists[select.value].push(title);
       console.log(select.value);
-      
     }
     savePlaylists();
     n.close();
@@ -1657,7 +1688,7 @@ function addPlaylist(title) {
 
 function savePlaylists() {
   loadPlaylist();
-  fs.writeFileSync("./playlists.json", JSON.stringify(playlists));
+  fs.writeFileSync(playlistFile, JSON.stringify(playlists));
 }
 
 function switchPlaylist(playlistName) {
@@ -1703,8 +1734,7 @@ function removeFromPlaylist(playlistName, songName) {
     const _songName = playlists[playlistName][i];
     if (songName == _songName) {
       new Notif("Removed from playlist", `"${songName}" was removed from "${playlistName}"`, 2000);
-      delete playlists[playlistName][i];
-      [].
+      playlists[playlistName].splice(i, 1);
       savePlaylists();
       searchChange();
       // console.log(playlists[playlistName][i]);
