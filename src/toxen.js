@@ -6,6 +6,9 @@ let data;
 let isReady = false;
 let randomize = false;
 let repeat = false;
+/**
+ * @type {HTMLAudioElement}
+ */
 let audio;
 let playHistory = [];
 let mousePos = {
@@ -33,6 +36,16 @@ var Notif = require("ionlib").Popup;
  */
 var settings;
 var preMusicDirectory = null;
+/**
+ * @type {{
+    "folderPath": string;
+    "artist": string;
+    "title": string;
+    "file": string;
+    "srt": string;
+    "background": string;
+    }[]}
+ */
 var allMusicData = [];
 /**
  * @type {string}
@@ -153,6 +166,13 @@ function deleteSong(id) {
   ref.parentNode.removeChild(ref);
 }
 
+/**
+ * Get the ID of the currently playing song.
+ */
+function getPlayingId() {
+  return +document.getElementById("now-playing").getAttribute("playingid");
+}
+
 function playSong(id)
 {
   const ref = document.getElementById("music-"+id);
@@ -207,15 +227,21 @@ function playSong(id)
   RenderSubtitles(allMusicData[id].srt);
   Visualizer();
 
-  // Resetting settings after script modification
-  Control.functionEvents = [];
+  // // Resetting settings after script modification
+  // Control.functionEvents = [];
+  // event_sliderUpdate();
+  // if (fs.existsSync(allMusicData[id].folderPath+"/script.js")) {
+  //   var script = require(allMusicData[id].folderPath+"/script.js");
+  //   /**
+  //    * __dirname is the root directory of toxen.
+  //    */
+  //   script.script(__dirname+"/src/scriptControl.js");
+  // }
+
   event_sliderUpdate();
-  if (fs.existsSync(allMusicData[id].folderPath+"/script.js")) {
-    var script = require(allMusicData[id].folderPath+"/script.js");
-    /**
-     * __dirname is the root directory of toxen.
-     */
-    script.script(__dirname+"/src/scriptControl.js");
+  ToxenScriptManager.events = [];
+  if (fs.existsSync(allMusicData[id].folderPath+"/storyboard.txn")) {
+    ToxenScriptManager.ScriptParser(allMusicData[id].folderPath+"/storyboard.txn");
   }
 }
 
@@ -242,6 +268,16 @@ function keypress(/**@type {KeyboardEvent} */e)
   }
   else if (e.ctrlKey && e.key == "r") {
     toggleFunction("repeat");
+  }
+  else if (e.ctrlKey && e.altKey && e.key == "s") {
+    event_sliderUpdate();
+    ToxenScriptManager.events = [];
+
+    var id = getPlayingId();
+    if (fs.existsSync(allMusicData[id].folderPath+"/storyboard.txn")) {
+      ToxenScriptManager.ScriptParser(allMusicData[id].folderPath+"/storyboard.txn");
+      new Notif("Reloaded Script File");
+    }
   }
   else if (e.ctrlKey && e.key == "s") {
     toggleFunction("shuffle");
@@ -431,6 +467,12 @@ function changeVolume()
   document.getElementById("volumeLabel").innerHTML = "- Volume + " + document.getElementById("volume").value;
 }
 
+/**
+ * Change the current background image.
+ * @param {string} image The path to the image
+ * @param {string} queryString An extra query string for updating cache.
+ * @param {boolean} reset If true, removes background.
+ */
 function setBG(image, queryString, reset)
 {
   if (queryString == undefined) {
@@ -1034,7 +1076,6 @@ function fileDropped(e)
   }
   //Music Files
   else if (isExt(".mp3")) {
-    //console.log(file);
     fs.mkdirSync(pathDir+"/"+file.name.substring(0,file.name.length-4), {recursive:true});
     fs.copyFileSync(file.path, pathDir+"/"+file.name.substring(0,file.name.length-4)+"/"+file.name);
     //Adding the file, i swear make a fucking function >_>
@@ -1063,7 +1104,6 @@ function fileDropped(e)
       var newItemP = document.createElement("p");
       newItemP.innerHTML = artist + " - " + title;
       newItem.appendChild(newItemP);
-      //console.log(newItem);
       document.getElementById("music-list").appendChild(newItem);
       songs[songCount] = filePath;
       allMusicData.push({
@@ -1184,7 +1224,6 @@ function renameAction(object, newName, other) {
   fs.access(pathDir+newName, function(err) {
     if (!err) {
       if (other && other.input) {
-        console.log(other.input.parentNode.parentNode);
         other.input.parentNode.parentNode.instance.titleObject.innerHTML = "Song already exists";
         other.input.focus();
         other.input.setSelectionRange(0, other.input.value.length);
@@ -1218,7 +1257,6 @@ function renameAction(object, newName, other) {
                 songName = songName.substring(0, songName.length-1);
               }
               songName = Path.basename(songName);
-              console.log(songName);
               
               if (song == songName) {
                 playlists[key][i] = newName;
@@ -1478,7 +1516,6 @@ async function DownloadUpdate(url, object) {
   }
   DL.onData = function(data) {
     object.descriptionObject.innerHTML = DL.downloadPercent()+"%";
-    // console.log(object);
   }
   DL.start();
 }
@@ -1679,7 +1716,6 @@ function addPlaylist(title) {
     }
     else {
       playlists[select.value].push(title);
-      console.log(select.value);
     }
     savePlaylists();
     n.close();
@@ -1737,8 +1773,245 @@ function removeFromPlaylist(playlistName, songName) {
       playlists[playlistName].splice(i, 1);
       savePlaylists();
       searchChange();
-      // console.log(playlists[playlistName][i]);
       break;
     }
   }
+}
+
+setInterval(() => {
+  if (!audio) {
+    audio = document.getElementById("musicObject");
+    return;
+  }
+  if (ToxenScriptManager.events.length > 0) {
+    for (let i = 0; i < ToxenScriptManager.events.length; i++) {
+      /**
+       * @type {ToxenScriptManager.ToxenEvent}
+       */
+      const e = ToxenScriptManager.events[i];
+      if (audio.currentTime >= e.startPoint && audio.currentTime <= e.endPoint) {
+        e.fn();
+      }
+    }
+  }
+}, 1);
+
+class ToxenScriptManager{
+  /**
+   * Parses Toxen script files for background effects.
+   * @param {string} scriptFile Path to script file.
+   */
+  static ScriptParser(scriptFile) {
+    var data = fs.readFileSync(scriptFile, "utf8").split("\n");
+    for (let i = 0; i < data.length; i++) {
+      const line = data[i].trim();
+      if (typeof line == "string" && !line.startsWith("#") && !line.startsWith("//") && line != "") {
+        var fb = lineParser(line);
+        if (fb == undefined) continue;
+        if (typeof fb == "string") {
+          setTimeout(() => {
+            new Notif("Parsing error", ["Failed parsing script:", "\""+scriptFile+"\"", "Error at line "+(i+1), fb]);
+          }, 100);
+          throw "Failed parsing script. Error at line "+(i+1)+"\n"+fb;
+        }
+        if (fb.success == false) {
+          setTimeout(() => {
+            new Notif("Parsing error", ["Failed parsing script:", "\""+scriptFile+"\"", "Error at line "+(i+1)]);
+          }, 100);
+          throw "Failed parsing script. Error at line "+(i+1)+"\n"+fb.error;
+        }
+      }
+    }
+
+    /**
+     * Checks a line and parses it.
+     * @param {string} line Current line of the script.
+     */
+    function lineParser(line) {
+      try { // Massive trycatch for any error.
+        // Regexes
+        const timeReg = /(?<=\[).+\s*-\s*\S+(?=\])/g;
+        const typeReg = /(?<=\[.+\s*-\s*\S+\]\s*)\S*(?=\s*=>)/g;
+        const argReg = /(?<=\[.+\s*-\s*\S+\]\s*\S*\s*=>\s*).*/g;
+
+        // Variables
+        var startPoint = 0;
+        var endPoint = 0;
+        var args = [];
+        var fn = (args) => {};
+
+        // Parsing...
+        var timeRegResult = line.match(timeReg)[0];
+        timeRegResult = timeRegResult.replace(/\s/g, "");
+        var tP = timeRegResult.split("-");
+        startPoint = ToxenScriptManager.timeStampToSeconds(tP[0]);
+        endPoint = ToxenScriptManager.timeStampToSeconds(tP[1]);
+
+        if (startPoint >= endPoint) { // Catch error if sP is higher than eP
+          return "startPoint cannot be higher than endPoint";
+        }
+        
+        var type = line.match(typeReg)[0].toLowerCase();
+        if (typeof type != "string") {
+          return "Invalid type format.";
+        }
+
+        var argString = line.match(argReg)[0].trim();
+
+        if (typeof argString != "string") {
+          return `Arguments are not in a valid format.`;
+        }
+
+        /**
+         * @param {string} as 
+         */
+        function parseArgumentsFromString(as) {
+          var argList = [];
+          var curArg = "";
+          var waitForQuote = true;
+          for (let i = 0; i < as.length; i++) {
+            const l = as[i];
+            if (l == "\"" && i == 0) {
+              waitForQuote = false;
+              continue;
+            }
+            else if (l == "\"" && curArg == "" && waitForQuote == true) {
+              waitForQuote = false;
+              continue;
+            }
+            else if (l == "\\\\" && curArg != "" && as[i+1] == "\"") {
+              i++;
+              curArg += "\"";
+              continue;
+            }
+            else if (l == "\"" && curArg != "") {
+              argList.push(curArg);
+              curArg = "";
+              waitForQuote = true;
+              continue;
+            }
+            else {
+              if (!waitForQuote) {
+                curArg += l;
+              }
+              continue;
+            }
+          }
+
+          return argList;
+        }
+
+        args = parseArgumentsFromString(argString);        
+        fn = function() {
+          ToxenScriptManager.eventFunctions[type](args);
+        };
+
+        if (typeof ToxenScriptManager.eventFunctions[type] == undefined) {
+          return `Type "${type.toLowerCase()}" is not valid.`;
+        }
+
+        ToxenScriptManager.events.push(new ToxenScriptManager.ToxenEvent(startPoint, endPoint, fn));
+
+      } catch (error) { // Catch any error
+        return {
+          "success": false,
+          "error": error
+        };
+      }
+    }
+  }
+
+  /**
+   * Function Types
+   */
+  static eventFunctions = {
+    /**
+     * Change the image of the background.
+     * @param {[string]} args Arguments.
+     */
+    background: function(args) {
+      var id = +document.getElementById("now-playing").getAttribute("playingid");
+      setBG(allMusicData[id].folderPath+"/"+args[0]);
+    },
+    /**
+     * Change the color of the visualizer
+     * @param {[string | number, string | number, string | number]} args Arguments
+     */
+    visualizercolor: function(args) {
+      VisualizerProperties.rgb(args[0], args[1], args[2]);
+    },
+    visualizerintensity: function(args) {
+      if (args[1] && args[1].toLowerCase() == "smooth") {
+        if (+args[0] < settings.visualizerIntensity) {
+          settings.visualizerIntensity -= 0.1;
+        }
+        else if (+args[0] > settings.visualizerIntensity) {
+          settings.visualizerIntensity += 0.1;
+        }
+
+        if (Math.round(+args[0] - settings.visualizerIntensity) == 0) {
+          settings.visualizerIntensity = +args[0];
+        }
+      }
+      else {
+        VisualizerProperties.setIntensity(+args[0]);
+      }
+    }
+  }
+  
+  /**
+   * Convert a timestamp into seconds.
+   * @param {string} timestamp Time in format "hh:mm:ss".
+   */
+  static timeStampToSeconds(timestamp)
+  {
+    try {
+      var seconds = 0;
+      var parts = timestamp.split(":");
+      for (let i = 0; i < parts.length; i++) {
+        const time = +parts[i];
+        let x = parts.length-i-1;
+        if (x == 0) {
+          seconds += time;
+        }
+        if (x == 1) {
+          seconds += time*60;
+        }
+        if (x == 2) {
+          seconds += time*60*60;
+        }
+        if (x == 3) {
+          seconds += time*60*60*24;
+        }
+      }
+      return seconds;
+    }
+    catch (error) {
+      var n = new Notif("Music Script Error", "Unable to convert timestamp \""+timestamp+"\" to a valid timing point.");
+      n.setButtonText("welp, fuck");
+    }
+  }
+
+  static ToxenEvent = class ToxenEvent{
+    /**
+     * Create a new Event
+     * @param {number} startPoint Starting point in seconds.
+     * @param {number} endPoint Ending point in seconds.
+     * @param {(args: any[]) => void} fn Function to run at this interval.
+     */
+    constructor(startPoint, endPoint, fn)
+    {
+      this.startPoint = startPoint;
+      this.endPoint = endPoint;
+      this.fn = fn;
+      this.active = false;
+      this.hasRun = false;
+    }
+  }
+
+  /**
+   * List of events in order for the current song.
+   * @type {ToxenScriptManager.ToxenEvent[]}
+   */
+  static events = [];
 }
