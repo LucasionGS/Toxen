@@ -56,14 +56,11 @@ You can drop a subtitle file into Toxen to add it to the currently playing song.
 | Ctrl + Left Arrow | Previous song | Goes to the last song you played, this goes all the way back to the first song you played in this session |
 | Ctrl + Right Arrow | Next song | Goes to the next song on the list. If shuffle is enabled, it plays a random song instead |
 
-![Options](https://lucasion.xyz/f/17.11.12-28.08.19.png)
-
-## Build-in YouTube Downloader
-
-
-![YouTube Downloader](https://lucasion.xyz/f/17.12.22-28.08.19.png)
-
 ## Library Credits
 **Audio Visualizer** based on [**JS Audio Visualizer**](https://codepen.io/nfj525/pen/rVBaab) created by [Nick Jones](https://codepen.io/nfj525).
 
 **YouTube Downloader** is using [**node-ytdl-core**](https://github.com/fent/node-ytdl-core) created by [fent](https://github.com/fent/), to get video information and download data streams
+
+## Documentation
+
+[**Toxen Storyboard Syntax**](./storyboard.md)
