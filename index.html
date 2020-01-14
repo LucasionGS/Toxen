@@ -28,13 +28,14 @@
       <h1 id="title" class="title">T<img src="icon.png" style="width: 25px;">xen Music</h1>
       <button type="button" onclick="LoadMusic()">Reload Music Folder</button>
       <input id="searchField" type="text" name="search" value="" oninput="searchChange(this.value, this);" placeholder="Search...">
-      <div class="playlistSection">
-        <label>Playlist</label>
-        <select name="playlist" id="playlistSelector"></select>
-      </div>
       <div class="separator"></div>
       <div class="music-list" id="music-list">
         <!-- Music gets inserted here -->
+      </div>
+      <div class="separator"></div>
+      <div class="playlistSection">
+        <label>Playlist</label>
+        <select name="playlist" id="playlistSelector"></select>
       </div>
       <div class="separator"></div>
       <!-- Shuffle & Repeat -->
@@ -68,22 +69,26 @@
         <button type="button" name="button" onclick="openMusicFolder()">Open Music Folder</button>
         <div class="separator"></div>
 
-        
-        <label id="bgdim">Background Dim: %</label><br>
-        <input class="setting slider" type="range" settype="value" id="bgdimslider"
-        name="backgroundDim" min="0" max="100" value="50"
-        oninput="event_sliderUpdate();">
-        <br>
         <label id="musicspeed">Playback Rate: x</label><br>
         <input class="setting slider" type="range" settype="value" id="musicspeedslider"
         name="playbackRate" min="25" max="200" value="100"
         oninput="event_sliderUpdate();">
         <br>
         <div class="separator"></div>
-        <h3>Visualizer</h3>
-        <input class="setting setBox" type="checkbox" settype="checkbox"
+        <h3>Background Effects</h3>
+        <input id="toggleStoryboard" class="setting setBox" type="checkbox" settype="checkbox"
+        name="storyboard" checked onclick='settings.storyboard = this.checked;'>
+        <label for="toggleStoryboard">Storyboard Enabled</label>
+        <br>
+        <label id="bgdim">Background Dim: %</label><br>
+        <input class="setting slider" type="range" settype="value" id="bgdimslider"
+        name="backgroundDim" min="0" max="100" value="50"
+        oninput="event_sliderUpdate();">
+        <div class="separator"></div>
+        <h3>Audio Visualizer</h3>
+        <input id="toggleVisualizer" class="setting setBox" type="checkbox" settype="checkbox"
         name="visualizer" checked onclick='settings.visualizer = this.checked;'>
-        <label>Enabled</label>
+        <label for="toggleVisualizer">Visualizer Enabled</label>
         <br>
         <label id="visualintense">Visualizer Intensity</label><br>
         <input class="setting slider" type="range" settype="value" id="visualizerintensity"

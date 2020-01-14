@@ -103,6 +103,15 @@ div.sidebar .music-list p{
   margin-left: 5px;
 }
 
+div.sidebar input, div.sidebar label, div.sidebar h3, div.sidebar button{
+  margin-left: 8px;
+}
+
+div.sidebar input[type="checkbox"]{
+  width: 16px;
+  height: 16px;
+}
+
 div.player{
   position: fixed;
   bottom: 0;

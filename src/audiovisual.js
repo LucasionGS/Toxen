@@ -101,7 +101,7 @@ function Visualizer(){
       // console.log(avg);
     }
     else {
-      ctx.fillStyle = "rgba(0, 0, 0, "+(settigs.backgroundDim/100)+")";
+      ctx.fillStyle = "rgba(0, 0, 0, "+(settings.backgroundDim/100)+")";
       ctx.fillRect(0, 0, WIDTH, HEIGHT);
     }
   }

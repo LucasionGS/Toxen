@@ -1,12 +1,14 @@
 const { app, BrowserWindow, Menu, Tray } = require('electron');
-const process = require('child_process');
+const cp = require('child_process');
+const process = require('process');
 const fs = require('fs');
 const winWidth = 1280;
 const winHeight = 768;
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
-let usageWin;
+// let usageWin;
+
 
 function createWindow () {
   // Create the browser window.
@@ -53,7 +55,7 @@ function createWindow () {
       label:"Usage",
       click(){
         //Open github page
-        process.exec('start "" "https://github.com/LucasionGS/Toxen/blob/alpha/README.md"');
+        cp.exec('start "" "https://github.com/LucasionGS/Toxen/blob/alpha/README.md"');
       }
     },
     {
@@ -122,7 +124,7 @@ app.on('ready', createWindow);
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
+  if (cp.platform !== 'darwin') {
     app.quit();
   }
 });
