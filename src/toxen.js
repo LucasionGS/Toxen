@@ -1,5 +1,5 @@
-const {app} = require("electron");
 const ffmpeg = require('fluent-ffmpeg');
+var electron = require('electron');
 let nowPlaying = "";
 let songs = {};
 let songCount = 0;
@@ -277,7 +277,7 @@ function keypress(/**@type {KeyboardEvent} */e)
     var id = getPlayingId();
     if (fs.existsSync(allMusicData[id].folderPath+"/storyboard.txn")) {
       ToxenScriptManager.ScriptParser(allMusicData[id].folderPath+"/storyboard.txn");
-      new Popup("Reloaded Script File");
+      new Popup("Reloaded Script File", [], 1000);
     }
   }
   else if (e.ctrlKey && e.key == "s") {
@@ -293,7 +293,8 @@ function keypress(/**@type {KeyboardEvent} */e)
   }
   else if (e.ctrlKey && e.key == "m") {
     onMenuHover();
-    document.querySelector(".music-list").scrollIntoViewIfNeeded();
+    document.querySelector("#searchField").scrollIntoViewIfNeeded();
+    document.querySelector("#searchField").focus();
   }
   else if (e.ctrlKey && e.key == "y") {
     onMenuHover();
@@ -303,16 +304,21 @@ function keypress(/**@type {KeyboardEvent} */e)
     checkUpdate();
   }
   else if ((e.ctrlKey && e.key == "ArrowLeft" && !isFocusInput) || e.key == "MediaTrackPrevious") {
+    e.preventDefault();
     toggleFunction("previous");
   }
   else if ((e.ctrlKey && e.key == "ArrowRight" && !isFocusInput) || e.key == "MediaTrackNext") {
+    e.preventDefault();
     toggleFunction("next");
+  }
+  else if (e.key == "MediaPlayPause") {
+    e.preventDefault();
+    playToggle();
   }
   else if (e.key == "F5") {
     location.reload();
   }
   else if (e.key == "F11") {
-    var electron = require('electron');
     var window = electron.remote.getCurrentWindow();
     window.setFullScreen(!window.isFullScreen());
     window.setMenuBarVisibility(!window.isFullScreen());
@@ -949,21 +955,32 @@ async function addMusic()
   var ytInfo;
 
   if (name == "") {
-    ytInfo = ytdl.getBasicInfo(url);
-    ytInfo = await ytInfo;
+    ytInfo = await ytdl.getBasicInfo(url);
     name = ytInfo.title;
+    console.log(ytInfo);
   }
 
   name = isValid(name);
-  var stream = ytdl(url);
+  var stream;
+  try {
+    stream = ytdl(url);
+  }
+  catch (err) {
+    console.error(err);
+    document.getElementById("addButton").disabled = false;
+    document.getElementById("addButton").innerHTML = "Add Music";
+    return;
+  };
   //const mp4 = pathDir+name+'.mp4'; //Add this IF i add video
   var songFolderPath = pathDir+name+"/";
-  fs.mkdirSync(songFolderPath);
   const mp3 = songFolderPath+name+'.mp3';
   const jpg = songFolderPath+name+".jpg";
   if (dlImg) {
     https.get("https://i.ytimg.com/vi/"+ytdl.getURLVideoID(url)+"/maxresdefault.jpg", function(response) {
-    response.pipe(fs.createWriteStream(jpg));
+      response.pipe(fs.createWriteStream(jpg));
+      if (!fs.existsSync(songFolderPath)) {
+        fs.mkdirSync(songFolderPath, {recursive: true});
+      }
     });
   }
   // https://i.ytimg.com/vi/WROcJK3ZHGc/maxresdefault.jpg
@@ -973,9 +990,11 @@ async function addMusic()
   proc.setFfmpegPath(ffmpegPath);
   proc.saveToFile(mp3, (stdout, stderr) => {
     if (stderr) {
-      return console.log(stderr);
+      return console.error(stderr);
     }
-    console.log(stdout);
+    if (!fs.existsSync(songFolderPath)) {
+      fs.mkdirSync(songFolderPath, {recursive: true});
+    }
     //Add file to music browser
     document.getElementById("addUrl").value = "";
     document.getElementById("addName").value = "";
@@ -984,46 +1003,14 @@ async function addMusic()
     return console.log('Download complete!');
   })
   .on('end', function(err) {
-    var _title = name;
-    var folderPath = songFolderPath;
-    var artist;
-    var title;
-    var file = mp3;
-    var bgFile = jpg;
-    var srtFile = "";
-    var parts = _title.split(" - ", 2);
-    if (parts.length > 1) {
-      artist = parts[0];
-      title = parts[1];
-    }
-    else {
-      artist = "Unknown";
-      title = parts[0];
-    }
-
-    var newItem = document.createElement("div");
-    newItem.setAttribute("class", "music-item");
-    newItem.setAttribute("id","music-"+ songCount);
-    newItem.setAttribute("onclick", "playSong("+ songCount +");");
-    // newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
-    musicItemCm.attachContextMenu(newItem);
-    var newItemP = document.createElement("p");
-    newItemP.innerHTML = artist + " - " + title;
-    newItem.appendChild(newItemP);
-    //newItem.addEventListener('contextmenu', musicMenuFunc(event), false);
-    document.getElementById("music-list").appendChild(newItem);
-    songs[songCount] = file;
-    allMusicData.push({
-      "artist": artist,
-      "title": title,
-      "file": file,
-      "folderPath": folderPath,
-      "background": bgFile,
+    addSongToList({
+      "fullName": name,
+      "folderPath": songFolderPath,
+      "file": mp3,
+      "bgFile": jpg,
+      "srtFile": "",
     });
-    scrollToSong(songCount);
-    songCount++;
-
-    new Popup("Download Finished", name, 1000);
+    new Popup("Download Finished", data.fullName, 1000);
     new Notification("Download Finished");
     _finished();
     function _finished() {
@@ -1032,15 +1019,94 @@ async function addMusic()
       document.getElementById("addButton").disabled = false;
       document.getElementById("addButton").innerHTML = "Add Music";
     }
-    if (document.getElementById("deleteOnNewLoad")) {
-      document.getElementById("deleteOnNewLoad").parentNode.removeChild(document.getElementById("deleteOnNewLoad"));
-    }
+  }).
+  on("error", (err) => {
+    new Popup("Couldn't download file.", [
+      "Failed to download the audio file.",
+      "Make sure the video is not private, or try a different URL."
+    ]);
+    console.error(err);
+    // document.getElementById("addUrl").value = "";
+    // document.getElementById("addName").value = "";
+    document.getElementById("addButton").disabled = false;
+    document.getElementById("addButton").innerHTML = "Add Music";
   });
 
   // Get ID:
   // ytdl.getURLVideoID(url)
   // Video Image URL
   // http://i3.ytimg.com/vi/ ID /maxresdefault.jpg
+}
+
+const songItemParams = {
+  /**
+   * The full name of the song, formatted as `Artist - Title`-
+   */
+  fullName: "",
+  /**
+   * Song folder path.
+   */
+  folderPath: "",
+  /**
+   * mp3 file path.
+   */
+  file: "",
+  /**
+   * Background image path
+   */
+  bgFile: "",
+  /**
+   * SRT path.
+   */
+  srtFile: ""
+}
+
+/**
+ * @param {songItemParams} data 
+ */
+function addSongToList(data) {
+  var _title = data.fullName;
+  var folderPath = data.folderPath;
+  var artist;
+  var title;
+  var file = data.file;
+  var bgFile = data.bgFile;
+  var srtFile = "";
+  var parts = _title.split(" - ", 2);
+  if (parts.length > 1) {
+    artist = parts[0];
+    title = parts[1];
+  }
+  else {
+    artist = "Unknown";
+    title = parts[0];
+  }
+
+  var newItem = document.createElement("div");
+  newItem.setAttribute("class", "music-item");
+  newItem.setAttribute("id","music-"+ songCount);
+  newItem.setAttribute("onclick", "playSong("+ songCount +");");
+  // newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
+  musicItemCm.attachContextMenu(newItem);
+  var newItemP = document.createElement("p");
+  newItemP.innerHTML = artist + " - " + title;
+  newItem.appendChild(newItemP);
+  //newItem.addEventListener('contextmenu', musicMenuFunc(event), false);
+  document.getElementById("music-list").appendChild(newItem);
+  songs[songCount] = file;
+  allMusicData.push({
+    "artist": artist,
+    "title": title,
+    "file": file,
+    "folderPath": folderPath,
+    "background": bgFile,
+  });
+  scrollToSong(songCount);
+  songCount++;
+
+  if (document.getElementById("deleteOnNewLoad")) {
+    document.getElementById("deleteOnNewLoad").parentNode.removeChild(document.getElementById("deleteOnNewLoad"));
+  }
 }
 
 //Insert picture drop-in areas
@@ -1780,7 +1846,7 @@ setInterval(() => {
   if (ToxenScriptManager.events.length > 0 && settings.visualizer && settings.storyboard) {
     for (let i = 0; i < ToxenScriptManager.events.length; i++) {
       /**
-       * @type {ToxenScriptManager.ToxenEvent}
+       * @type {ToxenEvent}
        */
       const e = ToxenScriptManager.events[i];
       if (audio.currentTime >= e.startPoint && audio.currentTime <= e.endPoint) {
@@ -1800,8 +1866,10 @@ class ToxenScriptManager{
     for (let i = 0; i < data.length; i++) {
       const line = data[i].trim();
       if (typeof line == "string" && !line.startsWith("#") && !line.startsWith("//") && line != "") {
+
         var fb = lineParser(line);
         if (fb == undefined) continue;
+        // Failures
         if (typeof fb == "string") {
           setTimeout(() => {
             new Popup("Parsing error", ["Failed parsing script:", "\""+scriptFile+"\"", "Error at line "+(i+1), fb]);
@@ -1817,12 +1885,22 @@ class ToxenScriptManager{
       }
     }
 
+    if (ToxenScriptManager.events[ToxenScriptManager.events.length-1] && ToxenScriptManager.events[ToxenScriptManager.events.length-1].endPoint == "$") {
+      ToxenScriptManager.events[ToxenScriptManager.events.length-1].endPoint = ToxenScriptManager.timeStampToSeconds("2:00:00");
+    }
+
     /**
      * Checks a line and parses it.
      * @param {string} line Current line of the script.
      */
     function lineParser(line) {
       try { // Massive trycatch for any error.
+
+        // Check if no only start
+        const checkTime = /(?<=\[)[^-]*(?=\])/g;
+        if (checkTime.test(line)) {
+          line = line.replace(checkTime, "$& - $");
+        }
         // Regexes
         const timeReg = /(?<=\[).+\s*-\s*\S+(?=\])/g;
         const typeReg = /(?<=\[.+\s*-\s*\S+\]\s*)\S*(?=\s*=>)/g;
@@ -1838,8 +1916,22 @@ class ToxenScriptManager{
         var timeRegResult = line.match(timeReg)[0];
         timeRegResult = timeRegResult.replace(/\s/g, "");
         var tP = timeRegResult.split("-");
-        startPoint = ToxenScriptManager.timeStampToSeconds(tP[0]);
-        endPoint = ToxenScriptManager.timeStampToSeconds(tP[1]);
+        startPoint = tP[0];
+        endPoint = tP[1];
+
+        // if (!startPoint.startsWith("$")) { // Maybe add this as a features just like endPoint...
+          startPoint = ToxenScriptManager.timeStampToSeconds(tP[0]);
+        // }
+        if (endPoint != "$") {
+          endPoint = ToxenScriptManager.timeStampToSeconds(tP[1]);
+        }
+        else {
+          endPoint = "$";
+        }
+
+        if (ToxenScriptManager.events[ToxenScriptManager.events.length-1] && ToxenScriptManager.events[ToxenScriptManager.events.length-1].endPoint == "$"){
+          ToxenScriptManager.events[ToxenScriptManager.events.length-1].endPoint = startPoint;
+        }
 
         if (startPoint >= endPoint) { // Catch error if sP is higher than eP
           return "startPoint cannot be higher than endPoint";
@@ -1904,7 +1996,7 @@ class ToxenScriptManager{
           return `Type "${type.toLowerCase()}" is not valid.`;
         }
 
-        ToxenScriptManager.events.push(new ToxenScriptManager.ToxenEvent(startPoint, endPoint, fn));
+        ToxenScriptManager.events.push(new ToxenEvent(startPoint, endPoint, fn));
 
       } catch (error) { // Catch any error
         return {
@@ -1986,26 +2078,39 @@ class ToxenScriptManager{
     }
   }
 
-  static ToxenEvent = class ToxenEvent{
-    /**
-     * Create a new Event
-     * @param {number} startPoint Starting point in seconds.
-     * @param {number} endPoint Ending point in seconds.
-     * @param {(args: any[]) => void} fn Function to run at this interval.
-     */
-    constructor(startPoint, endPoint, fn)
-    {
-      this.startPoint = startPoint;
-      this.endPoint = endPoint;
-      this.fn = fn;
-      this.active = false;
-      this.hasRun = false;
-    }
-  }
+  // static ToxenEvent = class ToxenEvent{
+  //   /**
+  //    * Create a new Event
+  //    * @param {number} startPoint Starting point in seconds.
+  //    * @param {number} endPoint Ending point in seconds.
+  //    * @param {(args: any[]) => void} fn Function to run at this interval.
+  //    */
+  //   constructor(startPoint, endPoint, fn)
+  //   {
+  //     this.startPoint = startPoint;
+  //     this.endPoint = endPoint;
+  //     this.fn = fn;
+  //   }
+  // }
 
   /**
    * List of events in order for the current song.
-   * @type {ToxenScriptManager.ToxenEvent[]}
+   * @type {ToxenEvent[]}
    */
   static events = [];
+}
+
+class ToxenEvent{
+  /**
+   * Create a new Event
+   * @param {number} startPoint Starting point in seconds.
+   * @param {number} endPoint Ending point in seconds.
+   * @param {(args: any[]) => void} fn Function to run at this interval.
+   */
+  constructor(startPoint, endPoint, fn)
+  {
+    this.startPoint = startPoint;
+    this.endPoint = endPoint;
+    this.fn = fn;
+  }
 }

@@ -6,7 +6,8 @@ To add a storyboard to a song, create a new file called `storyboard.txn` in the 
 ## Syntax
 Toxen understands a special `Scripting Syntax`
 Let's start with changing the color of the `Audio Visualizer`.  
-We'll change it to `red` while the time of the song is between `0:00` and `1:00`
+We'll change it to `red` while the time of the song is between `0:00` and `1:00`  
+Note: Lines starting with `#` or `//` are ignored by the program.
 ```
 [0:00 - 1:00] VisualizerColor => "255" "0" "0"
 # "255" "0" "0" makes it red, as this uses the RGB format.
@@ -30,6 +31,13 @@ And Toxen would understand it just as well as the code shown before, since only 
 The syntax for Toxen is really simple. Timing points can be either in seconds since the song started or a `Timestamp` in the format of dd:hh:mm:ss
 ```
 [StartTime - EndTime] Event => "argument"
+```
+
+If you want an event to just run until another event runs, you can just leave out `EndTime` or replace it with a `$` and it will do it automatically.
+```
+[StartTime] Event => "argument"
+# or
+[StartTime - $] Event => "argument"
 ```
 
 ### Event Types
