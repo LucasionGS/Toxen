@@ -188,6 +188,7 @@ function playSong(id)
 
   };
   var songTitle = allMusicData[id].artist+" - "+allMusicData[id].title;
+  document.querySelector("title").innerText = songTitle;
   if (!fs.existsSync(allMusicData[id].file)) {
     new Popup(
       "No mp3 found.",
@@ -829,6 +830,30 @@ function LoadMusic(){
   }
   allMusicData = musicFiles;
   searchChange(document.getElementById("searchField").value, document.getElementById("searchField"));
+
+  // fs.watch(pathDir).on("change", (eventType, filename) => {
+  //   var d;
+  //   if ((d = document.getElementById("musicFolderChangedContent"))) {
+  //     /**
+  //      * @type {Popup}
+  //      */
+  //     var oldn = d.instance;
+
+  //     oldn.descriptionObject.innerHTML += `<br>Change on "${filename}"`
+  //     return;
+  //   }
+  //   var n = new Popup("Reload Music Folder?", [
+  //     "Change in music folder detected. Reload it to see the changes.",
+  //     `<br>Change on "${filename}"`
+  //   ]);
+  //   n.object.id = "musicFolderChangedContent";
+
+  //   n.buttonObject.addEventListener("click", () => {
+  //     LoadMusic();
+  //   });
+
+  //   n.setButtonText("Reload Music Folder");
+  // });
 }
 
 var filesDetected = 0;
