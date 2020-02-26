@@ -868,6 +868,9 @@ function LoadMusic(){
 
 var filesDetected = 0;
 var filesCopied = 0;
+/**
+ * @type {Popup}
+ */
 var fileCopyProcessNotif = undefined;
 function isFileCopyFinished(filesDetected, filesCopied, curFile) {
   if (fileCopyProcessNotif != undefined) {
@@ -899,7 +902,7 @@ function isFileCopyFinished(filesDetected, filesCopied, curFile) {
 }
 
 //Test for illegal chars
-function isValid(str){
+function isValid(str) {
   var orgStr = str;
   let reg = /[\\\/\:\*\?\"\<\>\|]/g;
   if (reg.test(str)) {
@@ -992,6 +995,9 @@ async function addMusic()
   if (name == "") {
     ytInfo = await ytdl.getBasicInfo(url);
     name = ytInfo.title;
+    if (ytInfo.media && ytInfo.media.artist && ytInfo.media.song) {
+      name = ytInfo.media.artist.replace(/ +\- +/g, "-") + " - " + ytInfo.media.song.replace(/ +\- +/g, "-");
+    }
     console.log(ytInfo);
   }
 
@@ -1002,6 +1008,8 @@ async function addMusic()
   }
   catch (err) {
     console.error(err);
+    console.log(url);
+    new Popup("Error", "An error happened while trying to download this stream.");
     document.getElementById("addButton").disabled = false;
     document.getElementById("addButton").innerHTML = "Add Music";
     return;
