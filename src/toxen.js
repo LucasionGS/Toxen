@@ -497,8 +497,16 @@ function setBG(image, queryString, reset)
   else {
     var body = document.getElementsByTagName('body')[0];
     var curBG = image;
-    body.style.background = "url(\""+curBG+"?"+queryString+"\") no-repeat center center fixed";
-    body.style.backgroundSize = "cover";
+    if (curBG != "") {
+      body.style.background = "url(\""+curBG+"?"+queryString+"\") no-repeat center center fixed black";
+      body.style.backgroundSize = "cover";
+    }
+    else {
+      var defImg = "";
+      if (fs.existsSync(settings.musicDir+"/default.jpg")) defImg = settings.musicDir+"/default.jpg";
+      if (fs.existsSync(settings.musicDir+"/default.png")) defImg = settings.musicDir+"/default.png";
+      body.style.background = "url(\""+defImg+"?"+queryString+"\") no-repeat center center fixed black";
+    }
   }
 
 }
@@ -707,12 +715,14 @@ function LoadMusic(){
   filesCopied = 0;
   for (var i = 0; i < _musicFiles.length; i++) {
     var thisMusicDir = settings.musicDir+"/"+_musicFiles[i].name+"/";
-    if (
-      _musicFiles[i].name.endsWith(".mp3")
+    if ( _musicFiles[i].name != "default.jpg" && _musicFiles[i].name != "default.png" &&
+      (
+        _musicFiles[i].name.endsWith(".mp3")
       || _musicFiles[i].name.endsWith(".srt")
       || _musicFiles[i].name.endsWith(".jpeg")
       || _musicFiles[i].name.endsWith(".jpg")
       || _musicFiles[i].name.endsWith(".png")
+      )
     ) {
       var fileRegExp = /\.mp3$|\.srt$|\.jpeg|\.jpg|\.png/gm;
       var foundFile = thisMusicDir.replace(/\/$/g, "");

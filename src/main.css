@@ -50,7 +50,7 @@ div.sidebar .music-list{
   margin-top: 10px;
   background: #424242;
   border-style: solid;
-  border-width: 1px;
+  border-width: 1px 1px 1px 0;
   max-height: 60%;
   overflow-y: hidden;
   overflow-x: hidden;
