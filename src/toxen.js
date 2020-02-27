@@ -154,6 +154,11 @@ function stop(btn)
 }
 
 function deleteSong(id) {
+  if (+document.getElementById("now-playing").getAttribute("playingid") == id) {
+    // document.getElementById("musicObject").stop();
+    // document.getElementById("musicObject").src = "";
+    toggleFunction("next");
+  }
   try {
     // Delete files inside
     var files = fs.readdirSync(allMusicData[id].folderPath);
@@ -174,10 +179,14 @@ function getPlayingId() {
   return +document.getElementById("now-playing").getAttribute("playingid");
 }
 
+/**
+ * 
+ * @param {number} id 
+ */
 function playSong(id)
 {
   const ref = document.getElementById("music-"+id);
-  if (ref.style.display == "none") {
+  if (ref == null || ref.style.display == "none") {
     musicEnd();
     return null;
   }
@@ -346,6 +355,11 @@ function keypress(/**@type {KeyboardEvent} */e)
   }
 }
 
+/**
+ * 
+ * @param {string} func 
+ * @param {boolean} force 
+ */
 function toggleFunction(func, force)
 {
   var object;
@@ -1013,10 +1027,10 @@ async function addMusic()
   const jpg = songFolderPath+name+".jpg";
   if (dlImg) {
     https.get("https://i.ytimg.com/vi/"+ytdl.getURLVideoID(url)+"/maxresdefault.jpg", function(response) {
-      response.pipe(fs.createWriteStream(jpg));
       if (!fs.existsSync(songFolderPath)) {
         fs.mkdirSync(songFolderPath, {recursive: true});
       }
+      response.pipe(fs.createWriteStream(jpg));
     });
   }
   // https://i.ytimg.com/vi/WROcJK3ZHGc/maxresdefault.jpg
@@ -1029,7 +1043,12 @@ async function addMusic()
       return console.error(stderr);
     }
     if (!fs.existsSync(songFolderPath)) {
-      fs.mkdirSync(songFolderPath, {recursive: true});
+      try {
+        fs.mkdirSync(songFolderPath, {recursive: true});
+      } catch (error) {
+        new Popup("Error", "Unable to access the song folder.").setButtonText("Damn it");
+        return console.error("Unable to access the song folder.");
+      }
     }
     //Add file to music browser
     document.getElementById("addUrl").value = "";
@@ -1046,15 +1065,14 @@ async function addMusic()
       "bgFile": jpg,
       "srtFile": "",
     });
-    new Popup("Download Finished", data.fullName, 1000);
-    new Notification("Download Finished");
-    _finished();
-    function _finished() {
-      document.getElementById("addUrl").value = "";
-      document.getElementById("addName").value = "";
-      document.getElementById("addButton").disabled = false;
-      document.getElementById("addButton").innerHTML = "Add Music";
-    }
+    new Popup("Download Finished", name, 1000);
+    // new Notification("Download Finished");
+    
+    // Finished
+    document.getElementById("addUrl").value = "";
+    document.getElementById("addName").value = "";
+    document.getElementById("addButton").disabled = false;
+    document.getElementById("addButton").innerHTML = "Add Music";
   }).
   on("error", (err) => {
     new Popup("Couldn't download file.", [
