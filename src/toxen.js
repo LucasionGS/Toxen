@@ -272,14 +272,7 @@ function keypress(/**@type {KeyboardEvent} */e)
     toggleFunction("repeat");
   }
   else if (e.ctrlKey && e.altKey && e.key == "s") {
-    event_sliderUpdate();
-    ToxenScriptManager.events = [];
-
-    var id = getPlayingId();
-    if (fs.existsSync(allMusicData[id].folderPath+"/storyboard.txn")) {
-      ToxenScriptManager.ScriptParser(allMusicData[id].folderPath+"/storyboard.txn");
-      new Popup("Reloaded Script File", [], 1000);
-    }
+    ToxenScriptManager.reloadCurrentScript();
   }
   else if (e.ctrlKey && e.key == "s") {
     toggleFunction("shuffle");
@@ -1900,11 +1893,33 @@ setInterval(() => {
 }, 1);
 
 class ToxenScriptManager{
+
+  static currentScriptFile = "";
+
+  /**
+   * Reloads the script for the currently playing song.
+   */
+  static reloadCurrentScript() {
+    event_sliderUpdate();
+    ToxenScriptManager.events = [];
+
+    var id = getPlayingId();
+    if (fs.existsSync(allMusicData[id].folderPath+"/storyboard.txn")) {
+      ToxenScriptManager.ScriptParser(allMusicData[id].folderPath+"/storyboard.txn");
+      new Popup("Reloaded Script File", [], 1000);
+    }
+  }
+
   /**
    * Parses Toxen script files for background effects.
    * @param {string} scriptFile Path to script file.
    */
   static ScriptParser(scriptFile) {
+    fs.unwatchFile(ToxenScriptManager.currentScriptFile);
+    fs.watchFile(scriptFile, (curr, prev) => {
+      ToxenScriptManager.reloadCurrentScript();
+    });
+    ToxenScriptManager.currentScriptFile = scriptFile;
     var data = fs.readFileSync(scriptFile, "utf8").split("\n");
     for (let i = 0; i < data.length; i++) {
       const line = data[i].trim();
