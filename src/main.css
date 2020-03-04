@@ -116,6 +116,7 @@ div.player{
   position: fixed;
   bottom: 0;
   width: 100%;
+  min-height: 64px;
   height: 8vh;
   background: #252525;
   border-top-style: solid;
