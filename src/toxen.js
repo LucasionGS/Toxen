@@ -1005,13 +1005,17 @@ async function addMusic()
     if (ytInfo.media && ytInfo.media.artist && ytInfo.media.song) {
       name = ytInfo.media.artist.replace(/ +\- +/g, "-") + " - " + ytInfo.media.song.replace(/ +\- +/g, "-");
     }
-    console.log(ytInfo);
   }
 
   name = isValid(name);
   var stream;
   try {
-    stream = ytdl(url);
+    // stream = ytdl(url);
+    // Changed to audio only download
+    new Popup("Downloading... Please wait", name, 2000);
+    stream = ytdl(url, {
+      "filter": "audioonly"
+    });
   }
   catch (err) {
     console.error(err);
@@ -1034,30 +1038,19 @@ async function addMusic()
     });
   }
   // https://i.ytimg.com/vi/WROcJK3ZHGc/maxresdefault.jpg
-  var proc = new ffmpeg({source:stream});
+  // var proc = new ffmpeg({source:stream});
 
-  new Popup("Downloading... Please wait", name, 2000);
-  proc.setFfmpegPath(ffmpegPath);
-  proc.saveToFile(mp3, (stdout, stderr) => {
-    if (stderr) {
-      return console.error(stderr);
+  // Make sure folder exists
+  if (!fs.existsSync(songFolderPath)) {
+    try {
+      fs.mkdirSync(songFolderPath, {recursive: true});
+    } catch (error) {
+      new Popup("Error", "Unable to access the song folder.").setButtonText("Damn it");
+      return console.error("Unable to access the song folder.");
     }
-    if (!fs.existsSync(songFolderPath)) {
-      try {
-        fs.mkdirSync(songFolderPath, {recursive: true});
-      } catch (error) {
-        new Popup("Error", "Unable to access the song folder.").setButtonText("Damn it");
-        return console.error("Unable to access the song folder.");
-      }
-    }
-    //Add file to music browser
-    document.getElementById("addUrl").value = "";
-    document.getElementById("addName").value = "";
-    document.getElementById("addButton").disabled = false;
-    document.getElementById("addButton").innerHTML = "Add Music";
-    return console.log('Download complete!');
-  })
-  .on('end', function(err) {
+  }
+  stream.pipe(fs.createWriteStream(mp3))
+  .on("close", () => {
     addSongToList({
       "fullName": name,
       "folderPath": songFolderPath,
@@ -1073,18 +1066,55 @@ async function addMusic()
     document.getElementById("addName").value = "";
     document.getElementById("addButton").disabled = false;
     document.getElementById("addButton").innerHTML = "Add Music";
-  }).
-  on("error", (err) => {
-    new Popup("Couldn't download file.", [
-      "Failed to download the audio file.",
-      "Make sure the video is not private, or try a different URL."
-    ]);
-    console.error(err);
-    // document.getElementById("addUrl").value = "";
-    // document.getElementById("addName").value = "";
-    document.getElementById("addButton").disabled = false;
-    document.getElementById("addButton").innerHTML = "Add Music";
   });
+  // proc.setFfmpegPath(ffmpegPath);
+  // proc.saveToFile(mp3, (stdout, stderr) => {
+  //   if (stderr) {
+  //     return console.error(stderr);
+  //   }
+  //   if (!fs.existsSync(songFolderPath)) {
+  //     try {
+  //       fs.mkdirSync(songFolderPath, {recursive: true});
+  //     } catch (error) {
+  //       new Popup("Error", "Unable to access the song folder.").setButtonText("Damn it");
+  //       return console.error("Unable to access the song folder.");
+  //     }
+  //   }
+  //   //Add file to music browser
+  //   document.getElementById("addUrl").value = "";
+  //   document.getElementById("addName").value = "";
+  //   document.getElementById("addButton").disabled = false;
+  //   document.getElementById("addButton").innerHTML = "Add Music";
+  //   return console.log('Download complete!');
+  // })
+  // .on('end', function(err) {
+  //   addSongToList({
+  //     "fullName": name,
+  //     "folderPath": songFolderPath,
+  //     "file": mp3,
+  //     "bgFile": jpg,
+  //     "srtFile": "",
+  //   });
+  //   new Popup("Download Finished", name, 1000);
+  //   // new Notification("Download Finished");
+    
+  //   // Finished
+  //   document.getElementById("addUrl").value = "";
+  //   document.getElementById("addName").value = "";
+  //   document.getElementById("addButton").disabled = false;
+  //   document.getElementById("addButton").innerHTML = "Add Music";
+  // }).
+  // on("error", (err) => {
+  //   new Popup("Couldn't download file.", [
+  //     "Failed to download the audio file.",
+  //     "Make sure the video is not private, or try a different URL."
+  //   ]);
+  //   console.error(err);
+  //   // document.getElementById("addUrl").value = "";
+  //   // document.getElementById("addName").value = "";
+  //   document.getElementById("addButton").disabled = false;
+  //   document.getElementById("addButton").innerHTML = "Add Music";
+  // });
 
   // Get ID:
   // ytdl.getURLVideoID(url)
