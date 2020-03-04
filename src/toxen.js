@@ -513,6 +513,7 @@ function setBG(image, queryString, reset)
       if (fs.existsSync(settings.musicDir+"/default.jpg")) defImg = settings.musicDir+"/default.jpg";
       if (fs.existsSync(settings.musicDir+"/default.png")) defImg = settings.musicDir+"/default.png";
       body.style.background = "url(\""+defImg+"?"+queryString+"\") no-repeat center center fixed black";
+      body.style.backgroundSize = "cover";
     }
   }
 
@@ -1177,9 +1178,10 @@ function fileDropped(e)
   }
   //Background files
   if (isExt(".jpg") || isExt(".png")) {
-    var curId = document.getElementById("now-playing").getAttribute("playingid");
-    //var fileName = allMusicData[curId].split("/")[songs[curId].split("/").length-1];
-    // fileName = fileName.substring(0,fileName.length-4);
+    var curId = +document.getElementById("now-playing").getAttribute("playingid");
+    try {
+      fs.unlinkSync(allMusicData[curId].background); // Remove old image
+    } catch { }
     fs.copyFileSync(file.path, allMusicData[curId].folderPath+file.name);
     allMusicData[curId].background = allMusicData[curId].folderPath+file.name;
     setBG(allMusicData[curId].background);
@@ -1187,8 +1189,6 @@ function fileDropped(e)
   //Subtitle files
   else if (isExt(".srt")) {
     var curId = document.getElementById("now-playing").getAttribute("playingid");
-    //var fileName = allMusicData[curId].split("/")[songs[curId].split("/").length-1];
-    // fileName = fileName.substring(0,fileName.length-4);
     fs.copyFileSync(file.path, allMusicData[curId].folderPath+file.name);
     allMusicData[curId].srt = allMusicData[curId].folderPath+file.name;
     new Popup("Added Subtitles", "Successfully added subtitles added for \""+allMusicData[curId].title+"\"", 1000);
