@@ -1,5 +1,6 @@
 const ffmpeg = require('fluent-ffmpeg');
 var electron = require('electron');
+const request = require("request");
 let nowPlaying = "";
 let songs = {};
 let songCount = 0;
@@ -509,14 +510,18 @@ function setBG(image, queryString, reset)
       body.style.backgroundSize = "cover";
     }
     else {
-      var defImg = "";
-      if (fs.existsSync(settings.musicDir+"/default.jpg")) defImg = settings.musicDir+"/default.jpg";
-      if (fs.existsSync(settings.musicDir+"/default.png")) defImg = settings.musicDir+"/default.png";
-      body.style.background = "url(\""+defImg+"?"+queryString+"\") no-repeat center center fixed black";
-      body.style.backgroundSize = "cover";
+      var defImg = "./icon.png";
+      if (!fs.existsSync(settings.musicDir+"/default.jpg")) {
+        defImg = settings.musicDir+"/default.jpg";
+        body.style.background = "url(\""+defImg+"?"+queryString+"\") no-repeat center center fixed black";
+        body.style.backgroundSize = "cover";
+      }
+      else {
+        body.style.background = "url(\""+defImg+"?"+queryString+"\") no-repeat center center fixed black";
+        body.style.backgroundSize = "contain";
+      }
     }
   }
-
 }
 
 function onMenuHover()
@@ -998,6 +1003,9 @@ async function addMusic()
 
   button.innerHTML = "Downloading... Please wait";
 
+  /**
+   * @type {ytdl.videoInfo}
+   */
   var ytInfo;
 
   if (name == "") {
@@ -1050,6 +1058,43 @@ async function addMusic()
       return console.error("Unable to access the song folder.");
     }
   }
+
+  // Testing with subs
+  var info = await ytdl.getInfo(url);
+  console.log(info);
+  var srt = "";
+  try {
+    if (info.player_response.captions.playerCaptionsTracklistRenderer.captionTracks) {
+      var tracks = info.player_response.captions.playerCaptionsTracklistRenderer.captionTracks;
+      for (let i = 0; i < tracks.length; i++) {
+        const track = tracks[i];
+        if (track.languageCode == "en" || track.languageCode == "jp") {
+          request(track.baseUrl, {}, (err, res, body) => {
+            var parser = new DOMParser();
+            var xml = parser.parseFromString(body, "text/xml");
+            /**
+             * @type {{"transcript": {"text": {"@attributes": { "start": string, "dur": string }, "#text": string}[]}}}
+             */
+            var jsonTrack = xmlToJson(xml);
+            var srtText = "";
+            // console.log(jsonTrack);
+            for (let i2 = 0; i2 < jsonTrack.transcript.text.length; i2++) {
+              const sub = jsonTrack.transcript.text[i2];
+              var start = ToxenScriptManager.convertSecondsToDigitalClock(+sub["@attributes"].start)
+              var end = ToxenScriptManager.convertSecondsToDigitalClock((+sub["@attributes"].start + +sub["@attributes"].dur));
+              srtText += (i2+1)+"\n"+start+" --> "+end+"\n"+sub["#text"].replace(/\n/g, " ")+"\n\n";
+            }
+            srt = songFolderPath+"/"+name+".srt";
+            fs.writeFileSync(srt, srtText);
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.log("No subs could be downloaded or parsed properly.");
+    srt = "";
+  }
+
   stream.pipe(fs.createWriteStream(mp3))
   .on("close", () => {
     addSongToList({
@@ -1057,16 +1102,19 @@ async function addMusic()
       "folderPath": songFolderPath,
       "file": mp3,
       "bgFile": jpg,
-      "srtFile": "",
-    });
+      "srtFile": srt,
+    }).setAttribute("playing", "new");
     new Popup("Download Finished", name, 1000);
-    // new Notification("Download Finished");
     
     // Finished
     document.getElementById("addUrl").value = "";
     document.getElementById("addName").value = "";
     document.getElementById("addButton").disabled = false;
     document.getElementById("addButton").innerHTML = "Add Music";
+  });
+  stream.on("progress", (c, d, t) => {
+    const percent = (d / t * 100).toFixed(2);
+    document.getElementById("addButton").innerText = `${percent}% Downloaded...`;
   });
   // proc.setFfmpegPath(ffmpegPath);
   // proc.saveToFile(mp3, (stdout, stderr) => {
@@ -1148,6 +1196,7 @@ const songItemParams = {
 
 /**
  * @param {songItemParams} data 
+ * @returns {HTMLDivElement}
  */
 function addSongToList(data) {
   var _title = data.fullName;
@@ -1156,7 +1205,7 @@ function addSongToList(data) {
   var title;
   var file = data.file;
   var bgFile = data.bgFile;
-  var srtFile = "";
+  var srtFile = data.srtFile;
   var parts = _title.split(" - ", 2);
   if (parts.length > 1) {
     artist = parts[0];
@@ -1184,6 +1233,7 @@ function addSongToList(data) {
     "title": title,
     "file": file,
     "folderPath": folderPath,
+    "srt": srtFile,
     "background": bgFile,
   });
   scrollToSong(songCount);
@@ -1192,7 +1242,48 @@ function addSongToList(data) {
   if (document.getElementById("deleteOnNewLoad")) {
     document.getElementById("deleteOnNewLoad").parentNode.removeChild(document.getElementById("deleteOnNewLoad"));
   }
+
+  return newItem;
 }
+
+// Changes XML to JSON
+function xmlToJson(xml) {
+	
+	// Create the return object
+	var obj = {};
+
+	if (xml.nodeType == 1) { // element
+		// do attributes
+		if (xml.attributes.length > 0) {
+		obj["@attributes"] = {};
+			for (var j = 0; j < xml.attributes.length; j++) {
+				var attribute = xml.attributes.item(j);
+				obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
+			}
+		}
+	} else if (xml.nodeType == 3) { // text
+		obj = xml.nodeValue;
+	}
+
+	// do children
+	if (xml.hasChildNodes()) {
+		for(var i = 0; i < xml.childNodes.length; i++) {
+			var item = xml.childNodes.item(i);
+			var nodeName = item.nodeName;
+			if (typeof(obj[nodeName]) == "undefined") {
+				obj[nodeName] = xmlToJson(item);
+			} else {
+				if (typeof(obj[nodeName].push) == "undefined") {
+					var old = obj[nodeName];
+					obj[nodeName] = [];
+					obj[nodeName].push(old);
+				}
+				obj[nodeName].push(xmlToJson(item));
+			}
+		}
+	}
+	return obj;
+};
 
 //Insert picture drop-in areas
 function fileDropped(e)
@@ -2182,6 +2273,69 @@ class ToxenScriptManager{
       var n = new Popup("Music Script Error", "Unable to convert timestamp \""+timestamp+"\" to a valid timing point.");
       n.setButtonText("welp, fuck");
     }
+  }
+
+  /**
+   * Convert seconds to digital time format.
+   * @param {number} seconds 
+   */
+  static convertSecondsToDigitalClock(seconds) {
+    var milliseconds = seconds * 1000;
+    var time = "";
+    var curNumber = 0;
+  
+    // Convert into hours
+    while (milliseconds >= 3600000) {
+      curNumber++;
+      milliseconds -= 3600000;
+    }
+    if (curNumber < 10) {
+      time += "0" + (curNumber) + ":";
+    }
+    else {
+      time += curNumber + ":";
+    }
+    curNumber = 0;
+  
+    // Convert into minutes
+    while (milliseconds >= 60000) {
+      curNumber++;
+      milliseconds -= 60000;
+    }
+    if (curNumber < 10) {
+      time += "0" + (curNumber) + ":";
+    }
+    else {
+      time += curNumber + ":";
+    }
+    curNumber = 0;
+  
+    // Convert into seconds
+    while (milliseconds >= 1000) {
+      curNumber++;
+      milliseconds -= 1000;
+    }
+    if (curNumber < 10) {
+      time += "0" + (curNumber) + ",";
+    }
+    else {
+      time += curNumber + ",";
+    }
+    curNumber = 0;
+  
+    // Use rest as decimal
+    milliseconds = Math.round(milliseconds);
+    if (milliseconds >= 100) {
+      time += ""+milliseconds;
+    }
+    else if (milliseconds >= 10) {
+      time += "0"+milliseconds;
+    }
+    else if (milliseconds < 10) {
+      time += "00"+milliseconds;
+    }
+  
+    return time;
   }
 
   // static ToxenEvent = class ToxenEvent{

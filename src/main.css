@@ -32,12 +32,17 @@ div.sidebar{
   box-sizing: border-box;
   background: #202020;
   height: 92vh;
+  max-height: calc(100vh - 64px);
   width: 500px;
   max-width: 50%;
   border-style: solid;
   border-width: 1px;
   overflow: hidden;
   overflow-y: auto;
+}
+
+div.sidebar::-webkit-scrollbar{
+  visibility: hidden;
 }
 
 div.sidebar div.addMusic{
