@@ -511,7 +511,7 @@ function setBG(image, queryString, reset)
     }
     else {
       var defImg = "./icon.png";
-      if (!fs.existsSync(settings.musicDir+"/default.jpg")) {
+      if (fs.existsSync(settings.musicDir+"/default.jpg")) {
         defImg = settings.musicDir+"/default.jpg";
         body.style.background = "url(\""+defImg+"?"+queryString+"\") no-repeat center center fixed black";
         body.style.backgroundSize = "cover";
