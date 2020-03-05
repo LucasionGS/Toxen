@@ -64,6 +64,7 @@ div.sidebar .music-list{
 
 div.sidebar[hover=true] .music-list{
   overflow-y: auto;
+  direction: rtl;
 }
 
 .addMusicItem{
@@ -147,6 +148,7 @@ div.play[mode="play"]{
   border-color: white;
 }
 div.music-item{
+  direction: ltr;
   padding: 1px;
   user-select: none;
   transition: all 0.1s ease-in-out;
