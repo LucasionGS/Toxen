@@ -71,6 +71,11 @@ div.sidebar[hover=true] .music-list{
   margin-left: 5px;
 }
 
+input.addMusicItem{
+  width: 80%;
+}
+
+
 div.sidebar .music-list p{
   white-space: nowrap;
   pointer-events: none;
@@ -150,6 +155,7 @@ div.play[mode="play"]{
 div.music-item{
   direction: ltr;
   padding: 1px;
+  padding-left: 4px;
   user-select: none;
   transition: all 0.1s ease-in-out;
 }
@@ -263,7 +269,6 @@ div.float-left{
   float:left;
 }
 
-
 div.Button p{
   user-select: none;
   margin: 0;
@@ -284,6 +289,10 @@ div.separator{
 label{
   color: white;
   user-select: none;
+}
+
+input#dlImg{
+  transform: translate(3px, 3px);
 }
 
 .subBox{
