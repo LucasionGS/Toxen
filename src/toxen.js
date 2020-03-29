@@ -1,4 +1,4 @@
-const ffmpeg = require('fluent-ffmpeg');
+// const ffmpeg = require('fluent-ffmpeg');
 var electron = require('electron');
 const request = require("request");
 let nowPlaying = "";
@@ -14,8 +14,8 @@ let repeat = false;
 let audio;
 let playHistory = [];
 let mousePos = {
-  "X":0,
-  "Y":0
+  "X": 0,
+  "Y": 0
 };
 var playlistFile = "./playlists.json";
 
@@ -31,7 +31,7 @@ let playlists = {};
 const fs = require("fs");
 const ytdl = require("ytdl-core");
 const https = require('https');
-const {ContextMenu, Path} = require("ionlib");
+const { ContextMenu, Path } = require("ionlib");
 var Popup = require("ionlib").Popup;
 /**
  * @type {{string: string | number}}
@@ -66,32 +66,32 @@ var musicItemCm = new ContextMenu([
   },
   {
     "name": "Add to playlist...",
-    "click": function(ev, ref) {
+    "click": function (ev, ref) {
       addPlaylist(ref.innerText);
     }
   },
   {
     "name": "Remove from current playlist",
-    "click": function(ev, ref) {
+    "click": function (ev, ref) {
       removeFromPlaylist(curPlaylist, ref.innerText);
     }
   },
   {
     "name": "Rename song",
-    "click": function(ev, ref) {
+    "click": function (ev, ref) {
       renameSong(ref, ev);
     }
   },
   {
     "name": "Delete song",
-    "click": function(ev, ref) {
+    "click": function (ev, ref) {
       let id = +ref.id.substring(6);
       new Popup(
         "No mp3 found.",
         [
-          "Do you really want to delete \""+allMusicData[id].artist+" - "+allMusicData[id].title+"\"?",
+          "Do you really want to delete \"" + allMusicData[id].artist + " - " + allMusicData[id].title + "\"?",
           "<strong>This cannot be undone?</strong>",
-          "<button onclick='deleteSong("+id+"); this.parentNode.parentNode.close();'>Delete song</button>",
+          "<button onclick='deleteSong(" + id + "); this.parentNode.parentNode.close();'>Delete song</button>",
           "<button onclick='this.parentNode.parentNode.close();'>Noooo</button>"
         ]
       ).setButtonText(false);
@@ -99,25 +99,23 @@ var musicItemCm = new ContextMenu([
   },
   {
     "name": "Open song folder",
-    "click": function(ev, ref) {
+    "click": function (ev, ref) {
       openMusicFolder(+ref.id.substring(6));
     }
   }
 ]);
 
-musicItemCm.menu.onmouseover = function() {
+musicItemCm.menu.onmouseover = function () {
   onMenuHover();
 }
 
 //Get mouse position
-window.onmousemove = function(/**@type {MouseEvent}*/e)
-{
+window.onmousemove = function (/**@type {MouseEvent}*/e) {
   mousePos.X = e.clientX;
   mousePos.Y = e.clientY;
 }
 
-function onload()
-{
+function onload() {
   audio = document.getElementById("musicObject");
 }
 
@@ -128,8 +126,7 @@ setTimeout(() => {
   loadPlaylist();
 }, 250);
 
-function playToggle()
-{
+function playToggle() {
   const btn = document.getElementById("play");
   var mode = btn.getAttribute("mode");
   if (mode == "stop") {
@@ -140,17 +137,15 @@ function playToggle()
   }
 }
 
-function play(btn)
-{
+function play(btn) {
   const musicObject = document.getElementById("musicObject");
-  btn.setAttribute("mode","play");
+  btn.setAttribute("mode", "play");
   musicObject.play();
 }
 
-function stop(btn)
-{
+function stop(btn) {
   const musicObject = document.getElementById("musicObject");
-  btn.setAttribute("mode","stop");
+  btn.setAttribute("mode", "stop");
   musicObject.pause();
 }
 
@@ -164,12 +159,12 @@ function deleteSong(id) {
     // Delete files inside
     var files = fs.readdirSync(allMusicData[id].folderPath);
     for (var i = 0; i < files.length; i++) {
-      fs.unlinkSync(allMusicData[id].folderPath+"/"+files[i]);
+      fs.unlinkSync(allMusicData[id].folderPath + "/" + files[i]);
     }
     // Delete Folder
     fs.rmdirSync(allMusicData[id].folderPath);
   } catch (e) { console.log("No files to delete"); }
-  const ref = document.getElementById("music-"+id);
+  const ref = document.getElementById("music-" + id);
   ref.parentNode.removeChild(ref);
 }
 
@@ -184,28 +179,28 @@ function getPlayingId() {
  * 
  * @param {number} id 
  */
-function playSong(id)
-{
-  const ref = document.getElementById("music-"+id);
+function playSong(id) {
+  const ref = document.getElementById("music-" + id);
   if (ref == null || ref.style.display == "none") {
     musicEnd();
     return null;
   }
   data = {
     "id": id,
-    "song": allMusicData[id].artist+" - "+allMusicData[id].title,
+    "song": allMusicData[id].artist + " - " + allMusicData[id].title,
     "file": allMusicData[id].file,
 
   };
-  var songTitle = allMusicData[id].artist+" - "+allMusicData[id].title;
+  
+  var songTitle = allMusicData[id].artist + " - " + allMusicData[id].title;
   document.querySelector("title").innerText = songTitle;
   if (!fs.existsSync(allMusicData[id].file)) {
     new Popup(
       "No mp3 found.",
       [
-        "No mp3 file cound be found inside of the song folder \""+allMusicData[id].folderPath+"\".",
+        "No mp3 file cound be found inside of the song folder \"" + allMusicData[id].folderPath + "\".",
         "Do you want to delete this folder?",
-        "<button onclick='deleteSong("+id+"); this.parentNode.parentNode.close();'>Delete song</button>"
+        "<button onclick='deleteSong(" + id + "); this.parentNode.parentNode.close();'>Delete song</button>"
       ]
     );
   }
@@ -218,7 +213,7 @@ function playSong(id)
   play(document.getElementById("play"));
   document.getElementById("now-playing").setAttribute("playingid", id);
   changeVolume();
-  if (playHistory[playHistory.length-1] != id) {
+  if (playHistory[playHistory.length - 1] != id) {
     playHistory[playHistory.length] = id;
   }
 
@@ -228,7 +223,7 @@ function playSong(id)
       allMusicItems[i].removeAttribute("playing");
     }
   }
-  var curMusicItem = document.getElementById("music-"+playHistory[playHistory.length-1]);
+  var curMusicItem = document.getElementById("music-" + playHistory[playHistory.length - 1]);
   if (playHistory.length >= 1) {
     curMusicItem.setAttribute("playing", true);
   }
@@ -252,14 +247,13 @@ function playSong(id)
 
   event_sliderUpdate();
   ToxenScriptManager.events = [];
-  if (fs.existsSync(allMusicData[id].folderPath+"/storyboard.txn")) {
-    ToxenScriptManager.ScriptParser(allMusicData[id].folderPath+"/storyboard.txn");
+  if (fs.existsSync(allMusicData[id].folderPath + "/storyboard.txn")) {
+    ToxenScriptManager.ScriptParser(allMusicData[id].folderPath + "/storyboard.txn");
   }
 }
 
 //Keypresses
-function keypress(/**@type {KeyboardEvent} */e)
-{
+function keypress(/**@type {KeyboardEvent} */e) {
   var curFocus = document.activeElement;
   var curFocusTag = curFocus.tagName.toLowerCase();
   var isFocusInput = curFocusTag == "input";
@@ -272,10 +266,9 @@ function keypress(/**@type {KeyboardEvent} */e)
     try {
       Popup.closeNewest();
     }
-    catch {}
+    catch { }
   }
-  else if(e.keyCode == 32 && !isFocusInput)
-  {
+  else if (e.keyCode == 32 && !isFocusInput) {
     playToggle();
   }
   else if (e.ctrlKey && e.key == "r") {
@@ -345,13 +338,13 @@ function keypress(/**@type {KeyboardEvent} */e)
   else if (e.ctrlKey && e.key == "+") {
     var mo = document.getElementById("musicObject");
     var mSpd = document.getElementById("musicspeedslider");
-    mSpd.value = ((Math.round(mo.playbackRate*10)/10)+0.1)*100;
+    mSpd.value = ((Math.round(mo.playbackRate * 10) / 10) + 0.1) * 100;
     event_sliderUpdate();
   }
   else if (e.ctrlKey && e.key == "-") {
     var mo = document.getElementById("musicObject");
     var mSpd = document.getElementById("musicspeedslider");
-    mSpd.value = ((Math.round(mo.playbackRate*10)/10)-0.1)*100;
+    mSpd.value = ((Math.round(mo.playbackRate * 10) / 10) - 0.1) * 100;
     event_sliderUpdate();
   }
 }
@@ -361,8 +354,7 @@ function keypress(/**@type {KeyboardEvent} */e)
  * @param {string} func 
  * @param {boolean} force 
  */
-function toggleFunction(func, force)
-{
+function toggleFunction(func, force) {
   var object;
   if (func == "shuffle") {
     object = document.getElementById("btnShuffleToggle");
@@ -375,16 +367,15 @@ function toggleFunction(func, force)
     object.setAttribute('activated', repeat);
   }
   if (func == "previous" && playHistory.length > 1) {
-    playHistory.length = playHistory.length-1;
-    playSong(playHistory[playHistory.length-1]);
+    playHistory.length = playHistory.length - 1;
+    playSong(playHistory[playHistory.length - 1]);
   }
   if (func == "next") {
     musicEnd();
   }
 }
 
-function musicEnd()
-{
+function musicEnd() {
   var _id;
   if (data == undefined || data.id == undefined) {
     _id = 0;
@@ -396,35 +387,35 @@ function musicEnd()
     playSong(_id);
   }
   else if (!randomize) {
-    if (songCount > _id+1) {
-      var musicObject = document.getElementById("music-"+(_id+1));
-      while(musicObject.style.display == "none") {
+    if (songCount > _id + 1) {
+      var musicObject = document.getElementById("music-" + (_id + 1));
+      while (musicObject.style.display == "none") {
         _id++;
-        if (songCount > _id+1) {
-          musicObject = document.getElementById("music-"+(_id+1));
+        if (songCount > _id + 1) {
+          musicObject = document.getElementById("music-" + (_id + 1));
         }
         else {
           _id = 0;
-          musicObject = document.getElementById("music-"+(_id));
-          while(musicObject.style.display == "none") {
+          musicObject = document.getElementById("music-" + (_id));
+          while (musicObject.style.display == "none") {
             _id++;
-            if (songCount > _id+1) {
-              musicObject = document.getElementById("music-"+(_id));
+            if (songCount > _id + 1) {
+              musicObject = document.getElementById("music-" + (_id));
             }
           }
           playSong(_id);
           return undefined;
         }
       }
-      playSong(_id+1);
+      playSong(_id + 1);
     }
     else {
       _id = 0;
-      musicObject = document.getElementById("music-"+(_id));
-      while(musicObject.style.display == "none") {
+      musicObject = document.getElementById("music-" + (_id));
+      while (musicObject.style.display == "none") {
         _id++;
-        if (songCount > _id+1) {
-          musicObject = document.getElementById("music-"+(_id));
+        if (songCount > _id + 1) {
+          musicObject = document.getElementById("music-" + (_id));
         }
       }
       playSong(_id);
@@ -434,7 +425,7 @@ function musicEnd()
   else {
     var _availableSongs = [];
     for (var i = 0; i < songCount; i++) {
-      var musicObject = document.getElementById("music-"+i);
+      var musicObject = document.getElementById("music-" + i);
       if (musicObject.style.display != "none") {
         _availableSongs.push(i);
       }
@@ -450,14 +441,13 @@ function musicEnd()
   }
 }
 
-function update()
-{
+function update() {
   if (audio && audio.duration && audio.duration > 0 && document.getElementById("curTime").max != audio.duration) {
     document.getElementById("curTime").max = audio.duration;
   }
   if (audio && audio.currentTime && audio.duration) {
     document.getElementById("curTime").value = audio.currentTime;
-    document.getElementById("song-digital-progress").innerHTML = ConvertSecondsToDigitalClock(audio.currentTime, true)+"/"+ConvertSecondsToDigitalClock(audio.duration, true);
+    document.getElementById("song-digital-progress").innerHTML = ConvertSecondsToDigitalClock(audio.currentTime, true) + "/" + ConvertSecondsToDigitalClock(audio.duration, true);
   }
 }
 
@@ -466,10 +456,9 @@ setInterval(() => {
   if (audio != undefined && audio.currentTime != undefined && audio.duration != undefined) {
     update();
   }
-},10);
+}, 10);
 
-function changeProgress(e)
-{
+function changeProgress(e) {
   if (e.buttons == 1) {
     e.preventDefault();
     var procent = e.offsetX / e.target.clientWidth;
@@ -477,9 +466,8 @@ function changeProgress(e)
   }
 }
 
-function changeVolume()
-{
-  document.getElementById("musicObject").volume = document.getElementById("volume").value/100;
+function changeVolume() {
+  document.getElementById("musicObject").volume = document.getElementById("volume").value / 100;
   document.getElementById("volumeLabel").innerHTML = "- Volume + " + document.getElementById("volume").value;
 }
 
@@ -489,8 +477,7 @@ function changeVolume()
  * @param {string} queryString An extra query string for updating cache.
  * @param {boolean} reset If true, removes background.
  */
-function setBG(image, queryString, reset)
-{
+function setBG(image, queryString, reset) {
   if (queryString == undefined) {
     try {
       queryString = fs.statSync(image).ctimeMs;
@@ -506,33 +493,31 @@ function setBG(image, queryString, reset)
     var body = document.getElementsByTagName('body')[0];
     var curBG = image;
     if (curBG != "") {
-      body.style.background = "url(\""+curBG+"?"+queryString+"\") no-repeat center center fixed black";
+      body.style.background = "url(\"" + curBG + "?" + queryString + "\") no-repeat center center fixed black";
       body.style.backgroundSize = "cover";
     }
     else {
       var defImg = "./icon.png";
-      if (fs.existsSync(settings.musicDir+"/default.jpg")) {
-        defImg = settings.musicDir+"/default.jpg";
-        body.style.background = "url(\""+defImg+"?"+queryString+"\") no-repeat center center fixed black";
+      if (fs.existsSync(settings.musicDir + "/default.jpg")) {
+        defImg = settings.musicDir + "/default.jpg";
+        body.style.background = "url(\"" + defImg + "?" + queryString + "\") no-repeat center center fixed black";
         body.style.backgroundSize = "cover";
       }
       else {
-        body.style.background = "url(\""+defImg+"?"+queryString+"\") no-repeat center center fixed black";
+        body.style.background = "url(\"" + defImg + "?" + queryString + "\") no-repeat center center fixed black";
         body.style.backgroundSize = "contain";
       }
     }
   }
 }
 
-function onMenuHover()
-{
+function onMenuHover() {
   document.getElementById("sidebar").setAttribute("hover", "true");
   document.getElementById("canvas").setAttribute("hover", "true");
-  
+
 }
 
-function offMenuHover()
-{
+function offMenuHover() {
   document.getElementById("sidebar").setAttribute("hover", "false");
   document.getElementById("canvas").setAttribute("hover", "false");
 }
@@ -584,13 +569,13 @@ function ConvertSecondsToDigitalClock(seconds = 0, trim = false) {
   // Use rest as decimal
   milliseconds = Math.round(milliseconds);
   if (milliseconds >= 100) {
-    time += ""+milliseconds;
+    time += "" + milliseconds;
   }
   else if (milliseconds >= 10) {
-    time += "0"+milliseconds;
+    time += "0" + milliseconds;
   }
   else if (milliseconds < 10) {
-    time += "00"+milliseconds;
+    time += "00" + milliseconds;
   }
 
   if (trim == true) {
@@ -607,7 +592,7 @@ function ConvertSecondsToDigitalClock(seconds = 0, trim = false) {
 /**
  * Reloads the current settings.
  */
-function reloadSettings(){
+function reloadSettings() {
   try {
     settings = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
     if (settings.musicDir == "") {
@@ -632,7 +617,7 @@ function reloadSettings(){
 }
 
 //Loading music and other startup events
-window.onload = function(){
+window.onload = function () {
   Popup.addStyle({
     "theme": "dark",
     "top": "fullTop",
@@ -643,11 +628,11 @@ window.onload = function(){
   let dropArea = document.getElementsByTagName("html")[0];
   dropArea.addEventListener('drop', fileDropped, false);
 
-  dropArea.addEventListener('dragenter', function(event){}, false);
+  dropArea.addEventListener('dragenter', function (event) { }, false);
 
-  dropArea.addEventListener('dragleave', function() {}, false);
+  dropArea.addEventListener('dragleave', function () { }, false);
 
-  dropArea.addEventListener('dragover', function(event){
+  dropArea.addEventListener('dragover', function (event) {
     event.stopPropagation();
     event.preventDefault();
   }, false);
@@ -665,7 +650,7 @@ var allFoundFiles = []; // Used for deleting after...
 /**
  * Loads and reloads all music in a folder.
  */
-function LoadMusic(){
+function LoadMusic() {
   allFoundFiles = [];
   songCount = 0;
 
@@ -674,10 +659,10 @@ function LoadMusic(){
   } catch (e) {
     settings = {
       //Add default settings if no file.
-      "musicDir":false,
-      "visualizer":true,
-      "backgroundDim":50,
-      "visualizerIntensity":15,
+      "musicDir": false,
+      "visualizer": true,
+      "backgroundDim": 50,
+      "visualizerIntensity": 15,
     };
   }
 
@@ -693,19 +678,19 @@ function LoadMusic(){
   otherWindow = document.getElementById("otherWindow");
   var _musicFiles;
   if (settings.musicDir !== false && settings.musicDir != undefined && settings.musicDir != "") {
-    fs.mkdirSync(settings.musicDir, {recursive: true});
+    fs.mkdirSync(settings.musicDir, { recursive: true });
     preMusicDirectory = settings.musicDir;
-    pathDir = settings.musicDir.replace(/\\/g, "/")+"/";
+    pathDir = settings.musicDir.replace(/\\/g, "/") + "/";
   }
   else {
-    fs.mkdirSync(defaultMusicDir, {recursive: true});
+    fs.mkdirSync(defaultMusicDir, { recursive: true });
     pathDir = defaultMusicDir;
     settings.musicDir = defaultMusicDir;
     preMusicDirectory = pathDir;
   }
 
   if (settings.musicDir) {
-    playlistFile = (settings.musicDir+"/playlists.json").replace(/\\+|\/\/+/g, "/");
+    playlistFile = (settings.musicDir + "/playlists.json").replace(/\\+|\/\/+/g, "/");
   }
 
   // Add playlist file if it doesn't exist
@@ -721,38 +706,38 @@ function LoadMusic(){
     }
   }
 
-  _musicFiles = fs.readdirSync(pathDir, {withFileTypes:true});
+  _musicFiles = fs.readdirSync(pathDir, { withFileTypes: true });
 
   var newMp3Count = 0;
   filesDetected = 0;
   filesCopied = 0;
   for (var i = 0; i < _musicFiles.length; i++) {
-    var thisMusicDir = settings.musicDir+"/"+_musicFiles[i].name+"/";
-    if ( _musicFiles[i].name != "default.jpg" && _musicFiles[i].name != "default.png" &&
+    var thisMusicDir = settings.musicDir + "/" + _musicFiles[i].name + "/";
+    if (_musicFiles[i].name != "default.jpg" && _musicFiles[i].name != "default.png" &&
       (
         _musicFiles[i].name.endsWith(".mp3")
-      || _musicFiles[i].name.endsWith(".srt")
-      || _musicFiles[i].name.endsWith(".jpeg")
-      || _musicFiles[i].name.endsWith(".jpg")
-      || _musicFiles[i].name.endsWith(".png")
+        || _musicFiles[i].name.endsWith(".srt")
+        || _musicFiles[i].name.endsWith(".jpeg")
+        || _musicFiles[i].name.endsWith(".jpg")
+        || _musicFiles[i].name.endsWith(".png")
       )
     ) {
       var fileRegExp = /\.mp3$|\.srt$|\.jpeg|\.jpg|\.png/gm;
       var foundFile = thisMusicDir.replace(/\/$/g, "");
-      thisMusicDir = settings.musicDir+"/"+_musicFiles[i].name.replace(fileRegExp, "")+"/";
-      fs.mkdirSync(thisMusicDir, {recursive: true});
+      thisMusicDir = settings.musicDir + "/" + _musicFiles[i].name.replace(fileRegExp, "") + "/";
+      fs.mkdirSync(thisMusicDir, { recursive: true });
       filesDetected++;
       allFoundFiles.push(foundFile);
-      fs.copyFile(foundFile, thisMusicDir+_musicFiles[i].name, function (err) {
+      fs.copyFile(foundFile, thisMusicDir + _musicFiles[i].name, function (err) {
         if (err) {
           console.log(err);
           return false;
         }
         filesCopied++;
-        fs.unlink(allFoundFiles[filesCopied-1], function (err) {
+        fs.unlink(allFoundFiles[filesCopied - 1], function (err) {
           if (err) { console.log(err); }
         });
-        isFileCopyFinished(filesDetected, filesCopied, allFoundFiles[filesCopied-1]);
+        isFileCopyFinished(filesDetected, filesCopied, allFoundFiles[filesCopied - 1]);
       });
     }
     else {
@@ -760,30 +745,30 @@ function LoadMusic(){
 
       //Creating JSON as string
       var _title = _musicFiles[i].name;
-      var folderPath = pathDir+"/"+_title+"/";
+      var folderPath = pathDir + "/" + _title + "/";
       var artist;
       var title;
-      var mp3File = pathDir+"/"+_title+"/"+_title+".mp3";
+      var mp3File = pathDir + "/" + _title + "/" + _title + ".mp3";
       var srtFile = "";
       var bgFile = "";
       var parts = _title.split(" - ", 2);
       if (!_musicFiles[i].isDirectory()) {
         continue;
       }
-      var _songFolderFiles = fs.readdirSync(pathDir+"/"+_title);
+      var _songFolderFiles = fs.readdirSync(pathDir + "/" + _title);
       for (var i2 = 0; i2 < _songFolderFiles.length; i2++) {
         if (_songFolderFiles[i2].endsWith(".mp3")) {
-          mp3File = pathDir+"/"+_title+"/"+_songFolderFiles[i2];
+          mp3File = pathDir + "/" + _title + "/" + _songFolderFiles[i2];
         }
         else if (_songFolderFiles[i2].endsWith(".srt")) {
-          srtFile = pathDir+"/"+_title+"/"+_songFolderFiles[i2];
+          srtFile = pathDir + "/" + _title + "/" + _songFolderFiles[i2];
         }
         else if (
           _songFolderFiles[i2].endsWith(".png")
           || _songFolderFiles[i2].endsWith(".jpeg")
           || _songFolderFiles[i2].endsWith(".jpg")
         ) {
-          bgFile = pathDir+"/"+_title+"/"+_songFolderFiles[i2];
+          bgFile = pathDir + "/" + _title + "/" + _songFolderFiles[i2];
         }
       }
       if (parts.length > 1) {
@@ -811,15 +796,15 @@ function LoadMusic(){
     for (var i = 0; i < musicFiles.length; i++) {
       var newItem = document.createElement("div");
       newItem.setAttribute("class", "music-item");
-      newItem.setAttribute("id","music-"+ i);
-      newItem.setAttribute("onclick", "playSong("+ i +");");
+      newItem.setAttribute("id", "music-" + i);
+      newItem.setAttribute("onclick", "playSong(" + i + ");");
       // newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
       musicItemCm.attachContextMenu(newItem);
       var newItemP = document.createElement("p");
       newItemP.innerText = musicFiles[i].artist + " - " + musicFiles[i].title;
       newItem.appendChild(newItemP);
       newItem.title = newItemP.innerText;
-      
+
       if (typeof curPlaylist != "string") {
         // 
       }
@@ -829,7 +814,7 @@ function LoadMusic(){
            * @type {string}
            */
           const songTitle = playlists[curPlaylist][titleIndex];
-          
+
           if (songTitle == newItem.innerText) {
             // Add music
           }
@@ -888,7 +873,7 @@ var fileCopyProcessNotif = undefined;
 function isFileCopyFinished(filesDetected, filesCopied, curFile) {
   if (fileCopyProcessNotif != undefined) {
     if (filesDetected != filesCopied) {
-      document.querySelector("#TEMP_FILECOPYPROCESS").innerHTML = filesCopied+"/"+filesDetected+" files copied<br>"+curFile;
+      document.querySelector("#TEMP_FILECOPYPROCESS").innerHTML = filesCopied + "/" + filesDetected + " files copied<br>" + curFile;
     }
     else {
       document.querySelector("#TEMP_FILECOPYPROCESS").innerHTML = "All files copied!";
@@ -906,8 +891,8 @@ function isFileCopyFinished(filesDetected, filesCopied, curFile) {
   else {
     fileCopyProcessNotif = new Popup(
       "Found files in Music folder",
-      "Copying files from folder to a valid location...<br>"+
-      "<div id='TEMP_FILECOPYPROCESS'>"+filesCopied+"/"+filesDetected+" files copied<br>"+curFile+"</div>"+
+      "Copying files from folder to a valid location...<br>" +
+      "<div id='TEMP_FILECOPYPROCESS'>" + filesCopied + "/" + filesDetected + " files copied<br>" + curFile + "</div>" +
       "<br>Please wait", 1000000
     );
     isFileCopyFinished(filesDetected, filesCopied);
@@ -920,7 +905,7 @@ function isValid(str) {
   let reg = /[\\\/\:\*\?\"\<\>\|]/g;
   if (reg.test(str)) {
     str = str.replace(reg, "");
-    new Popup("Invalid Characters Detected", "Changed \""+orgStr+"\"\nto \""+str+"\"");
+    new Popup("Invalid Characters Detected", "Changed \"" + orgStr + "\"\nto \"" + str + "\"");
   }
   return str;
 }
@@ -929,16 +914,16 @@ function downloadFFMPEG(dlAfter = false) {
   fs.mkdirSync("./resources/app/src/", {
     "recursive": true
   });
-  var d = new Download("http://files.lucasion.xyz/software/ffmpeg/ffmpeg.exe", "./resources/app/src/ffmpeg.exe");  
+  var d = new Download("http://files.lucasion.xyz/software/ffmpeg/ffmpeg.exe", "./resources/app/src/ffmpeg.exe");
   const div = document.createElement("div");
   div.innerText = "Starting Download";
   var n = new Popup("Downloading FFMPEG", [div]);
 
-  d.onData = function(data) {
-    div.innerText = Math.round(d.downloadPercent())+"% Downloaded";
+  d.onData = function (data) {
+    div.innerText = Math.round(d.downloadPercent()) + "% Downloaded";
   };
 
-  d.onError = function(err) {
+  d.onError = function (err) {
     n.close();
     console.error(err);
     new Popup("Error", err);
@@ -958,26 +943,25 @@ function downloadFFMPEG(dlAfter = false) {
 /**
  * Adding music via YouTube URL
  */
-async function addMusic()
-{
+async function addMusic() {
   var url = document.getElementById("addUrl").value;
-  if (ytdl.validateURL(url)) {}
+  if (ytdl.validateURL(url)) { }
   else {
-    return new Popup("Invalid URL", "\""+url+"\" is not a valid URL");
+    return new Popup("Invalid URL", "\"" + url + "\" is not a valid URL");
   }
 
   var name = document.getElementById("addName").value;
   var button = document.getElementById("addButton");
   var dlImg = document.getElementById("dlImg").checked;
 
-  button.innerHTML = "Checking FFMPEG...";
   button.disabled = true;
-
+  
+  /*button.innerHTML = "Checking FFMPEG...";
   var ffmpegPath;
   if (fs.existsSync('./resources/app/src/ffmpeg.exe')) {
     ffmpegPath = './resources/app/src/ffmpeg.exe';
   }
-  else if (fs.existsSync('./src/ffmpeg.exe')){
+  else if (fs.existsSync('./src/ffmpeg.exe')) {
     ffmpegPath = './src/ffmpeg.exe';
   }
   else {
@@ -988,18 +972,18 @@ async function addMusic()
       "<button id=\"_ffmpegresetbuttons\">Another time...</button>",
     ]);
 
-    n.object.querySelector("button#_ffmpegdownloadbutton").onclick = function() {
+    n.object.querySelector("button#_ffmpegdownloadbutton").onclick = function () {
       downloadFFMPEG(true);
       n.close();
     };
 
-    n.object.querySelector("button#_ffmpegresetbuttons").onclick = function() {
+    n.object.querySelector("button#_ffmpegresetbuttons").onclick = function () {
       document.getElementById("addButton").disabled = false;
       document.getElementById("addButton").innerHTML = "Add Music";
       n.close();
     };
     return;
-  }
+  }*/
 
   button.innerHTML = "Downloading... Please wait";
 
@@ -1035,13 +1019,13 @@ async function addMusic()
     return;
   };
   //const mp4 = pathDir+name+'.mp4'; //Add this IF i add video
-  var songFolderPath = pathDir+name+"/";
-  const mp3 = songFolderPath+name+'.mp3';
-  const jpg = songFolderPath+name+".jpg";
+  var songFolderPath = pathDir + name + "/";
+  const mp3 = songFolderPath + name + '.mp3';
+  const jpg = songFolderPath + name + ".jpg";
   if (dlImg) {
-    https.get("https://i.ytimg.com/vi/"+ytdl.getURLVideoID(url)+"/maxresdefault.jpg", function(response) {
+    https.get("https://i.ytimg.com/vi/" + ytdl.getURLVideoID(url) + "/maxresdefault.jpg", function (response) {
       if (!fs.existsSync(songFolderPath)) {
-        fs.mkdirSync(songFolderPath, {recursive: true});
+        fs.mkdirSync(songFolderPath, { recursive: true });
       }
       response.pipe(fs.createWriteStream(jpg));
     });
@@ -1052,7 +1036,7 @@ async function addMusic()
   // Make sure folder exists
   if (!fs.existsSync(songFolderPath)) {
     try {
-      fs.mkdirSync(songFolderPath, {recursive: true});
+      fs.mkdirSync(songFolderPath, { recursive: true });
     } catch (error) {
       new Popup("Error", "Unable to access the song folder.").setButtonText("Damn it");
       return console.error("Unable to access the song folder.");
@@ -1082,9 +1066,9 @@ async function addMusic()
               const sub = jsonTrack.transcript.text[i2];
               var start = ToxenScriptManager.convertSecondsToDigitalClock(+sub["@attributes"].start)
               var end = ToxenScriptManager.convertSecondsToDigitalClock((+sub["@attributes"].start + +sub["@attributes"].dur));
-              srtText += (i2+1)+"\n"+start+" --> "+end+"\n"+sub["#text"].replace(/\n/g, " ")+"\n\n";
+              srtText += (i2 + 1) + "\n" + start + " --> " + end + "\n" + sub["#text"].replace(/\n/g, " ") + "\n\n";
             }
-            srt = songFolderPath+"/"+name+".srt";
+            srt = songFolderPath + "/" + name + ".srt";
             fs.writeFileSync(srt, srtText);
           });
         }
@@ -1096,22 +1080,22 @@ async function addMusic()
   }
 
   stream.pipe(fs.createWriteStream(mp3))
-  .on("close", () => {
-    addSongToList({
-      "fullName": name,
-      "folderPath": songFolderPath,
-      "file": mp3,
-      "bgFile": jpg,
-      "srtFile": srt,
-    }).setAttribute("playing", "new");
-    new Popup("Download Finished", name, 1000);
-    
-    // Finished
-    document.getElementById("addUrl").value = "";
-    document.getElementById("addName").value = "";
-    document.getElementById("addButton").disabled = false;
-    document.getElementById("addButton").innerHTML = "Add Music";
-  });
+    .on("close", () => {
+      addSongToList({
+        "fullName": name,
+        "folderPath": songFolderPath,
+        "file": mp3,
+        "bgFile": jpg,
+        "srtFile": srt,
+      }).setAttribute("playing", "new");
+      new Popup("Download Finished", name, 1000);
+
+      // Finished
+      document.getElementById("addUrl").value = "";
+      document.getElementById("addName").value = "";
+      document.getElementById("addButton").disabled = false;
+      document.getElementById("addButton").innerHTML = "Add Music";
+    });
   stream.on("progress", (c, d, t) => {
     const percent = (d / t * 100).toFixed(2);
     document.getElementById("addButton").innerText = `${percent}% Downloaded...`;
@@ -1146,7 +1130,7 @@ async function addMusic()
   //   });
   //   new Popup("Download Finished", name, 1000);
   //   // new Notification("Download Finished");
-    
+
   //   // Finished
   //   document.getElementById("addUrl").value = "";
   //   document.getElementById("addName").value = "";
@@ -1218,8 +1202,8 @@ function addSongToList(data) {
 
   var newItem = document.createElement("div");
   newItem.setAttribute("class", "music-item");
-  newItem.setAttribute("id","music-"+ songCount);
-  newItem.setAttribute("onclick", "playSong("+ songCount +");");
+  newItem.setAttribute("id", "music-" + songCount);
+  newItem.setAttribute("onclick", "playSong(" + songCount + ");");
   // newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
   musicItemCm.attachContextMenu(newItem);
   var newItemP = document.createElement("p");
@@ -1248,46 +1232,45 @@ function addSongToList(data) {
 
 // Changes XML to JSON
 function xmlToJson(xml) {
-	
-	// Create the return object
-	var obj = {};
 
-	if (xml.nodeType == 1) { // element
-		// do attributes
-		if (xml.attributes.length > 0) {
-		obj["@attributes"] = {};
-			for (var j = 0; j < xml.attributes.length; j++) {
-				var attribute = xml.attributes.item(j);
-				obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
-			}
-		}
-	} else if (xml.nodeType == 3) { // text
-		obj = xml.nodeValue;
-	}
+  // Create the return object
+  var obj = {};
 
-	// do children
-	if (xml.hasChildNodes()) {
-		for(var i = 0; i < xml.childNodes.length; i++) {
-			var item = xml.childNodes.item(i);
-			var nodeName = item.nodeName;
-			if (typeof(obj[nodeName]) == "undefined") {
-				obj[nodeName] = xmlToJson(item);
-			} else {
-				if (typeof(obj[nodeName].push) == "undefined") {
-					var old = obj[nodeName];
-					obj[nodeName] = [];
-					obj[nodeName].push(old);
-				}
-				obj[nodeName].push(xmlToJson(item));
-			}
-		}
-	}
-	return obj;
+  if (xml.nodeType == 1) { // element
+    // do attributes
+    if (xml.attributes.length > 0) {
+      obj["@attributes"] = {};
+      for (var j = 0; j < xml.attributes.length; j++) {
+        var attribute = xml.attributes.item(j);
+        obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
+      }
+    }
+  } else if (xml.nodeType == 3) { // text
+    obj = xml.nodeValue;
+  }
+
+  // do children
+  if (xml.hasChildNodes()) {
+    for (var i = 0; i < xml.childNodes.length; i++) {
+      var item = xml.childNodes.item(i);
+      var nodeName = item.nodeName;
+      if (typeof (obj[nodeName]) == "undefined") {
+        obj[nodeName] = xmlToJson(item);
+      } else {
+        if (typeof (obj[nodeName].push) == "undefined") {
+          var old = obj[nodeName];
+          obj[nodeName] = [];
+          obj[nodeName].push(old);
+        }
+        obj[nodeName].push(xmlToJson(item));
+      }
+    }
+  }
+  return obj;
 };
 
 //Insert picture drop-in areas
-function fileDropped(e)
-{
+function fileDropped(e) {
   e.stopPropagation();
   e.preventDefault();
   let dt = e.dataTransfer;
@@ -1303,29 +1286,29 @@ function fileDropped(e)
     try {
       fs.unlinkSync(allMusicData[curId].background); // Remove old image
     } catch { }
-    fs.copyFileSync(file.path, allMusicData[curId].folderPath+file.name);
-    allMusicData[curId].background = allMusicData[curId].folderPath+file.name;
+    fs.copyFileSync(file.path, allMusicData[curId].folderPath + file.name);
+    allMusicData[curId].background = allMusicData[curId].folderPath + file.name;
     setBG(allMusicData[curId].background);
   }
   //Subtitle files
   else if (isExt(".srt")) {
     var curId = document.getElementById("now-playing").getAttribute("playingid");
-    fs.copyFileSync(file.path, allMusicData[curId].folderPath+file.name);
-    allMusicData[curId].srt = allMusicData[curId].folderPath+file.name;
-    new Popup("Added Subtitles", "Successfully added subtitles added for \""+allMusicData[curId].title+"\"", 1000);
+    fs.copyFileSync(file.path, allMusicData[curId].folderPath + file.name);
+    allMusicData[curId].srt = allMusicData[curId].folderPath + file.name;
+    new Popup("Added Subtitles", "Successfully added subtitles added for \"" + allMusicData[curId].title + "\"", 1000);
     RenderSubtitles(allMusicData[curId].srt);
   }
   //Music Files
   else if (isExt(".mp3")) {
-    fs.mkdirSync(pathDir+"/"+file.name.substring(0,file.name.length-4), {recursive:true});
-    fs.copyFileSync(file.path, pathDir+"/"+file.name.substring(0,file.name.length-4)+"/"+file.name);
+    fs.mkdirSync(pathDir + "/" + file.name.substring(0, file.name.length - 4), { recursive: true });
+    fs.copyFileSync(file.path, pathDir + "/" + file.name.substring(0, file.name.length - 4) + "/" + file.name);
     //Adding the file, i swear make a fucking function >_>
     {
-      var _title = file.name.substring(0,file.name.length-4);
-      var folderPath = pathDir+"/"+file.name.substring(0,file.name.length-4)+"/";
+      var _title = file.name.substring(0, file.name.length - 4);
+      var folderPath = pathDir + "/" + file.name.substring(0, file.name.length - 4) + "/";
       var artist;
       var title;
-      var filePath = folderPath+file.name;
+      var filePath = folderPath + file.name;
       var parts = _title.split(" - ", 2);
       if (parts.length > 1) {
         artist = parts[0];
@@ -1338,8 +1321,8 @@ function fileDropped(e)
 
       var newItem = document.createElement("div");
       newItem.setAttribute("class", "music-item");
-      newItem.setAttribute("id","music-"+ songCount);
-      newItem.setAttribute("onclick", "playSong("+ songCount +");");
+      newItem.setAttribute("id", "music-" + songCount);
+      newItem.setAttribute("onclick", "playSong(" + songCount + ");");
       // newItem.setAttribute("oncontextmenu", "renameSong(this, event);");
       musicItemCm.attachContextMenu(newItem);
       var newItemP = document.createElement("p");
@@ -1358,21 +1341,20 @@ function fileDropped(e)
     new Popup("Your song has been added", "", 1000);
     try {
       document.getElementById("deleteOnNewLoad").parentNode.removeChild(document.getElementById("deleteOnNewLoad"));
-    } catch (e) {}
+    } catch (e) { }
   }
   //If none of the above
   else {
     new Popup("Invalid file",
-    "Music files: .mp3,\nBackgrounds: .png, .jpg\nSubtitles: .srt");
+      "Music files: .mp3,\nBackgrounds: .png, .jpg\nSubtitles: .srt");
   }
 }
 
 var lastWindow;
-function openSettings()
-{
+function openSettings() {
   try {
     lastWindow.close();
-  } catch (e) {}
+  } catch (e) { }
   lastWindow = window.open("settings.html");
 }
 function searchChange(search = document.getElementById("searchField").value, object = document.getElementById("searchField")) {
@@ -1387,7 +1369,7 @@ function searchChange(search = document.getElementById("searchField").value, obj
          * @type {string}
          */
         const songTitle = playlists[curPlaylist][titleIndex];
-        
+
         if (songTitle == _songs[i].childNodes[0].innerText) {
           inPlaylist = true;
           break;
@@ -1429,31 +1411,31 @@ function renameSong(object, e) {
   var id = object.getAttribute("id").replace("music-", "");
   var info = allMusicData[id];
   const input = document.createElement("input");
-  input.value = info.artist +" - "+info.title;
+  input.value = info.artist + " - " + info.title;
   input.style.width = "80%";
   input.style.textAlign = "center";
   const btn = document.createElement("Button");
   btn.innerHTML = "Rename";
   var n = new Popup("Rename",
-  [
-    "Renaming \""+info.artist +" - "+info.title+"\" to\n",
-    input,
-    // btn
-  ]);
+    [
+      "Renaming \"" + info.artist + " - " + info.title + "\" to\n",
+      input,
+      // btn
+    ]);
 
   btn.onclick = function () {
-    renameAction(object, input.value, {input:input});
+    renameAction(object, input.value, { input: input });
   }
 
   n.buttonObject.setText("Rename");
-  n.buttonObject.onclick =  function() {
-    renameAction(object, input.value, {input:input});
+  n.buttonObject.onclick = function () {
+    renameAction(object, input.value, { input: input });
   };
 
   input.onkeydown = function (ev) {
     if (ev.key == "Enter") {
       ev.preventDefault();
-      renameAction(object, input.value, {input:input});
+      renameAction(object, input.value, { input: input });
     }
   }
   input.focus();
@@ -1462,7 +1444,7 @@ function renameSong(object, e) {
 
 function renameAction(object, newName, other) {
   var id = object.getAttribute("id").replace("music-", "");
-  fs.access(pathDir+newName, function(err) {
+  fs.access(pathDir + newName, function (err) {
     if (!err) {
       if (other && other.input) {
         other.input.parentNode.parentNode.instance.titleObject.innerHTML = "Song already exists";
@@ -1473,19 +1455,19 @@ function renameAction(object, newName, other) {
       return console.log("Song Exists");
     }
     // If no song is named that
-    fs.rename(allMusicData[id].folderPath, pathDir+newName, function (err) {
-      if (err) { 
+    fs.rename(allMusicData[id].folderPath, pathDir + newName, function (err) {
+      if (err) {
         console.error(err);
         var _button = document.createElement("button");
         _button.innerHTML = "Show Technical Error";
-        _button.onclick = function() {
+        _button.onclick = function () {
           this.parentNode.parentNode.instance.titleObject.innerHTML = "Technical Details";
           this.parentNode.innerHTML = err;
         };
         new Popup("Couldn't rename song", ["Make sure you are not currently listening to the song you are trying to rename, as this will fail.\n", _button]);
 
       }
-      else{
+      else {
         other.input.parentNode.parentNode.close();
 
         for (const key in playlists) {
@@ -1495,20 +1477,20 @@ function renameAction(object, newName, other) {
               const song = playlist[i];
               var songName = allMusicData[id].folderPath;
               while (songName.endsWith("/")) {
-                songName = songName.substring(0, songName.length-1);
+                songName = songName.substring(0, songName.length - 1);
               }
               songName = Path.basename(songName);
-              
+
               if (song == songName) {
                 playlists[key][i] = newName;
-                console.log("Updated \""+key+"\" playlist");
+                console.log("Updated \"" + key + "\" playlist");
               }
             }
           }
         }
         savePlaylists();
 
-        new Popup("Renamed", ["Changed \""+allMusicData[id].folderPath+"\"\nto\n"+"\""+pathDir+newName+"\""], 1000);
+        new Popup("Renamed", ["Changed \"" + allMusicData[id].folderPath + "\"\nto\n" + "\"" + pathDir + newName + "\""], 1000);
         onMenuHover();
         LoadMusic();
       }
@@ -1538,8 +1520,7 @@ catch (e) {
 
 
 const options = document.getElementsByClassName("setting");
-window.addEventListener("load", function()
-{
+window.addEventListener("load", function () {
   event_sliderUpdate(-1);
   for (var i = 0; i < options.length; i++) {
     var typeOfSetting = options[i].getAttribute("settype");
@@ -1562,12 +1543,11 @@ window.addEventListener("load", function()
   }
 }, false);
 
-function applySettings()
-{
+function applySettings() {
   if (document.querySelector("#subtitleFont").value == "") {
     document.querySelector("#subBox").style.fontFamily = "Arial";
   }
-  else{
+  else {
     document.querySelector("#subBox").style.fontFamily = document.querySelector("#subtitleFont").value;
   }
   const _options = document.getElementsByClassName("setting");
@@ -1597,20 +1577,19 @@ function applySettings()
   }, 2000);
 }
 
-function event_sliderUpdate(value)
-{
+function event_sliderUpdate(value) {
   //New Setting
-  setTimeout(function(){
-    document.getElementById("bgdim").innerHTML = "Background Dim: "+document.getElementById("bgdimslider").value+"%";
-    
-    document.getElementById("musicspeed").innerHTML = "Playback Rate: "+(document.getElementById("musicspeedslider").value/100)+"x";
-    document.getElementById("musicObject").playbackRate = (document.getElementById("musicspeedslider").value/100);
+  setTimeout(function () {
+    document.getElementById("bgdim").innerHTML = "Background Dim: " + document.getElementById("bgdimslider").value + "%";
 
-    document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+document.getElementById("visualizerintensity").value;
-    document.getElementById("visualcolor").innerHTML = "Visualizer Color: "+
-    document.getElementById("visualizerRed").value+"/"+
-    document.getElementById("visualizerGreen").value+"/"+
-    document.getElementById("visualizerBlue").value;
+    document.getElementById("musicspeed").innerHTML = "Playback Rate: " + (document.getElementById("musicspeedslider").value / 100) + "x";
+    document.getElementById("musicObject").playbackRate = (document.getElementById("musicspeedslider").value / 100);
+
+    document.getElementById("visualintense").innerHTML = "Visualizer Intensity: " + document.getElementById("visualizerintensity").value;
+    document.getElementById("visualcolor").innerHTML = "Visualizer Color: " +
+      document.getElementById("visualizerRed").value + "/" +
+      document.getElementById("visualizerGreen").value + "/" +
+      document.getElementById("visualizerBlue").value;
     VisualizerProperties.rgb(
       document.getElementById("visualizerRed").value,
       document.getElementById("visualizerGreen").value,
@@ -1619,20 +1598,20 @@ function event_sliderUpdate(value)
 
 
     if (value == -1) { //Default setting
-      document.getElementById("bgdim").innerHTML = "Background Dim: "+preset["backgroundDim"]+"%";
-      document.getElementById("visualintense").innerHTML = "Visualizer Intensity: "+preset["visualizerIntensity"];
+      document.getElementById("bgdim").innerHTML = "Background Dim: " + preset["backgroundDim"] + "%";
+      document.getElementById("visualintense").innerHTML = "Visualizer Intensity: " + preset["visualizerIntensity"];
     }
   }, 1);
   try {
     settings.backgroundDim = document.getElementById("bgdimslider").value;
     settings.visualizerIntensity = document.getElementById("visualizerintensity").value;
-  } catch (error) {}
+  } catch (error) { }
   document.querySelector("#applyButton").querySelector("p").innerHTML = "Save*";
 }
 
 function openMusicFolder(songId = -1) {
   if (songId < 0) {
-    var _url = document.getElementById("musicDir").value.replace(/\\/g,"\\\\");
+    var _url = document.getElementById("musicDir").value.replace(/\\/g, "\\\\");
     if (_url == "") {
       //_url = document.getElementById("musicDir").getAttribute("placeholder").replace("\\","\\\\")
       _url = defaultMusicDir;
@@ -1640,10 +1619,10 @@ function openMusicFolder(songId = -1) {
     while (_url.startsWith("/") || _url.startsWith("\\")) {
       _url = _url.substring(1);
     }
-    __proc.exec('start "" "'+_url+'"');
+    __proc.exec('start "" "' + _url + '"');
   }
   else {
-    __proc.exec('start "" "'+allMusicData[songId].folderPath+'"');
+    __proc.exec('start "" "' + allMusicData[songId].folderPath + '"');
   }
 }
 
@@ -1655,40 +1634,39 @@ class VisualizerProperties {
   static toR = 25;
   static toG = 0;
   static toB = 250;
-  static rgb(r = this.r, g = this.g, b = this.b)
-  {
+  static rgb(r = this.r, g = this.g, b = this.b) {
     this.toR = r;
     this.toG = g;
     this.toB = b;
     return {
-      r:r,
-      g:g,
-      b:b
+      r: r,
+      g: g,
+      b: b
     };
   }
 
-  static setIntensity(value){
+  static setIntensity(value) {
     settings.visualizerIntensity = value;
   }
 }
 
 setInterval(function () {
   if (VisualizerProperties.r != VisualizerProperties.toR) {
-    VisualizerProperties.r -= ((VisualizerProperties.r - VisualizerProperties.toR)/50);
+    VisualizerProperties.r -= ((VisualizerProperties.r - VisualizerProperties.toR) / 50);
   }
   if (VisualizerProperties.g != VisualizerProperties.toG) {
-    VisualizerProperties.g -= ((VisualizerProperties.g - VisualizerProperties.toG)/50);
+    VisualizerProperties.g -= ((VisualizerProperties.g - VisualizerProperties.toG) / 50);
   }
   if (VisualizerProperties.b != VisualizerProperties.toB) {
-    VisualizerProperties.b -= ((VisualizerProperties.b - VisualizerProperties.toB)/50);
+    VisualizerProperties.b -= ((VisualizerProperties.b - VisualizerProperties.toB) / 50);
   }
 }, 1);
 
 const http = require('https');
 // const fs = require("fs");
-const {Download} = require("ionodelib");
+const { Download } = require("ionodelib");
 var proc = require('child_process');
-var defaultMusicDir = process.env.HOMEDRIVE+process.env.HOMEPATH+"/Music/";
+var defaultMusicDir = process.env.HOMEDRIVE + process.env.HOMEPATH + "/Music/";
 defaultMusicDir = defaultMusicDir.replace(/(\\+)/g, "/");
 
 //Default check for update on startup
@@ -1697,48 +1675,47 @@ setTimeout(function () {
 }, 0);
 
 //Check for updates
-function checkUpdate()
-{
+function checkUpdate() {
   var packageFile = "./resources/app/package.json";
   if (!fs.existsSync(packageFile)) {
     return;
   }
   const curVers = JSON.parse(fs.readFileSync(packageFile, "utf8")).version;
   fetch("https://api.github.com/repos/LucasionGS/Toxen/releases/latest")
-  .then(response => {
-    return response.json();
-  })
-  .then(data => {
-    const newVers = data.tag_name;
-    const dlUrl = data.assets[0].browser_download_url;
+    .then(response => {
+      return response.json();
+    })
+    .then(data => {
+      const newVers = data.tag_name;
+      const dlUrl = data.assets[0].browser_download_url;
 
 
 
-    if (curVers != newVers) {
-      var link = document.createElement("a");
-      link.innerHTML = "Click here to update";
-      var n = new Popup("New Update Available", [link]);
-      link.onclick = function() {
-        // fetch("https://api.github.com/repos/LucasionGS/ToxenInstall/releases/latest")
-        // .then(response => {
-        //   return response.json();
-        // })
-        // .then(data => {
-        //   var installerUrl = data.assets[0].browser_download_url;
-        // });
-        url = "https://raw.githubusercontent.com/LucasionGS/ToxenInstall/master/ToxenInstall/bin/Debug/ToxenInstall.exe";
-        DownloadUpdate(url, n);
+      if (curVers != newVers) {
+        var link = document.createElement("a");
+        link.innerHTML = "Click here to update";
+        var n = new Popup("New Update Available", [link]);
+        link.onclick = function () {
+          // fetch("https://api.github.com/repos/LucasionGS/ToxenInstall/releases/latest")
+          // .then(response => {
+          //   return response.json();
+          // })
+          // .then(data => {
+          //   var installerUrl = data.assets[0].browser_download_url;
+          // });
+          url = "https://raw.githubusercontent.com/LucasionGS/ToxenInstall/master/ToxenInstall/bin/Debug/ToxenInstall.exe";
+          DownloadUpdate(url, n);
+        }
       }
-    }
-  })
-  .catch(err => {
-    new Popup("Check Update failed", err);
-  });
+    })
+    .catch(err => {
+      new Popup("Check Update failed", err);
+    });
 }
 
 async function DownloadUpdate(url, object) {
   var DL = new Download(url, "./ToxenInstall.exe");
-  DL.onClose = function() {
+  DL.onClose = function () {
     setTimeout(() => {
       // proc.spawn('cmd.exe start \"\" ToxenInstall.exe', ["/c"], {detacted:true, stdio: 'ignore'});
       // proc.spawn('cmd.exe', [], {detacted:true, stdio: 'ignore'});
@@ -1749,8 +1726,8 @@ async function DownloadUpdate(url, object) {
       });
     }, 1);
   }
-  DL.onData = function(data) {
-    object.descriptionObject.innerHTML = DL.downloadPercent()+"%";
+  DL.onData = function (data) {
+    object.descriptionObject.innerHTML = DL.downloadPercent() + "%";
   }
   DL.start();
 }
@@ -1759,9 +1736,8 @@ function ParseGitRedirect(res) {
   return res.match(/<a href="(.*)">.*<\/a>/)[1];
 }
 
-function scrollToSong(id)
-{
-  var musicObject = document.getElementById("music-"+id);
+function scrollToSong(id) {
+  var musicObject = document.getElementById("music-" + id);
   musicObject.scrollIntoViewIfNeeded();
 }
 
@@ -1782,8 +1758,7 @@ var createSubBoxInterval = setInterval(function () {
   }
 }, 1);
 
-function ParseSrt(srtFile)
-{
+function ParseSrt(srtFile) {
   var srtPath = srtFile;
   try {
     var srtText = fs.readFileSync(srtPath, "utf8");
@@ -1796,10 +1771,10 @@ function ParseSrt(srtFile)
 
   for (var i = 0; i < lines.length; i++) {
     var newSub = {
-      "id":-1,
-      "startTime":-1,
-      "endTime":-1,
-      "text":""
+      "id": -1,
+      "startTime": -1,
+      "endTime": -1,
+      "text": ""
     };
     if (lines[i].trim() == "") {
       continue;
@@ -1813,15 +1788,15 @@ function ParseSrt(srtFile)
       var timeStamps = lines[i].split("-->");
       //startTime
       var ints = timeStamps[0].split(",", 1)[0].split(":");
-      newSub.startTime = ((+ints[0]*60*60)+(+ints[1]*60)+(+ints[2])+(+timeStamps[0].split(",", 2)[1]/1000));
+      newSub.startTime = ((+ints[0] * 60 * 60) + (+ints[1] * 60) + (+ints[2]) + (+timeStamps[0].split(",", 2)[1] / 1000));
 
       //endTime
       ints = timeStamps[1].split(",", 1)[0].split(":");
-      newSub.endTime = ((+ints[0]*60*60)+(+ints[1]*60)+(+ints[2])+(+timeStamps[1].split(",", 2)[1]/1000));
+      newSub.endTime = ((+ints[0] * 60 * 60) + (+ints[1] * 60) + (+ints[2]) + (+timeStamps[1].split(",", 2)[1] / 1000));
       i++;
       //Set texts
-      while (lines[i].trim() != "") {
-        newSub.text += Imd.MarkDownToHTML(lines[i])+"\n";
+      while (lines[i] && lines[i].trim() != "") {
+        newSub.text += Imd.MarkDownToHTML(lines[i]) + "\n";
         i++;
       }
       subData.push(newSub);
@@ -1867,7 +1842,7 @@ function addPlaylist(title) {
   if (!fs.existsSync(playlistFile)) {
     fs.writeFileSync(playlistFile, "{}");
   }
-  
+
   var select = document.createElement("select");
   const alreadyIn = document.createElement("p");
   alreadyIn.innerHTML = "";
@@ -1892,7 +1867,7 @@ function addPlaylist(title) {
         select.appendChild(option);
       }
       else {
-        alreadyIn.innerHTML += key+"<br>";
+        alreadyIn.innerHTML += key + "<br>";
       }
     }
   }
@@ -1901,7 +1876,7 @@ function addPlaylist(title) {
     alreadyIn.innerHTML = "Already in:<br>None";
   }
   else {
-    alreadyIn.innerHTML = "Already in:<br>"+alreadyIn.innerHTML;
+    alreadyIn.innerHTML = "Already in:<br>" + alreadyIn.innerHTML;
   }
 
   const optionNew = document.createElement("option");
@@ -1926,7 +1901,7 @@ function addPlaylist(title) {
   customPlaylist.addEventListener("keydown", (ev) => {
     select.value = "$_newPlaylist";
   });
-  n.buttonObject.onclick = function() {
+  n.buttonObject.onclick = function () {
     if (select.value == "$_newPlaylist") {
       if (customPlaylist.value.trim() == "") {
         error("You need to fill out a name for a new playlist!");
@@ -1938,7 +1913,7 @@ function addPlaylist(title) {
       }
 
       function error(msg) {
-        n.descriptionObject.children[n.descriptionObject.children.length-1].innerText = msg;
+        n.descriptionObject.children[n.descriptionObject.children.length - 1].innerText = msg;
       }
       customPlaylist.value = customPlaylist.value.trim();
       if (playlists[customPlaylist.value]) {
@@ -2031,7 +2006,7 @@ setInterval(() => {
   }
 }, 1);
 
-class ToxenScriptManager{
+class ToxenScriptManager {
 
   static currentScriptFile = "";
 
@@ -2043,8 +2018,8 @@ class ToxenScriptManager{
     ToxenScriptManager.events = [];
 
     var id = getPlayingId();
-    if (fs.existsSync(allMusicData[id].folderPath+"/storyboard.txn")) {
-      ToxenScriptManager.ScriptParser(allMusicData[id].folderPath+"/storyboard.txn");
+    if (fs.existsSync(allMusicData[id].folderPath + "/storyboard.txn")) {
+      ToxenScriptManager.ScriptParser(allMusicData[id].folderPath + "/storyboard.txn");
       new Popup("Reloaded Script File", [], 1000);
     }
   }
@@ -2069,21 +2044,21 @@ class ToxenScriptManager{
         // Failures
         if (typeof fb == "string") {
           setTimeout(() => {
-            new Popup("Parsing error", ["Failed parsing script:", "\""+scriptFile+"\"", "Error at line "+(i+1), fb]);
+            new Popup("Parsing error", ["Failed parsing script:", "\"" + scriptFile + "\"", "Error at line " + (i + 1), fb]);
           }, 100);
-          throw "Failed parsing script. Error at line "+(i+1)+"\n"+fb;
+          throw "Failed parsing script. Error at line " + (i + 1) + "\n" + fb;
         }
         if (fb.success == false) {
           setTimeout(() => {
-            new Popup("Parsing error", ["Failed parsing script:", "\""+scriptFile+"\"", "Error at line "+(i+1)]);
+            new Popup("Parsing error", ["Failed parsing script:", "\"" + scriptFile + "\"", "Error at line " + (i + 1)]);
           }, 100);
-          throw "Failed parsing script. Error at line "+(i+1)+"\n"+fb.error;
+          throw "Failed parsing script. Error at line " + (i + 1) + "\n" + fb.error;
         }
       }
     }
 
-    if (ToxenScriptManager.events[ToxenScriptManager.events.length-1] && ToxenScriptManager.events[ToxenScriptManager.events.length-1].endPoint == "$") {
-      ToxenScriptManager.events[ToxenScriptManager.events.length-1].endPoint = ToxenScriptManager.timeStampToSeconds("2:00:00");
+    if (ToxenScriptManager.events[ToxenScriptManager.events.length - 1] && ToxenScriptManager.events[ToxenScriptManager.events.length - 1].endPoint == "$") {
+      ToxenScriptManager.events[ToxenScriptManager.events.length - 1].endPoint = ToxenScriptManager.timeStampToSeconds("2:00:00");
     }
 
     /**
@@ -2107,7 +2082,7 @@ class ToxenScriptManager{
         var startPoint = 0;
         var endPoint = 0;
         var args = [];
-        var fn = (args) => {};
+        var fn = (args) => { };
 
         // Parsing...
         var timeRegResult = line.match(timeReg)[0];
@@ -2117,7 +2092,7 @@ class ToxenScriptManager{
         endPoint = tP[1];
 
         // if (!startPoint.startsWith("$")) { // Maybe add this as a features just like endPoint...
-          startPoint = ToxenScriptManager.timeStampToSeconds(tP[0]);
+        startPoint = ToxenScriptManager.timeStampToSeconds(tP[0]);
         // }
         if (endPoint != "$") {
           endPoint = ToxenScriptManager.timeStampToSeconds(tP[1]);
@@ -2126,14 +2101,14 @@ class ToxenScriptManager{
           endPoint = "$";
         }
 
-        if (ToxenScriptManager.events[ToxenScriptManager.events.length-1] && ToxenScriptManager.events[ToxenScriptManager.events.length-1].endPoint == "$"){
-          ToxenScriptManager.events[ToxenScriptManager.events.length-1].endPoint = startPoint;
+        if (ToxenScriptManager.events[ToxenScriptManager.events.length - 1] && ToxenScriptManager.events[ToxenScriptManager.events.length - 1].endPoint == "$") {
+          ToxenScriptManager.events[ToxenScriptManager.events.length - 1].endPoint = startPoint;
         }
 
         if (startPoint >= endPoint) { // Catch error if sP is higher than eP
           return "startPoint cannot be higher than endPoint";
         }
-        
+
         var type = line.match(typeReg)[0].toLowerCase();
         if (typeof type != "string") {
           return "Invalid type format.";
@@ -2162,7 +2137,7 @@ class ToxenScriptManager{
               waitForQuote = false;
               continue;
             }
-            else if (l == "\\\\" && curArg != "" && as[i+1] == "\"") {
+            else if (l == "\\\\" && curArg != "" && as[i + 1] == "\"") {
               i++;
               curArg += "\"";
               continue;
@@ -2184,8 +2159,8 @@ class ToxenScriptManager{
           return argList;
         }
 
-        args = parseArgumentsFromString(argString);        
-        fn = function() {
+        args = parseArgumentsFromString(argString);
+        fn = function () {
           ToxenScriptManager.eventFunctions[type](args);
         };
 
@@ -2212,18 +2187,18 @@ class ToxenScriptManager{
      * Change the image of the background.
      * @param {[string]} args Arguments.
      */
-    background: function(args) {
+    background: function (args) {
       var id = +document.getElementById("now-playing").getAttribute("playingid");
-      setBG(allMusicData[id].folderPath+"/"+args[0]);
+      setBG(allMusicData[id].folderPath + "/" + args[0]);
     },
     /**
      * Change the color of the visualizer
      * @param {[string | number, string | number, string | number]} args Arguments
      */
-    visualizercolor: function(args) {
+    visualizercolor: function (args) {
       VisualizerProperties.rgb(args[0], args[1], args[2]);
     },
-    visualizerintensity: function(args) {
+    visualizerintensity: function (args) {
       if (args[1] && args[1].toLowerCase() == "smooth") {
         if (+args[0] < settings.visualizerIntensity) {
           settings.visualizerIntensity -= 0.1;
@@ -2241,36 +2216,35 @@ class ToxenScriptManager{
       }
     }
   }
-  
+
   /**
    * Convert a timestamp into seconds.
    * @param {string} timestamp Time in format "hh:mm:ss".
    */
-  static timeStampToSeconds(timestamp)
-  {
+  static timeStampToSeconds(timestamp) {
     try {
       var seconds = 0;
       var parts = timestamp.split(":");
       for (let i = 0; i < parts.length; i++) {
         const time = +parts[i];
-        let x = parts.length-i-1;
+        let x = parts.length - i - 1;
         if (x == 0) {
           seconds += time;
         }
         if (x == 1) {
-          seconds += time*60;
+          seconds += time * 60;
         }
         if (x == 2) {
-          seconds += time*60*60;
+          seconds += time * 60 * 60;
         }
         if (x == 3) {
-          seconds += time*60*60*24;
+          seconds += time * 60 * 60 * 24;
         }
       }
       return seconds;
     }
     catch (error) {
-      var n = new Popup("Music Script Error", "Unable to convert timestamp \""+timestamp+"\" to a valid timing point.");
+      var n = new Popup("Music Script Error", "Unable to convert timestamp \"" + timestamp + "\" to a valid timing point.");
       n.setButtonText("welp, fuck");
     }
   }
@@ -2283,7 +2257,7 @@ class ToxenScriptManager{
     var milliseconds = seconds * 1000;
     var time = "";
     var curNumber = 0;
-  
+
     // Convert into hours
     while (milliseconds >= 3600000) {
       curNumber++;
@@ -2296,7 +2270,7 @@ class ToxenScriptManager{
       time += curNumber + ":";
     }
     curNumber = 0;
-  
+
     // Convert into minutes
     while (milliseconds >= 60000) {
       curNumber++;
@@ -2309,7 +2283,7 @@ class ToxenScriptManager{
       time += curNumber + ":";
     }
     curNumber = 0;
-  
+
     // Convert into seconds
     while (milliseconds >= 1000) {
       curNumber++;
@@ -2322,19 +2296,19 @@ class ToxenScriptManager{
       time += curNumber + ",";
     }
     curNumber = 0;
-  
+
     // Use rest as decimal
     milliseconds = Math.round(milliseconds);
     if (milliseconds >= 100) {
-      time += ""+milliseconds;
+      time += "" + milliseconds;
     }
     else if (milliseconds >= 10) {
-      time += "0"+milliseconds;
+      time += "0" + milliseconds;
     }
     else if (milliseconds < 10) {
-      time += "00"+milliseconds;
+      time += "00" + milliseconds;
     }
-  
+
     return time;
   }
 
@@ -2360,15 +2334,14 @@ class ToxenScriptManager{
   static events = [];
 }
 
-class ToxenEvent{
+class ToxenEvent {
   /**
    * Create a new Event
    * @param {number} startPoint Starting point in seconds.
    * @param {number} endPoint Ending point in seconds.
    * @param {(args: any[]) => void} fn Function to run at this interval.
    */
-  constructor(startPoint, endPoint, fn)
-  {
+  constructor(startPoint, endPoint, fn) {
     this.startPoint = startPoint;
     this.endPoint = endPoint;
     this.fn = fn;
