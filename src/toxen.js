@@ -1,5 +1,10 @@
 // const ffmpeg = require('fluent-ffmpeg');
+// Hue API
+let hue = require("node-hue-api").v3;
+let hueApi = null;
+// Electron API
 var electron = require('electron');
+// Toxen functionality
 const request = require("request");
 let nowPlaying = "";
 let songs = {};
@@ -180,6 +185,7 @@ function getPlayingId() {
  * @param {number} id 
  */
 function playSong(id) {
+  hueApi = null;
   const ref = document.getElementById("music-" + id);
   if (ref == null || ref.style.display == "none") {
     musicEnd();
@@ -2067,6 +2073,25 @@ class ToxenScriptManager {
      */
     function lineParser(line) {
       try { // Massive trycatch for any error.
+        let maxPerSecond = 0;
+        const checkMaxPerSecond = /^\b(once|twice)\b/g;
+        if (checkMaxPerSecond.test(line)) {
+          line.replace(checkMaxPerSecond, function(item) {
+            if (item == "once") {
+              maxPerSecond = 1;
+            }
+            if (item == "twice") {
+              maxPerSecond = 2;
+            }
+            return "";
+          });
+        }
+
+        // Check if non-time function
+        const checkFunction = /:\S*\s*=>\s*.*/g;
+        if (checkFunction.test(line)) {
+          line = "[0 - 1]" + line;
+        }
 
         // Check if no only start
         const checkTime = /(?<=\[)[^-]*(?=\])/g;
@@ -2097,9 +2122,9 @@ class ToxenScriptManager {
         if (endPoint != "$") {
           endPoint = ToxenScriptManager.timeStampToSeconds(tP[1]);
         }
-        else {
-          endPoint = "$";
-        }
+        // else {
+        //   endPoint = "$";
+        // }
 
         if (ToxenScriptManager.events[ToxenScriptManager.events.length - 1] && ToxenScriptManager.events[ToxenScriptManager.events.length - 1].endPoint == "$") {
           ToxenScriptManager.events[ToxenScriptManager.events.length - 1].endPoint = startPoint;
@@ -2112,6 +2137,11 @@ class ToxenScriptManager {
         var type = line.match(typeReg)[0].toLowerCase();
         if (typeof type != "string") {
           return "Invalid type format.";
+        }
+
+        // only compatible with "once"
+        if (maxPerSecond == 0 && /\b(huecolor|hueandvisualizercolor)\b/g.test(type)) {
+          return "Invalid type compatibility.\n"+type+" is required to use a limiter prefix.";
         }
 
         var argString = line.match(argReg)[0].trim();
@@ -2160,15 +2190,34 @@ class ToxenScriptManager {
         }
 
         args = parseArgumentsFromString(argString);
+
+        ToxenScriptManager.events.push(new ToxenEvent(startPoint, endPoint, fn));
+        let currentEvent = ToxenScriptManager.events[ToxenScriptManager.events.length - 1];
         fn = function () {
-          ToxenScriptManager.eventFunctions[type](args);
+          if (maxPerSecond > 0 && !type.startsWith(":") && currentEvent.hasRun == false) {
+            try {
+              ToxenScriptManager.eventFunctions[type](args);
+            } catch (error) {
+              console.error(error);
+            }
+            setTimeout(() => {
+              currentEvent.hasRun = false;
+            }, 1000 / maxPerSecond);
+          }
+          else if (maxPerSecond == 0 && !type.startsWith(":")) {
+            ToxenScriptManager.eventFunctions[type](args);
+          }
+          else if (type.startsWith(":") && currentEvent.hasRun == false) {
+            ToxenScriptManager.eventFunctions[type](args);
+          }
+          currentEvent.hasRun = true;
         };
+
+        currentEvent.fn = fn;
 
         if (typeof ToxenScriptManager.eventFunctions[type] == undefined) {
           return `Type "${type.toLowerCase()}" is not valid.`;
         }
-
-        ToxenScriptManager.events.push(new ToxenEvent(startPoint, endPoint, fn));
 
       } catch (error) { // Catch any error
         return {
@@ -2214,6 +2263,48 @@ class ToxenScriptManager {
       else {
         VisualizerProperties.setIntensity(+args[0]);
       }
+    },
+    /**
+     * Change the color of a Hue Light.
+     * @param {[string | number, string | number, string | number, string | number, string | number]} args Arguments
+     */
+    huecolor: function (args) {
+      let brightness = 100;
+      let lights = args[0].split(",");
+      if (args[4] !== undefined) {
+        brightness = +args[4];
+      }
+      if (hueApi)
+        for (let i = 0; i < lights.length; i++)
+          hueApi.lights.setLightState(+lights[i], new hue.lightStates.LightState().on().rgb(+args[1], +args[2], +args[3]).brightness(brightness));
+    },
+    /**
+     * Change the color of a Hue Light and Visualizer.
+     * @param {[string | number, string | number, string | number, string | number, string | number]} args Arguments
+     */
+    hueandvisualizercolor: function (args) {
+      VisualizerProperties.rgb(args[1], args[2], args[3]);
+      let brightness = 100;
+      let lights = args[0].split(",");
+      if (args[4] !== undefined) {
+        brightness = +args[4];
+      }
+      if (hueApi)
+        for (let i = 0; i < lights.length; i++)
+          hueApi.lights.setLightState(+lights[i], new hue.lightStates.LightState().on().rgb(+args[1], +args[2], +args[3]).brightness(brightness));
+    },
+    // :Functions
+    /**
+     * 
+     * @param {[string, string, string]} args 
+     */
+    ":hueconnect": async function(args) {
+      let ipAddress = args[0];
+      let hueUser = {
+        "username": args[1],
+        "clientkey": args[2]
+      };
+      hueApi = await hue.api.createInsecureLocal(ipAddress).connect(hueUser.username, hueUser.clientkey);
     }
   }
 
@@ -2312,21 +2403,6 @@ class ToxenScriptManager {
     return time;
   }
 
-  // static ToxenEvent = class ToxenEvent{
-  //   /**
-  //    * Create a new Event
-  //    * @param {number} startPoint Starting point in seconds.
-  //    * @param {number} endPoint Ending point in seconds.
-  //    * @param {(args: any[]) => void} fn Function to run at this interval.
-  //    */
-  //   constructor(startPoint, endPoint, fn)
-  //   {
-  //     this.startPoint = startPoint;
-  //     this.endPoint = endPoint;
-  //     this.fn = fn;
-  //   }
-  // }
-
   /**
    * List of events in order for the current song.
    * @type {ToxenEvent[]}
@@ -2346,4 +2422,6 @@ class ToxenEvent {
     this.endPoint = endPoint;
     this.fn = fn;
   }
+
+  hasRun = false;
 }

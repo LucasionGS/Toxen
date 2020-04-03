@@ -63,4 +63,4 @@ You can drop a subtitle file into Toxen to add it to the currently playing song.
 
 ## Documentation
 
-[**Toxen Storyboard Syntax**](./storyboard.md)
+[**ToxenScript Syntax for storyboards**](./toxenscript.md)

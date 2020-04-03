@@ -13,6 +13,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "ionlib": "^1.0.11",
     "ionodelib": "^1.0.0",
+    "node-hue-api": "^4.0.5",
     "register-scheme": "github:devsnek/node-register-scheme",
     "request": "^2.88.2",
     "ytdl-core": "^2.0.0"
