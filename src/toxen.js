@@ -2010,7 +2010,90 @@ setInterval(() => {
       }
     }
   }
-}, 1);
+}, 0);
+
+// Background Pulse
+class Pulse {
+  /**
+   * @type {Pulse[]}
+   */
+  allPulses = [];
+  constructor() {
+    const leftDiv = document.createElement("div");
+    leftDiv.style.position = "absolute";
+    leftDiv.style.top = "0";
+    leftDiv.style.left = "0";
+    leftDiv.style.background = "linear-gradient(-90deg, rgba(0,0,0,0) 0%, rgba(255,255,255,0.8) 100%)";
+    leftDiv.style.height = "100vh";
+
+    this.left = leftDiv;
+
+    document.getElementById("content").insertBefore(leftDiv, document.getElementById("canvas"));
+
+    const rightDiv = document.createElement("div");
+    rightDiv.style.position = "absolute";
+    rightDiv.style.top = "0";
+    rightDiv.style.right = "0";
+    rightDiv.style.background = "linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(255,255,255,0.8) 100%)";
+    rightDiv.style.height = "100vh";
+
+    this.right = rightDiv;
+
+    document.getElementById("content").insertBefore(rightDiv, document.getElementById("canvas"));
+
+    this.allPulses.push(this);
+  }
+  /**
+   * @type {HTMLDivElement}
+   */
+  left = null;
+  /**
+   * @type {HTMLDivElement}
+   */
+  right = null;
+
+  _width = 0;
+
+  lastPulse = 0;
+
+  set width(value) {
+    this._width = value;
+    this.left.style.width = this._width+"px";
+    this.right.style.width = this._width+"px";
+  }
+
+  get width() {
+    return this._width;
+  }
+
+  /**
+   * @param {Number} width 
+   */
+  pulse(width) {
+    this.lastPulse = width;
+    this.width = width;
+  }
+
+  interval = setInterval(() => {
+    if (this.width > 0) {
+      this.width -= Math.max(Math.min(this.width, 1), (this.width / settings.visualizerIntensity) * 2);
+      let opacity = (this.width / this.lastPulse);
+      this.left.style.opacity = opacity;
+      this.right.style.opacity = opacity;
+    }
+  }, 10);
+
+  destroy() {
+    this.left.parentElement.removeChild(this.left);
+    this.right.parentElement.removeChild(this.right);
+    clearInterval(this.interval);
+  }
+}
+
+let testPulse;
+setTimeout(() => {
+  testPulse = new Pulse();
+}, 10);
 
 class ToxenScriptManager {
 
@@ -2144,6 +2227,11 @@ class ToxenScriptManager {
           return "Invalid type compatibility.\n"+type+" is required to use a limiter prefix.";
         }
 
+        // only compatible with "once"
+        if (maxPerSecond > 0 && /\b(bpmpulse)\b/g.test(type)) {
+          console.warn("Irrelevant limiter.\n"+type+" cannot use a limiter prefix and has been ignored.");
+        }
+
         var argString = line.match(argReg)[0].trim();
 
         if (typeof argString != "string") {
@@ -2191,6 +2279,11 @@ class ToxenScriptManager {
 
         args = parseArgumentsFromString(argString);
 
+        if (type == "bpmpulse") {
+          // BPM calculation
+          maxPerSecond = +args[0] / 60;
+        }
+
         ToxenScriptManager.events.push(new ToxenEvent(startPoint, endPoint, fn));
         let currentEvent = ToxenScriptManager.events[ToxenScriptManager.events.length - 1];
         fn = function () {
@@ -2202,7 +2295,7 @@ class ToxenScriptManager {
             }
             setTimeout(() => {
               currentEvent.hasRun = false;
-            }, 1000 / maxPerSecond);
+            }, (1000 / maxPerSecond));
           }
           else if (maxPerSecond == 0 && !type.startsWith(":")) {
             ToxenScriptManager.eventFunctions[type](args);
@@ -2292,6 +2385,9 @@ class ToxenScriptManager {
       if (hueApi)
         for (let i = 0; i < lights.length; i++)
           hueApi.lights.setLightState(+lights[i], new hue.lightStates.LightState().on().rgb(+args[1], +args[2], +args[3]).brightness(brightness));
+    },
+    /**
+  // YOU SUCK JDASJADSJ K DASJKASWDSASADASDAS DWAS Dlse.pulse(256);
     },
     // :Functions
     /**

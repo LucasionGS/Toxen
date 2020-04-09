@@ -29,6 +29,7 @@ h1.subtitle{
 }
 
 div.sidebar{
+  position: absolute;
   box-sizing: border-box;
   background: #202020;
   height: 92vh;
@@ -37,6 +38,7 @@ div.sidebar{
   max-width: 50%;
   border-style: solid;
   border-width: 1px;
+  z-index: 1000;
   overflow: hidden;
   overflow-y: auto;
 }
