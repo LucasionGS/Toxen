@@ -4,6 +4,7 @@ body{
   background: rgba(9, 9, 9, 0.8);
   background-size: cover;
   font-family: Arial;
+  overflow-x: hidden;
 }
 
 /* Default Text Attributes */

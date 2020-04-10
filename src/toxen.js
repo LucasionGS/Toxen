@@ -2090,6 +2090,9 @@ class Pulse {
   }
 }
 
+/**
+ * @type {Pulse}
+ */
 let testPulse;
 setTimeout(() => {
   testPulse = new Pulse();
@@ -2105,6 +2108,9 @@ class ToxenScriptManager {
   static reloadCurrentScript() {
     event_sliderUpdate();
     ToxenScriptManager.events = [];
+
+    // Prevent the intensity from going mayham on smooth setters, which it does for some unknown reason.
+    VisualizerProperties.setIntensity(15)
 
     var id = getPlayingId();
     if (fs.existsSync(allMusicData[id].folderPath + "/storyboard.txn")) {
@@ -2279,9 +2285,40 @@ class ToxenScriptManager {
 
         args = parseArgumentsFromString(argString);
 
+        // Special treatments
         if (type == "bpmpulse") {
           // BPM calculation
-          maxPerSecond = +args[0] / 60;
+          if (args[1] == undefined) {
+            args[1] = 1;
+          }
+          let bpm = +args[0], intensity = +args[1];
+
+          let bps = bpm / 60;
+          maxPerSecond = 1;
+          let mspb = 1000 / bps;
+          let beatCount = (endPoint - startPoint) * 1000 / mspb;
+          // console.log(
+          //   bpm,
+          //   bps,
+          //   mspb,
+          //   beatCount
+          // );
+          
+          for (let i = 0; i < beatCount; i++) {
+            let st = +(startPoint + (i * (mspb / 1000))).toFixed(3);
+            let et = +(startPoint + ((i + 1) * (mspb / 1000))).toFixed(3);
+            let cmd = `[${st} - ${et}] Pulse => "${intensity}"`;
+            // console.log(cmd);
+            lineParser(cmd);
+          }
+
+          return {
+            "success": true
+          };
+        }
+        if (type == "pulse") {
+          // Convert to pulses
+          maxPerSecond = 1;
         }
 
         ToxenScriptManager.events.push(new ToxenEvent(startPoint, endPoint, fn));
@@ -2387,7 +2424,20 @@ class ToxenScriptManager {
           hueApi.lights.setLightState(+lights[i], new hue.lightStates.LightState().on().rgb(+args[1], +args[2], +args[3]).brightness(brightness));
     },
     /**
-  // YOU SUCK JDASJADSJ K DASJKASWDSASADASDAS DWAS Dlse.pulse(256);
+     * 
+     * @param {[number]} args 
+     */
+    pulse: function (args) {
+      let [intensity] = args;
+      testPulse.pulse(settings.visualizerIntensity * 32 * intensity);
+    },
+    /**
+     * This function doesn't do anything.  
+     * BPMPulse is converted to Pulses when parsed.
+     */
+    bpmpulse: function() {
+      // This function doesn't do anything.
+      // BPMPulse is converted to Pulses when parsed.
     },
     // :Functions
     /**
